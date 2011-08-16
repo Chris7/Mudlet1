@@ -99,9 +99,7 @@ public:
     bool mShowGrid;
     QPointF mLastMouseClick;
     bool mBubbleMode;
-    bool m2DPanMode;
-    float m2Dpanx;
-    float m2Dpany;
+    bool mMapperUseAntiAlias;
 
 signals:
 

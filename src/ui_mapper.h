@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mapper.ui'
 **
-** Created: Tue Aug 16 00:14:16 2011
+** Created: Tue Aug 16 19:22:37 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -192,7 +192,7 @@ public:
         font.setWeight(50);
         shiftLeft->setFont(font);
         shiftLeft->setAutoRepeat(true);
-        shiftLeft->setAutoRepeatDelay(1);
+        shiftLeft->setAutoRepeatDelay(100);
         shiftLeft->setAutoRepeatInterval(1);
 
         horizontalLayout_2->addWidget(shiftLeft);
@@ -205,7 +205,7 @@ public:
         shiftUp->setMaximumSize(QSize(30, 20));
         shiftUp->setBaseSize(QSize(0, 0));
         shiftUp->setAutoRepeat(true);
-        shiftUp->setAutoRepeatDelay(1);
+        shiftUp->setAutoRepeatDelay(100);
         shiftUp->setAutoRepeatInterval(1);
 
         horizontalLayout_2->addWidget(shiftUp);
@@ -218,7 +218,7 @@ public:
         shiftDown->setMaximumSize(QSize(30, 20));
         shiftDown->setBaseSize(QSize(0, 0));
         shiftDown->setAutoRepeat(true);
-        shiftDown->setAutoRepeatDelay(1);
+        shiftDown->setAutoRepeatDelay(100);
         shiftDown->setAutoRepeatInterval(1);
 
         horizontalLayout_2->addWidget(shiftDown);
@@ -231,7 +231,7 @@ public:
         shiftRight->setMaximumSize(QSize(30, 20));
         shiftRight->setBaseSize(QSize(0, 0));
         shiftRight->setAutoRepeat(true);
-        shiftRight->setAutoRepeatDelay(1);
+        shiftRight->setAutoRepeatDelay(100);
         shiftRight->setAutoRepeatInterval(1);
 
         horizontalLayout_2->addWidget(shiftRight);

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'profile_preferences.ui'
 **
-** Created: Mon Aug 15 14:54:55 2011
+** Created: Tue Aug 16 19:22:37 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,11 +45,10 @@ public:
     QGridLayout *gridLayout_6;
     QLabel *label_34;
     QSpinBox *MainIconSize;
+    QLabel *label_33;
+    QSpinBox *TEFolderIconSize;
     QCheckBox *showMenuBar;
     QCheckBox *showToolbar;
-    QGroupBox *groupBox_5;
-    QVBoxLayout *verticalLayout_7;
-    QComboBox *encoding;
     QGroupBox *groupBox_2;
     QVBoxLayout *verticalLayout;
     QCheckBox *mAlertOnNewData;
@@ -180,7 +179,6 @@ public:
     QPushButton *pushButton_foreground_color_2;
     QLabel *label_40;
     QPushButton *pushButton_background_color_2;
-    QLabel *label_41;
     QGridLayout *gridLayout_15;
     QLabel *label_17;
     QLabel *label_42;
@@ -216,21 +214,16 @@ public:
     QPushButton *pushButton_Lcyan_2;
     QPushButton *pushButton_Lwhite_2;
     QPushButton *reset_colors_button_2;
+    QCheckBox *mMapperUseAntiAlias;
     QSpacerItem *verticalSpacer_7;
-    QWidget *tab_2;
-    QVBoxLayout *verticalLayout_4;
-    QGroupBox *groupBox_12;
-    QGridLayout *gridLayout_11;
-    QLabel *label_33;
-    QSpinBox *TEFolderIconSize;
-    QSpacerItem *verticalSpacer_4;
     QWidget *tab_3;
     QGridLayout *gridLayout_7;
     QGroupBox *groupBox_7;
-    QVBoxLayout *verticalLayout_5;
+    QVBoxLayout *verticalLayout_4;
     QCheckBox *mFORCE_MCCP_OFF;
     QCheckBox *mFORCE_GA_OFF;
     QCheckBox *checkBox_mUSE_FORCE_LF_AFTER_PROMPT;
+    QCheckBox *mFORCE_MXP_NEGOTIATION_OFF;
     QLabel *need_reconnect_for_specialoption;
     QSpacerItem *verticalSpacer_6;
     QWidget *downloadMapOptions;
@@ -245,7 +238,7 @@ public:
     {
         if (profile_preferences->objectName().isEmpty())
             profile_preferences->setObjectName(QString::fromUtf8("profile_preferences"));
-        profile_preferences->resize(770, 667);
+        profile_preferences->resize(770, 735);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -291,31 +284,31 @@ public:
 
         gridLayout_6->addWidget(MainIconSize, 0, 1, 1, 1);
 
+        label_33 = new QLabel(groupBox_11);
+        label_33->setObjectName(QString::fromUtf8("label_33"));
+
+        gridLayout_6->addWidget(label_33, 1, 0, 1, 1);
+
+        TEFolderIconSize = new QSpinBox(groupBox_11);
+        TEFolderIconSize->setObjectName(QString::fromUtf8("TEFolderIconSize"));
+        TEFolderIconSize->setMinimum(1);
+        TEFolderIconSize->setMaximum(4);
+        TEFolderIconSize->setValue(3);
+
+        gridLayout_6->addWidget(TEFolderIconSize, 1, 1, 1, 1);
+
         showMenuBar = new QCheckBox(groupBox_11);
         showMenuBar->setObjectName(QString::fromUtf8("showMenuBar"));
 
-        gridLayout_6->addWidget(showMenuBar, 1, 0, 1, 2);
+        gridLayout_6->addWidget(showMenuBar, 2, 0, 1, 1);
 
         showToolbar = new QCheckBox(groupBox_11);
         showToolbar->setObjectName(QString::fromUtf8("showToolbar"));
 
-        gridLayout_6->addWidget(showToolbar, 2, 0, 1, 2);
+        gridLayout_6->addWidget(showToolbar, 3, 0, 1, 1);
 
 
         gridLayout_19->addWidget(groupBox_11, 0, 0, 1, 1);
-
-        groupBox_5 = new QGroupBox(General);
-        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setEnabled(false);
-        verticalLayout_7 = new QVBoxLayout(groupBox_5);
-        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
-        encoding = new QComboBox(groupBox_5);
-        encoding->setObjectName(QString::fromUtf8("encoding"));
-
-        verticalLayout_7->addWidget(encoding);
-
-
-        gridLayout_19->addWidget(groupBox_5, 1, 0, 1, 1);
 
         groupBox_2 = new QGroupBox(General);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
@@ -342,7 +335,7 @@ public:
         verticalLayout->addWidget(acceptServerGUI);
 
 
-        gridLayout_19->addWidget(groupBox_2, 2, 0, 1, 1);
+        gridLayout_19->addWidget(groupBox_2, 1, 0, 1, 1);
 
         groupBox_13 = new QGroupBox(General);
         groupBox_13->setObjectName(QString::fromUtf8("groupBox_13"));
@@ -366,11 +359,11 @@ public:
         gridLayout_13->addWidget(need_reconnect_for_gmcp, 1, 0, 1, 1);
 
 
-        gridLayout_19->addWidget(groupBox_13, 4, 0, 1, 1);
+        gridLayout_19->addWidget(groupBox_13, 3, 0, 1, 1);
 
         verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout_19->addItem(verticalSpacer_8, 8, 0, 1, 1);
+        gridLayout_19->addItem(verticalSpacer_8, 7, 0, 1, 1);
 
         groupBox_3 = new QGroupBox(General);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
@@ -388,7 +381,7 @@ public:
         horizontalLayout_2->addWidget(mMXPMode);
 
 
-        gridLayout_19->addWidget(groupBox_3, 7, 0, 1, 1);
+        gridLayout_19->addWidget(groupBox_3, 6, 0, 1, 1);
 
         groupBox_16 = new QGroupBox(General);
         groupBox_16->setObjectName(QString::fromUtf8("groupBox_16"));
@@ -407,7 +400,7 @@ public:
         ircNick->raise();
         label_58->raise();
 
-        gridLayout_19->addWidget(groupBox_16, 5, 0, 1, 1);
+        gridLayout_19->addWidget(groupBox_16, 4, 0, 1, 1);
 
         tabWidgeta->addTab(General, QString());
         input_line_tab = new QWidget();
@@ -1008,12 +1001,6 @@ public:
 
         gridLayout_14->addWidget(pushButton_background_color_2, 1, 1, 1, 1);
 
-        label_41 = new QLabel(groupBox_14);
-        label_41->setObjectName(QString::fromUtf8("label_41"));
-        label_41->setWordWrap(true);
-
-        gridLayout_14->addWidget(label_41, 4, 0, 1, 2);
-
         gridLayout_15 = new QGridLayout();
         gridLayout_15->setObjectName(QString::fromUtf8("gridLayout_15"));
         label_17 = new QLabel(groupBox_14);
@@ -1105,7 +1092,7 @@ public:
         gridLayout_15->addWidget(label_48, 3, 0, 1, 1);
 
 
-        gridLayout_14->addLayout(gridLayout_15, 5, 0, 1, 1);
+        gridLayout_14->addLayout(gridLayout_15, 4, 0, 1, 1);
 
         gridLayout_16 = new QGridLayout();
         gridLayout_16->setObjectName(QString::fromUtf8("gridLayout_16"));
@@ -1198,72 +1185,53 @@ public:
         gridLayout_16->addWidget(pushButton_Lwhite_2, 7, 1, 1, 1);
 
 
-        gridLayout_14->addLayout(gridLayout_16, 5, 1, 1, 1);
+        gridLayout_14->addLayout(gridLayout_16, 4, 1, 1, 1);
 
         reset_colors_button_2 = new QPushButton(groupBox_14);
         reset_colors_button_2->setObjectName(QString::fromUtf8("reset_colors_button_2"));
 
         gridLayout_14->addWidget(reset_colors_button_2, 7, 1, 1, 1);
 
+        mMapperUseAntiAlias = new QCheckBox(groupBox_14);
+        mMapperUseAntiAlias->setObjectName(QString::fromUtf8("mMapperUseAntiAlias"));
+
+        gridLayout_14->addWidget(mMapperUseAntiAlias, 6, 0, 1, 1);
+
         verticalSpacer_7 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-        gridLayout_14->addItem(verticalSpacer_7, 6, 1, 1, 1);
+        gridLayout_14->addItem(verticalSpacer_7, 5, 0, 1, 1);
 
 
         gridLayout_18->addWidget(groupBox_14, 0, 0, 1, 1);
 
         tabWidgeta->addTab(tab_4, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        verticalLayout_4 = new QVBoxLayout(tab_2);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        groupBox_12 = new QGroupBox(tab_2);
-        groupBox_12->setObjectName(QString::fromUtf8("groupBox_12"));
-        gridLayout_11 = new QGridLayout(groupBox_12);
-        gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
-        label_33 = new QLabel(groupBox_12);
-        label_33->setObjectName(QString::fromUtf8("label_33"));
-
-        gridLayout_11->addWidget(label_33, 0, 0, 1, 1);
-
-        TEFolderIconSize = new QSpinBox(groupBox_12);
-        TEFolderIconSize->setObjectName(QString::fromUtf8("TEFolderIconSize"));
-        TEFolderIconSize->setMinimum(1);
-        TEFolderIconSize->setMaximum(4);
-        TEFolderIconSize->setValue(3);
-
-        gridLayout_11->addWidget(TEFolderIconSize, 0, 1, 1, 1);
-
-
-        verticalLayout_4->addWidget(groupBox_12);
-
-        verticalSpacer_4 = new QSpacerItem(20, 523, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_4->addItem(verticalSpacer_4);
-
-        tabWidgeta->addTab(tab_2, QString());
         tab_3 = new QWidget();
         tab_3->setObjectName(QString::fromUtf8("tab_3"));
         gridLayout_7 = new QGridLayout(tab_3);
         gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         groupBox_7 = new QGroupBox(tab_3);
         groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
-        verticalLayout_5 = new QVBoxLayout(groupBox_7);
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_4 = new QVBoxLayout(groupBox_7);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         mFORCE_MCCP_OFF = new QCheckBox(groupBox_7);
         mFORCE_MCCP_OFF->setObjectName(QString::fromUtf8("mFORCE_MCCP_OFF"));
 
-        verticalLayout_5->addWidget(mFORCE_MCCP_OFF);
+        verticalLayout_4->addWidget(mFORCE_MCCP_OFF);
 
         mFORCE_GA_OFF = new QCheckBox(groupBox_7);
         mFORCE_GA_OFF->setObjectName(QString::fromUtf8("mFORCE_GA_OFF"));
 
-        verticalLayout_5->addWidget(mFORCE_GA_OFF);
+        verticalLayout_4->addWidget(mFORCE_GA_OFF);
 
         checkBox_mUSE_FORCE_LF_AFTER_PROMPT = new QCheckBox(groupBox_7);
         checkBox_mUSE_FORCE_LF_AFTER_PROMPT->setObjectName(QString::fromUtf8("checkBox_mUSE_FORCE_LF_AFTER_PROMPT"));
 
-        verticalLayout_5->addWidget(checkBox_mUSE_FORCE_LF_AFTER_PROMPT);
+        verticalLayout_4->addWidget(checkBox_mUSE_FORCE_LF_AFTER_PROMPT);
+
+        mFORCE_MXP_NEGOTIATION_OFF = new QCheckBox(groupBox_7);
+        mFORCE_MXP_NEGOTIATION_OFF->setObjectName(QString::fromUtf8("mFORCE_MXP_NEGOTIATION_OFF"));
+
+        verticalLayout_4->addWidget(mFORCE_MXP_NEGOTIATION_OFF);
 
         need_reconnect_for_specialoption = new QLabel(groupBox_7);
         need_reconnect_for_specialoption->setObjectName(QString::fromUtf8("need_reconnect_for_specialoption"));
@@ -1273,7 +1241,7 @@ public:
         need_reconnect_for_specialoption->setTextFormat(Qt::AutoText);
         need_reconnect_for_specialoption->setWordWrap(true);
 
-        verticalLayout_5->addWidget(need_reconnect_for_specialoption);
+        verticalLayout_4->addWidget(need_reconnect_for_specialoption);
 
 
         gridLayout_7->addWidget(groupBox_7, 0, 0, 1, 1);
@@ -1368,7 +1336,7 @@ public:
 
         retranslateUi(profile_preferences);
 
-        tabWidgeta->setCurrentIndex(6);
+        tabWidgeta->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(profile_preferences);
@@ -1377,9 +1345,10 @@ public:
     void retranslateUi(QDialog *profile_preferences)
     {
         profile_preferences->setWindowTitle(QApplication::translate("profile_preferences", "Dialog", 0, QApplication::UnicodeUTF8));
-        groupBox_11->setTitle(QApplication::translate("profile_preferences", "Toolbar Icon Size", 0, QApplication::UnicodeUTF8));
-        label_34->setText(QApplication::translate("profile_preferences", "Icon size", 0, QApplication::UnicodeUTF8));
+        groupBox_11->setTitle(QApplication::translate("profile_preferences", "Icon sizes", 0, QApplication::UnicodeUTF8));
+        label_34->setText(QApplication::translate("profile_preferences", "Icon size toolbars:", 0, QApplication::UnicodeUTF8));
         MainIconSize->setSpecialValueText(QString());
+        label_33->setText(QApplication::translate("profile_preferences", "Icon size in tree views:", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
         showMenuBar->setToolTip(QApplication::translate("profile_preferences", "Enables the typical menu bar with drop-down menus in the main window. Requires restart to take effect", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
@@ -1388,13 +1357,6 @@ public:
         showToolbar->setToolTip(QApplication::translate("profile_preferences", "Enables the default button bar in the main window. Requires restart to take effect", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         showToolbar->setText(QApplication::translate("profile_preferences", "Show main toolbar", 0, QApplication::UnicodeUTF8));
-        groupBox_5->setTitle(QApplication::translate("profile_preferences", "Character Encoding", 0, QApplication::UnicodeUTF8));
-        encoding->clear();
-        encoding->insertItems(0, QStringList()
-         << QApplication::translate("profile_preferences", "English (ASCII)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("profile_preferences", "UTF-8", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("profile_preferences", "Chinese", 0, QApplication::UnicodeUTF8)
-        );
         groupBox_2->setTitle(QApplication::translate("profile_preferences", "Misc", 0, QApplication::UnicodeUTF8));
         mAlertOnNewData->setText(QApplication::translate("profile_preferences", "Toolbar notification if Mudlet is minimized and new data arrives", 0, QApplication::UnicodeUTF8));
         mFORCE_SAVE_ON_EXIT->setText(QApplication::translate("profile_preferences", "Force auto save on exit", 0, QApplication::UnicodeUTF8));
@@ -1521,12 +1483,11 @@ public:
         pushButton_command_line_background_color->setText(QString());
         label_59->setText(QApplication::translate("profile_preferences", "Command line background color:", 0, QApplication::UnicodeUTF8));
         tabWidgeta->setTabText(tabWidgeta->indexOf(color_view_tab), QApplication::translate("profile_preferences", "Color view", 0, QApplication::UnicodeUTF8));
-        groupBox_14->setTitle(QApplication::translate("profile_preferences", "Select your color preferences for the Map display", 0, QApplication::UnicodeUTF8));
-        label_39->setText(QApplication::translate("profile_preferences", "Foreground color:", 0, QApplication::UnicodeUTF8));
+        groupBox_14->setTitle(QApplication::translate("profile_preferences", "Select your color preferences for the Map display and override ANSI color defaults:", 0, QApplication::UnicodeUTF8));
+        label_39->setText(QApplication::translate("profile_preferences", "Link color", 0, QApplication::UnicodeUTF8));
         pushButton_foreground_color_2->setText(QString());
         label_40->setText(QApplication::translate("profile_preferences", "Background color:", 0, QApplication::UnicodeUTF8));
         pushButton_background_color_2->setText(QString());
-        label_41->setText(QApplication::translate("profile_preferences", "These preferences set how do you want a particular color to be represented visually in the main display", 0, QApplication::UnicodeUTF8));
         label_17->setText(QApplication::translate("profile_preferences", "Black:", 0, QApplication::UnicodeUTF8));
         label_42->setText(QApplication::translate("profile_preferences", "Red:", 0, QApplication::UnicodeUTF8));
         label_43->setText(QApplication::translate("profile_preferences", "Green:", 0, QApplication::UnicodeUTF8));
@@ -1560,11 +1521,9 @@ public:
         pushButton_Lcyan_2->setText(QString());
         pushButton_Lwhite_2->setText(QString());
         reset_colors_button_2->setText(QApplication::translate("profile_preferences", "Reset all colors to default", 0, QApplication::UnicodeUTF8));
-        tabWidgeta->setTabText(tabWidgeta->indexOf(tab_4), QApplication::translate("profile_preferences", "Map Colors", 0, QApplication::UnicodeUTF8));
-        groupBox_12->setTitle(QApplication::translate("profile_preferences", "Visual", 0, QApplication::UnicodeUTF8));
-        label_33->setText(QApplication::translate("profile_preferences", "folder/group in tree icons size:", 0, QApplication::UnicodeUTF8));
-        tabWidgeta->setTabText(tabWidgeta->indexOf(tab_2), QApplication::translate("profile_preferences", "Script Editor Options", 0, QApplication::UnicodeUTF8));
-        groupBox_7->setTitle(QApplication::translate("profile_preferences", "Special options needed for some older MUD drivers", 0, QApplication::UnicodeUTF8));
+        mMapperUseAntiAlias->setText(QApplication::translate("profile_preferences", "Use high quality graphics (disable on slow computers)", 0, QApplication::UnicodeUTF8));
+        tabWidgeta->setTabText(tabWidgeta->indexOf(tab_4), QApplication::translate("profile_preferences", "Mapper", 0, QApplication::UnicodeUTF8));
+        groupBox_7->setTitle(QApplication::translate("profile_preferences", "Special options needed for some older MUD drivers (needs client restart to take effect)", 0, QApplication::UnicodeUTF8));
         mFORCE_MCCP_OFF->setText(QApplication::translate("profile_preferences", "Force compression off", 0, QApplication::UnicodeUTF8));
         mFORCE_GA_OFF->setText(QApplication::translate("profile_preferences", "Force telnet GA signal interpretation off", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
@@ -1572,6 +1531,7 @@ public:
 "\" to your command input on empty commands. This option will rarely be necessary.", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         checkBox_mUSE_FORCE_LF_AFTER_PROMPT->setText(QApplication::translate("profile_preferences", "Force new line on empty commands", 0, QApplication::UnicodeUTF8));
+        mFORCE_MXP_NEGOTIATION_OFF->setText(QApplication::translate("profile_preferences", "Force MXP negotiation off", 0, QApplication::UnicodeUTF8));
         need_reconnect_for_specialoption->setText(QApplication::translate("profile_preferences", "Please reconnect to your game for the change to take effect", 0, QApplication::UnicodeUTF8));
         label_60->setText(QApplication::translate("profile_preferences", "download Map from server (NOTE: This will override all of your personal changes to the map. To get back to an older version of the map you can manually delete the most recent snapshot of the map in the folder <mudlet_home_dir>/<yourprofile>/map)", 0, QApplication::UnicodeUTF8));
         buttonDownloadMap->setText(QApplication::translate("profile_preferences", "download latest map version from server", 0, QApplication::UnicodeUTF8));

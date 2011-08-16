@@ -50,7 +50,6 @@ public:
     int mOz;
     bool mShiftMode;
     bool mShowInfo;
-    bool mPanMode;
 
 
 public slots:
@@ -104,8 +103,6 @@ public:
     float xDist;
     float yDist;
     float zDist;
-    float panx;
-    float pany;
     float dehnung;
     int mShowTopLevels;
     int mShowBottomLevels;

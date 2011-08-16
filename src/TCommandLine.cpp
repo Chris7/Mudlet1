@@ -473,7 +473,7 @@ void TCommandLine::mousePressEvent( QMouseEvent * event )
 
 void TCommandLine::enterCommand( QKeyEvent * event )
 {
-    QString _t = toPlainText().toUtf8();
+    QString _t = toPlainText();
     mAutoCompletion = false;
     mTabCompletion = false;
     mTabCompletionCount = -1;
@@ -529,7 +529,7 @@ void TCommandLine::handleTabCompletion( bool direction )
         mTabCompletionCount = -1;
     }
     int amount = mpHost->mpConsole->buffer.size();
-    if( amount > 100 ) amount = 100;
+    if( amount > 500 ) amount = 500;
 
     QStringList bufferList = mpHost->mpConsole->buffer.getEndLines( amount );
     QString buffer = bufferList.join(" ");

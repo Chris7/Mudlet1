@@ -50,7 +50,7 @@ class TLuaInterpreter;
 #include "TArea.h"
 #include "TRoom.h"
 #include "TMap.h"
-#include <QListWidget>
+#include <QListWidget>;
 
 class dlgTriggerEditor;
 class TConsole;
@@ -292,6 +292,8 @@ public:
     bool               mAcceptServerGUI;
     QColor             mCommandLineFgColor;
     QColor             mCommandLineBgColor;
+    bool               mMapperUseAntiAlias;
+    bool               mFORCE_MXP_NEGOTIATION_OFF;
 
 private:
     Host();
