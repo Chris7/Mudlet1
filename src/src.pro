@@ -3,8 +3,8 @@ CONFIG += release uitools
 
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-deprecated -Wno-unused-parameter
 QMAKE_CXXFLAGS_DEBUG += -O3 -Wno-deprecated -Wno-unused-parameter
-MOC_DIR = ./build/tmp
-OBJECTS_DIR = ./build/tmp
+MOC_DIR = ./tmp
+OBJECTS_DIR = ./tmp
 QT += network opengl phonon
 DEPENDPATH += .
 INCLUDEPATH += .
