@@ -3266,7 +3266,7 @@ int TLuaInterpreter::searchRoomUserData( lua_State *L )
 			if (_keyValue.contains(_value))
 			{
 				lua_pushnumber( L, i );
-				lua_pushstring( L, pHost->mpMap->rooms[i]->userData[_key].toLatin1().data() );
+				lua_pushstring( L, _keyValue.toLatin1().data() );
 				lua_settable(L, -3);
 				return 1;
 			}
