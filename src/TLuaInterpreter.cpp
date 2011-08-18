@@ -3224,6 +3224,57 @@ int TLuaInterpreter::searchRoom( lua_State *L )
     }
 }
 
+int TLuaInterpreter::searchRoomUserData( lua_State *L )
+{
+	//basically stolen from searchRoom
+	//if we have, searchUserData(key, value)
+	//we look through all room ids in a given field for the string and
+	//return a table of roomids matching
+    string key, value;
+    if( lua_isstring( L, 1 ) )
+    {
+        key = lua_tostring( L, 1 );
+    }
+    else
+    {
+        lua_pushstring( L, "searchRoomUserData: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+	if( lua_isstring( L, 2 ) )
+    {
+        value = lua_tostring( L, 2 );
+    }
+    else
+    {
+        lua_pushstring( L, "searchRoomUserData: wrong 2nd argument type" );
+        lua_error( L );
+        return 1;
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+	QMapIterator<int, TRoom *> it( pHost->mpMap->rooms );
+	lua_newtable(L);
+	while( it.hasNext() )
+	{
+		it.next();
+		int i = it.key();
+		QString _key = key.c_str();
+        QString _value = value.c_str();
+		if (pHost->mpMap->rooms[i]->userData.contains( _key ))
+		{
+			QString _keyValue = pHost->mpMap->rooms[i]->userData[_key];
+			if (_keyValue.contains(_value))
+			{
+				lua_pushnumber( L, i );
+				lua_pushstring( L, pHost->mpMap->rooms[i]->userData[_key].toLatin1().data() );
+				lua_settable(L, -3);
+				return 1;
+			}
+		}
+	}
+	return 1;
+}
+
 int TLuaInterpreter::getAreaTable( lua_State *L )
 {
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
@@ -8273,6 +8324,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getRoomEnv", TLuaInterpreter::getRoomEnv );
     lua_register( pGlobalLua, "getRoomUserData", TLuaInterpreter::getRoomUserData );
     lua_register( pGlobalLua, "setRoomUserData", TLuaInterpreter::setRoomUserData );
+	lua_register( pGlobalLua, "searchRoomUserData", TLuaInterpreter::searchRoomUserData );
     lua_register( pGlobalLua, "getRoomsByPosition", TLuaInterpreter::getRoomsByPosition );
     //lua_register( pGlobalLua, "dumpRoomUserData", TLuaInterpreter::dumpRoomUserData );
     lua_register( pGlobalLua, "clearRoomUserData", TLuaInterpreter::clearRoomUserData );
