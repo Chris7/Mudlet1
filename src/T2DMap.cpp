@@ -1395,23 +1395,24 @@ void T2DMap::paintEvent( QPaintEvent * e )
         while( it.hasNext() )
         {
             it.next();
+			if (it.value().posz == mOz)
+			{
+				QRectF lr = QRectF( 0, 0, 1000, 100 );
+				QPixmap pix( lr.size().toSize() );
+				pix.fill(QColor(0,0,0,0));
+				QPainter lp( &pix );
 
-            QRectF lr = QRectF( 0, 0, 1000, 100 );
-            QPixmap pix( lr.size().toSize() );
-            pix.fill(QColor(0,0,0,0));
-            QPainter lp( &pix );
-
-            lp.fillRect( lr, it.value().bgColor );
-            QPen lpen;
-            lpen.setColor( it.value().fgColor );
-            lp.setPen( lpen );
-            QRectF br;
-            lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
-            QPointF lpos;
-            lpos.setX( it.value().pos.x()*tx+_rx );
-            lpos.setY( it.value().pos.y()*ty*-1+_ry );
-            p.drawPixmap( lpos, pix, br.toRect() );
-
+				lp.fillRect( lr, it.value().bgColor );
+				QPen lpen;
+				lpen.setColor( it.value().fgColor );
+				lp.setPen( lpen );
+				QRectF br;
+				lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+				QPointF lpos;
+				lpos.setX( it.value().pos.x()*tx+_rx );
+				lpos.setY( it.value().pos.y()*ty*-1+_ry );
+				p.drawPixmap( lpos, pix, br.toRect() );
+			}
         }
     }
     if( mShowInfo )

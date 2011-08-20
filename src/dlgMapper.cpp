@@ -36,11 +36,20 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     mp2dMap->mpMap = pM;
     mp2dMap->mpHost = pH;
     QMapIterator<int, QString> it( mpMap->areaNamesMap );
+	//sort them alphabetically (case sensitive)
+	QMap <QString, QString> areaNames;
     while( it.hasNext() )
     {
         it.next();
         QString name = it.value();
-        showArea->addItem( name );
+		areaNames.insert(name.toLower(), name);
+    }
+	//areaNames.sort();
+	QMapIterator<QString, QString> areaIt( areaNames );
+	while( areaIt.hasNext() )
+    {
+        areaIt.next();
+		showArea->addItem( areaIt.value() );
     }
     grid->setChecked( true );
     bubbles->setChecked( mpHost->mBubbleMode );

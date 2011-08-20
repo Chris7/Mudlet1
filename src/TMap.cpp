@@ -993,6 +993,7 @@ bool TMap::serialize( QDataStream & ofs )
             ofs << itL2.key();//label ID
             TMapLabel label = itL2.value();
             ofs << label.pos;
+			ofs << label.posz;
             ofs << label.pointer;
             ofs << label.size;
             ofs << label.text;
@@ -1226,7 +1227,7 @@ bool TMap::restore()
 
 
 // called from scripts
-int TMap::createMapLabel(int area, QString text, float x, float y, QColor fg, QColor bg )
+int TMap::createMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg )
 {
     if( ! areas.contains( area ) ) return -1;
     TMapLabel label;
@@ -1236,6 +1237,7 @@ int TMap::createMapLabel(int area, QString text, float x, float y, QColor fg, QC
     label.fgColor = fg;
     label.size = QSizeF(100,100);
     label.pos = QPointF( x, y );
+	label.posz = z;
 //    int labelID = areas[area]->labelMap.size();
 //    areas[area]->labelMap[labelID] = label;
     int labelID;

@@ -5685,7 +5685,7 @@ int TLuaInterpreter::highlightRoom( lua_State * L )
 int TLuaInterpreter::createMapLabel( lua_State * L )
 {
     int area, fgr, fgg, fgb, bgr, bgg, bgb;
-    float posx, posy;
+    float posx, posy, posz;
     string text;
     if( ! lua_isnumber( L, 1 ) )
     {
@@ -5730,8 +5730,8 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     {
         posy = lua_tonumber( L, 4 );
     }
-
-    if( ! lua_isnumber( L, 5 ) )
+	
+	if( ! lua_isnumber( L, 5 ) )
     {
         lua_pushstring( L, "createMapLabel: wrong argument type" );
         lua_error( L );
@@ -5739,7 +5739,7 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        fgr = lua_tointeger( L, 5 );
+        posz = lua_tonumber( L, 5 );
     }
 
     if( ! lua_isnumber( L, 6 ) )
@@ -5750,7 +5750,7 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        fgg = lua_tointeger( L, 6 );
+        fgr = lua_tointeger( L, 6 );
     }
 
     if( ! lua_isnumber( L, 7 ) )
@@ -5761,7 +5761,7 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        fgb = lua_tointeger( L, 7 );
+        fgg = lua_tointeger( L, 7 );
     }
 
     if( ! lua_isnumber( L, 8 ) )
@@ -5772,7 +5772,7 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        bgr = lua_tointeger( L, 8 );
+        fgb = lua_tointeger( L, 8 );
     }
 
     if( ! lua_isnumber( L, 9 ) )
@@ -5783,7 +5783,7 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        bgg = lua_tointeger( L, 9 );
+        bgr = lua_tointeger( L, 9 );
     }
 
     if( ! lua_isnumber( L, 10 ) )
@@ -5794,14 +5794,25 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     }
     else
     {
-        bgb = lua_tointeger( L, 10 );
+        bgg = lua_tointeger( L, 10 );
+    }
+
+    if( ! lua_isnumber( L, 11 ) )
+    {
+        lua_pushstring( L, "createMapLabel: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        bgb = lua_tointeger( L, 11 );
     }
 
     QString _text = text.c_str();
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     QColor fg = QColor(fgr,fgg,fgb);
     QColor bg = QColor(bgr, bgg, bgb);
-    lua_pushinteger( L, pHost->mpMap->createMapLabel( area, _text, posx, posy, fg, bg ) );
+    lua_pushinteger( L, pHost->mpMap->createMapLabel( area, _text, posx, posy, posz, fg, bg ) );
     return 1;
 }
 

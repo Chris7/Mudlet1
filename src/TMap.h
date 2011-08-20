@@ -47,6 +47,7 @@ class TMapLabel
 {
 public:
     QPointF pos;
+	float posz;
     QPointF pointer;
     QSizeF size;
     QString text;
@@ -59,7 +60,7 @@ class TMap
 {
 public:
     TMap( Host *);
-    int createMapLabel(int area, QString text, float x, float y, QColor fg, QColor bg );
+    int createMapLabel(int area, QString text, float x, float y, float z, QColor fg, QColor bg );
     void deleteMapLabel( int area, int labelID );
     bool addRoom( int id=0 );
     void auditRooms();
