@@ -994,6 +994,9 @@ bool TMap::serialize( QDataStream & ofs )
             TMapLabel label = itL2.value();
             ofs << label.pos;
 			ofs << label.posz;
+			if (label.posz){
+			cout << "ofs label:" << label.posz << endl;
+			}
             ofs << label.pointer;
             ofs << label.size;
             ofs << label.text;
@@ -1110,6 +1113,8 @@ bool TMap::restore()
                     ifs >> labelID;
                     TMapLabel label;
                     ifs >> label.pos;
+					ifs >> label.posz;
+					cout << "ifs label:" << label.posz << endl;
                     ifs >> label.pointer;
                     ifs >> label.size;
                     ifs >> label.text;
