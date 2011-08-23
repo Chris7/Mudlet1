@@ -46,8 +46,7 @@ class dlgMapper;
 class TMapLabel
 {
 public:
-    QPointF pos;
-	float posz;
+    QVector3D pos;
     QPointF pointer;
     QSizeF size;
     QString text;

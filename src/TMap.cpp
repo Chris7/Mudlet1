@@ -993,10 +993,6 @@ bool TMap::serialize( QDataStream & ofs )
             ofs << itL2.key();//label ID
             TMapLabel label = itL2.value();
             ofs << label.pos;
-			ofs << label.posz;
-			if (label.posz){
-			cout << "ofs label:" << label.posz << endl;
-			}
             ofs << label.pointer;
             ofs << label.size;
             ofs << label.text;
@@ -1106,15 +1102,15 @@ bool TMap::restore()
                 ifs >> size_labels;
                 ifs >> areaID;
                 int labelCount = 0;
-                QMap<int, TMapLabel> _map;
+                QMap<int, TMapLabel> _map; 
                 while( ! ifs.atEnd() &&  labelCount < size_labels )
                 {
                     int labelID;
                     ifs >> labelID;
                     TMapLabel label;
                     ifs >> label.pos;
-					ifs >> label.posz;
-					cout << "ifs label:" << label.posz << endl;
+					//ifs >> label.posz;
+					//cout << label.pos.x() << endl;
                     ifs >> label.pointer;
                     ifs >> label.size;
                     ifs >> label.text;
@@ -1241,8 +1237,8 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     label.bgColor.setAlpha(50);
     label.fgColor = fg;
     label.size = QSizeF(100,100);
-    label.pos = QPointF( x, y );
-	label.posz = z;
+    label.pos = QVector3D( x, y, z);
+	//label.posz = z;
 //    int labelID = areas[area]->labelMap.size();
 //    areas[area]->labelMap[labelID] = label;
     int labelID;

@@ -67,6 +67,7 @@ public:
     float    xspan;
     float    yspan;
     bool     mMultiSelection;
+	bool	 mMultiZSelection;
     QRectF   mMultiRect;
     bool     mPopupMenu;
     QList<int> mMultiSelectionList;
@@ -116,6 +117,7 @@ public slots:
     void shiftDown();
     void shiftLeft();
     void shiftRight();
+    void cleanupMap();
     void slot_setCharacter();
     void slot_setImage();
     void slot_movePosition();
