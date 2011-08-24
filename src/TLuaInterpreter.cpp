@@ -4391,6 +4391,221 @@ int TLuaInterpreter::tempLineTrigger( lua_State *L )
     return 1;
 }
 
+// tempTrigger( string name, string regex, string function to call, multiline, fg, bg, filter, match all(perlSlashG), highlight,
+// play sound, fire length(mStayOpen), lineDelta).
+int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
+{
+    bool multiLine, matchAll, highlight, playSound, filter, colorTrigger;
+    int fireLength, lineDelta;
+    QStringList regexList;
+    QString script, parent, pattern, soundFile;
+    QColor fgColor, bgColor, hlFgColor, hlBgColor;
+    if( ! lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        parent = lua_tostring( L, 1 );
+    }
+    
+    if( ! lua_isstring( L, 2 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        pattern = lua_tostring( L, 2 );
+    }
+    if( ! lua_isstring( L, 3 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        script = lua_tostring( L, 3 );
+    }
+    if( ! lua_isnumber( L, 4 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        multiLine = lua_tonumber( L, 4 );
+    }
+    if( ! lua_isstring( L, 5 ) )
+    {
+        if (lua_isnumber(L,5))
+            colorTrigger = false;
+        else{
+            lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+            lua_error( L );
+            return 1;
+        }
+    }
+    else
+    {
+        colorTrigger = true;
+        fgColor.setNamedColor(lua_tostring( L, 5 ));
+    }
+    if( ! lua_isstring( L, 6 ) )
+    {
+        if (lua_isnumber(L,6))
+            colorTrigger = false;
+        else{
+            lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+            lua_error( L );
+            return 1;
+        }
+    }
+    else
+    {
+        bgColor.setNamedColor(lua_tostring( L, 6 ));
+    }
+    
+    if( ! lua_isnumber( L, 7 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        filter = lua_tonumber( L, 7 );
+    }
+    if( ! lua_isnumber( L, 8 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        matchAll = lua_tonumber( L, 8 );
+    }
+    if( ! lua_isstring( L, 9 ) )
+    {
+        if (lua_isnumber(L, 9))
+            highlight = false;
+        else{
+            lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+            lua_error( L );
+            return 1;
+        }
+    }
+    else
+    {
+        highlight = true;
+        hlFgColor = lua_tostring( L, 9 );
+    }
+    if( ! lua_isstring( L, 9 ) )
+    {
+        if (lua_isnumber(L, 9))
+            highlight = false;
+        else{
+            lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+            lua_error( L );
+            return 1;
+        }
+    }
+    else
+    {
+        highlight = true;
+        hlFgColor = lua_tostring( L, 9 );
+    }
+    //lineDelta).
+    if( ! lua_isstring( L, 10 ) )
+    {
+        if (lua_isnumber(L, 10))
+            playSound = false;
+        else{
+            lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+            lua_error( L );
+            return 1;
+        }
+    }
+    else
+    {
+        playSound = true;
+        soundFile = lua_tostring( L, 10 );
+    }
+    if( ! lua_isnumber( L, 11 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        fireLength = lua_tonumber( L, 11 );
+    }
+    if( ! lua_isnumber( L, 12 ) )
+    {
+        lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        lineDelta = lua_tonumber( L, 12 );
+    }
+    Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
+    //TLuaInterpreter * pLuaInterpreter = pHost->getLuaInterpreter();
+    //mpHost = pLuaInterpreter->mpHost;
+    TTrigger * pT;
+    QList<int> propertyList;
+    
+    TTrigger * pP = mpHost->getTriggerUnit()->findTrigger( parent );
+    
+    if( !pP )
+    {
+        regexList << pattern;
+        if (colorTrigger)
+            propertyList << REGEX_COLOR_PATTERN;
+        else
+            propertyList << REGEX_PERL;
+    }
+    else{
+        regexList = pP->getRegexCodeList();
+        propertyList = pP->getRegexCodePropertyList();
+    }
+
+    pT = new TTrigger( pP, mpHost );
+    pT->setRegexCodeList( regexList, propertyList );
+    pT->setIsFolder( 0 );
+    pT->setIsActive( true );
+    pT->setIsTempTrigger( true );
+    pT->registerTrigger();
+    pT->setScript( script );
+    pT->setName( pattern );
+    pT->setIsMultiline( multiLine );            
+    pT->mPerlSlashGOption = matchAll;//match all
+    pT->mFilterTrigger = filter;
+    pT->setConditionLineDelta( lineDelta );//line delta
+    pT->mStayOpen = fireLength;//fire length
+    pT->mSoundTrigger = playSound;//sound trigger, need to set sound file if true
+    if (playSound){
+        pT->setSound(soundFile);
+    }
+    if (colorTrigger){
+        pT->setFgColor( fgColor );
+        pT->setBgColor( bgColor );
+    }
+    pT->setIsColorizerTrigger(highlight); //highlight
+    if (highlight){
+        pT->setFgColor( hlFgColor );
+        pT->setBgColor( hlBgColor );
+    }
+    return 1;
+}
 
 // tempTrigger( string regex, string function to call ) // one shot timer.
 int TLuaInterpreter::tempRegexTrigger( lua_State *L )
@@ -5986,8 +6201,17 @@ int TLuaInterpreter::getSpecialExits( lua_State * L )
             it.next();
             int id_to = it.key();
             QString dir = it.value();
+			QString exit = dir.section(1,-1);
+			QString exitStatus = dir.left(1);
+			//cout << exit.toLatin1().data() <<endl;
+			//cout << exitStatus.toLatin1().data() <<endl;
             lua_pushnumber( L, id_to );
-            lua_pushstring( L, dir.toLatin1().data() );
+			//lua_newtable(L);
+            lua_pushstring( L, exit.toLatin1().data() );//done to remove the prepended special exit status
+			//lua_pushstring( L, exitStatus.toLatin1().data());
+			//lua_settable(F, -3);
+			//lua_pushnumber( L, dir.section(0,1) );//done to remove the prepended special exit status
+			//lua_pushtable(L, F);
             lua_settable(L, -3);
         }
         return 1;
@@ -8264,6 +8488,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "permRegexTrigger", TLuaInterpreter::permRegexTrigger );
     lua_register( pGlobalLua, "permSubstringTrigger", TLuaInterpreter::permSubstringTrigger );
     lua_register( pGlobalLua, "permBeginOfLineStringTrigger", TLuaInterpreter::permBeginOfLineStringTrigger );
+    lua_register( pGlobalLua, "tempComplexRegexTrigger", TLuaInterpreter::tempComplexRegexTrigger );
     lua_register( pGlobalLua, "permTimer", TLuaInterpreter::permTimer );
     lua_register( pGlobalLua, "permAlias", TLuaInterpreter::permAlias );
     lua_register( pGlobalLua, "exists", TLuaInterpreter::exists );

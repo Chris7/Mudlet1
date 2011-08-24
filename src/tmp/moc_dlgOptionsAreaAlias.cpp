@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'dlgOptionsAreaAlias.h'
 **
-** Created: Mon Aug 15 23:51:18 2011
+** Created: Tue Aug 23 23:13:15 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -38,6 +38,7 @@ T2DMap::T2DMap()
     yzoom = 30;
     gzoom = 20;
     mPick = false;
+    mPickBox = QRect(0,0,0,0);
     mTarget = 0;
     mRoomSelection = 0;
     mStartSpeedWalk = false;
@@ -60,6 +61,7 @@ T2DMap::T2DMap(QWidget * parent)
     yzoom = 30;
     gzoom = 20;
     mPick = false;
+    mPickBox = QRect(0,0,0,0);
     mTarget = 0;
     mRoomSelection = 0;
     mStartSpeedWalk = false;
@@ -1003,6 +1005,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         {
             p.fillRect(dr,QColor(255,155,55));
             mPick = false;
+            mPickBox = QRect(dr.x(), dr.y(), 2*tx*rSize, 2*ty*rSize); //set it as the bounds from upper left to bottom right
             if( mStartSpeedWalk )
             {
                 mStartSpeedWalk = false;
@@ -1227,6 +1230,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                {
                    p.fillRect(dr,QColor(50,255,50));
                    mPick = false;
+                   mPickBox = QRect(dr.x(), dr.y(), 2*(tx*rSize), 2*(ty*rSize)); //set it as the bounds from upper left to bottom right
                    mTarget = it.key();
                    if( mpMap->rooms.contains(mTarget) )
                    {
@@ -1283,6 +1287,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                     p.drawPath(myPath);
 
                     mPick = false;
+                    mPickBox = QRect(dr.x(), dr.y(), 2*(tx*rSize), 2*(ty*rSize)); //set it as the bounds from upper left to bottom right
                     mTarget = it.key();
                     if( mpMap->rooms.contains(mTarget) )
                     {
@@ -1438,44 +1443,45 @@ void T2DMap::mouseDoubleClickEvent ( QMouseEvent * event )
 
 void T2DMap::mouseReleaseEvent(QMouseEvent * event )
 {
-	if (mLeftDown){
-		mLeftDown = false;
+    if (mLeftDown){
+        mLeftDown = false;
         m2DPanMode=false;
-		if( event->buttons() && event->modifiers().testFlag(Qt::ControlModifier))
-		{
-			if( mCustomLinesRoomFrom > 0 )
-			{
-				if( mpMap->rooms.contains( mCustomLinesRoomFrom ) )
-				{
-					float ox = mOx;
-					float oy = mOy;
-					float _rx;
-					float _ry;
-					if( ox*mTX > xspan/2*mTX )
-						_rx = -(mTX*ox-xspan/2*mTX);
-					else
-						_rx = xspan/2*mTX-mTX*ox;
-					if( oy*mTY > yspan/2*mTY )
-						_ry = -(mTY*oy-yspan/2*mTY);
-					else
-						_ry = yspan/2*mTY-mTY*oy;
-					float mx = event->pos().x()/mTX + mOx;
-					float my = event->pos().y()/mTY + mOy;
-					mx = mx - xspan/2;
-					my = yspan/2 - my;;
-					mpMap->rooms[mCustomLinesRoomFrom]->customLines[mCustomLinesRoomExit].push_back( QPointF( mx, my ) );
-				}
-				repaint();
-			}
-		}
+        if( event->buttons() && event->modifiers().testFlag(Qt::ControlModifier))
+        {
+            if( mCustomLinesRoomFrom > 0 )
+            {
+                if( mpMap->rooms.contains( mCustomLinesRoomFrom ) )
+                {
+                    float ox = mOx;
+                    float oy = mOy;
+                    float _rx;
+                    float _ry;
+                    if( ox*mTX > xspan/2*mTX )
+                            _rx = -(mTX*ox-xspan/2*mTX);
+                    else
+                            _rx = xspan/2*mTX-mTX*ox;
+                    if( oy*mTY > yspan/2*mTY )
+                            _ry = -(mTY*oy-yspan/2*mTY);
+                    else
+                            _ry = yspan/2*mTY-mTY*oy;
+                    float mx = event->pos().x()/mTX + mOx;
+                    float my = event->pos().y()/mTY + mOy;
+                    mx = mx - xspan/2;
+                    my = yspan/2 - my;;
+                    mpMap->rooms[mCustomLinesRoomFrom]->customLines[mCustomLinesRoomExit].push_back( QPointF( mx, my ) );
+                }
+                repaint();
+            }
+        }
     }
     if (mRightDown){
         mRightDown = false;
         if( mCustomLinesRoomFrom > 0 )//why do we even bother wasting a cycle on this if?
             mCustomLinesRoomFrom = 0;
-        int x = event->x();
-        int y = event->y();
-        mPHighlight = QPoint(x,y);
+        //int x = event->x();
+        //int y = event->y();
+        mPHighlight = event->pos();
+        //mPHighlight = QPoint(x,y);
         mPick = true;
         //repaint();
 
@@ -1553,7 +1559,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         popup->popup( mapToGlobal( event->pos() ) );
         mLastMouseClick = event->posF();
     }
-    update();
+    //update();
 }
 
 void T2DMap::cleanupMap()
@@ -1561,7 +1567,7 @@ void T2DMap::cleanupMap()
     mMultiSelectionList.clear();
     mMultiSelection = false;
     mMultiZSelection = false;
-    mPick = false;
+    //mPick = false;
     mRoomBeingMoved=false;
     mMultiRect = QRect(0,0,0,0);
     setMouseTracking(false);
@@ -1570,44 +1576,43 @@ void T2DMap::cleanupMap()
 
 void T2DMap::mousePressEvent(QMouseEvent *event)
 {
+    //first and foremost, is there a menu up?
+    if (mPopupMenu)
+        mPopupMenu = false;
     mNewMoveAction = true;
-	if (event->buttons() & Qt::LeftButton){
-		mLeftDown = true;
-        if (!event->modifiers().testFlag(Qt::ControlModifier)){
-            m2DPanXStart = event->x();
-            m2DPanYStart = event->y();
-            m2DPanMode=true;
-            cleanupMap();
+    if (event->buttons() & Qt::LeftButton){
+            mLeftDown = true;
+    //if we're outside the realm for mPick, set it false
+        if (!mPickBox.contains(event->pos())){
+            //we clicked outside the selected room, deselect it
+            mPick = false;
+            mRoomSelection = 0;
+        }
+        if( mRoomBeingMoved )
+        {
+            mPHighlightMove = event->pos();
+            mPick = true;
+            setMouseTracking(false);
+            mRoomBeingMoved=false;
         }
         else{
-            mPick = false;
-            if( mRoomBeingMoved )
-            {
-                mPHighlightMove = event->pos();
-                mPick = true;
-                setMouseTracking(false);
-                mRoomBeingMoved=false;
-            }
-            if( ! mPopupMenu ){
-                mMultiSelection = true;
-                mMultiZSelection = event->modifiers().testFlag(Qt::ShiftModifier);
-				mMultiRect = QRect(event->pos(), event->pos());
-				mPHighlight = event->pos();
-				mPick = true;
-				update();
-                }
-            else
-                mPopupMenu=false;
+            mMultiSelection = true;
+            mMultiZSelection = !event->modifiers().testFlag(Qt::ShiftModifier);
+            mMultiRect = QRect(event->pos(), event->pos());
+            mPHighlight = event->pos();
+            mPick = true;
+            update();
         }
     }
-	else if (event->buttons() & Qt::RightButton)
-		mRightDown = true;
-	//if we ever left click, we don't want these properties to still be active
+    else if (event->buttons() & Qt::RightButton)
+        mRightDown = true;
     update();
 }
 
 void T2DMap::slot_movePosition()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     QDialog * pD = new QDialog(this);
     QVBoxLayout * pL = new QVBoxLayout;
     pD->setLayout( pL );
@@ -1626,9 +1631,9 @@ void T2DMap::slot_movePosition()
         if( tLC < 0 ) return;
         mRoomSelection = mMultiSelectionList[tLC];
     }
-
+    cout << "here" << endl;
     if( ! mpHost->mpMap->rooms.contains( mRoomSelection ) ) return;
-
+    cout << "here" << endl;
     pLEx->setText(QString::number(mpHost->mpMap->rooms[mRoomSelection]->x));
     pLEy->setText(QString::number(mpHost->mpMap->rooms[mRoomSelection]->y));
     pLEz->setText(QString::number(mpHost->mpMap->rooms[mRoomSelection]->z));
@@ -1702,10 +1707,11 @@ void T2DMap::slot_movePosition()
 
 void T2DMap::slot_moveRoom()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     mRoomBeingMoved = true;
     setMouseTracking(true);
     mNewMoveAction = true;
-
 }
 
 
@@ -1728,6 +1734,8 @@ void T2DMap::slot_setImage()
 
 void T2DMap::slot_deleteRoom()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     if( mMultiSelection )
     {
         mMultiRect = QRect(0,0,0,0);
@@ -1748,6 +1756,8 @@ void T2DMap::slot_deleteRoom()
 
 void T2DMap::slot_selectRoomColor(QListWidgetItem * pI )
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     mChosenRoomColor = pI->text().toInt();
 }
 
@@ -1891,6 +1901,8 @@ void T2DMap::slot_shrink()
 #include "dlgRoomExits.h"
 void T2DMap::slot_setExits()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     if( mpHost->mpMap->rooms.contains( mRoomSelection ) )
     {
         dlgRoomExits * pD = new dlgRoomExits( mpHost, this );
@@ -1908,6 +1920,8 @@ void T2DMap::slot_setUserData()
 
 void T2DMap::slot_lockRoom()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     if( mMultiSelection )
     {
         mMultiRect = QRect(0,0,0,0);
@@ -1931,7 +1945,8 @@ void T2DMap::slot_lockRoom()
 void T2DMap::slot_setRoomWeight()
 {
 
-
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     if( mMultiSelectionList.size() > 0 )
     {
         int w = QInputDialog::getInt(this,"Enter a room weight (= travel time)","room weight:", 1);
@@ -1962,6 +1977,12 @@ void T2DMap::slot_setRoomWeight()
 
 void T2DMap::mouseMoveEvent( QMouseEvent * event )
 {
+    if (mLeftDown & !m2DPanMode & !event->modifiers().testFlag(Qt::ControlModifier)){
+        m2DPanXStart = event->x();
+        m2DPanYStart = event->y();
+        m2DPanMode=true;
+        cleanupMap();
+    }
     if (m2DPanMode)
     {
         int x = event->x();
@@ -2033,7 +2054,8 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
                 }
                 if( mMultiRect.contains(dr) )
                 {
-                    mMultiSelectionList << pArea->rooms[k];
+                    if ((mMultiZSelection && rz == mOz) || !mMultiZSelection)
+                        mMultiSelectionList << pArea->rooms[k];
                 }
             }
             int mx = event->pos().x()/mTX;
@@ -2162,6 +2184,8 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
 
 void T2DMap::slot_setArea()
 {
+    if (!mRoomSelection && !mMultiSelection)
+        return;
     QUiLoader loader;
 
     QFile file(":/ui/set_room_area.ui");

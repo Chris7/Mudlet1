@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mapper_room_color.ui'
 **
-** Created: Tue Aug 16 19:22:37 2011
+** Created: Sun Aug 21 15:41:54 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

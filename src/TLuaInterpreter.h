@@ -216,6 +216,7 @@ public:
     static int disableTrigger( lua_State * L );
     static int tempTrigger( lua_State * L );
     static int tempRegexTrigger( lua_State * L );
+    static int tempComplexRegexTrigger( lua_State * L );
     static int killTrigger( lua_State * L );
     static int getLineCount( lua_State * L );
     static int getLineNumber( lua_State * L );

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'T2DMap.h'
 **
-** Created: Tue Aug 16 00:16:24 2011
+** Created: Wed Aug 24 01:17:03 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_T2DMap[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-      29,   14, // methods
+      30,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -43,23 +43,24 @@ static const uint qt_meta_data_T2DMap[] = {
      145,    7,    7,    7, 0x0a,
      157,    7,    7,    7, 0x0a,
      170,    7,    7,    7, 0x0a,
-     190,    7,    7,    7, 0x0a,
-     206,    7,    7,    7, 0x0a,
-     226,    7,    7,    7, 0x0a,
-     251,  248,    7,    7, 0x0a,
-     290,    7,    7,    7, 0x0a,
-     306,    7,    7,    7, 0x0a,
-     324,    7,    7,    7, 0x0a,
-     343,    7,    7,    7, 0x0a,
-     357,    7,    7,    7, 0x0a,
-     371,    7,    7,    7, 0x0a,
-     387,    7,    7,    7, 0x0a,
-     406,    7,    7,    7, 0x0a,
-     422,    7,    7,    7, 0x0a,
-     443,    7,    7,    7, 0x0a,
-     458,    7,    7,    7, 0x0a,
-     479,    7,    7,    7, 0x0a,
-     503,  501,    7,    7, 0x0a,
+     183,    7,    7,    7, 0x0a,
+     203,    7,    7,    7, 0x0a,
+     219,    7,    7,    7, 0x0a,
+     239,    7,    7,    7, 0x0a,
+     264,  261,    7,    7, 0x0a,
+     303,    7,    7,    7, 0x0a,
+     319,    7,    7,    7, 0x0a,
+     337,    7,    7,    7, 0x0a,
+     356,    7,    7,    7, 0x0a,
+     370,    7,    7,    7, 0x0a,
+     384,    7,    7,    7, 0x0a,
+     400,    7,    7,    7, 0x0a,
+     419,    7,    7,    7, 0x0a,
+     435,    7,    7,    7, 0x0a,
+     456,    7,    7,    7, 0x0a,
+     471,    7,    7,    7, 0x0a,
+     492,    7,    7,    7, 0x0a,
+     516,  514,    7,    7, 0x0a,
 
        0        // eod
 };
@@ -69,10 +70,10 @@ static const char qt_meta_stringdata_T2DMap[] = {
     "slot_customLineColor()\0showInfo()\0"
     "shiftZup()\0shiftZdown()\0switchArea(QString)\0"
     "toggleShiftMode()\0shiftUp()\0shiftDown()\0"
-    "shiftLeft()\0shiftRight()\0slot_setCharacter()\0"
-    "slot_setImage()\0slot_movePosition()\0"
-    "slot_defineNewColor()\0pI\0"
-    "slot_selectRoomColor(QListWidgetItem*)\0"
+    "shiftLeft()\0shiftRight()\0cleanupMap()\0"
+    "slot_setCharacter()\0slot_setImage()\0"
+    "slot_movePosition()\0slot_defineNewColor()\0"
+    "pI\0slot_selectRoomColor(QListWidgetItem*)\0"
     "slot_moveRoom()\0slot_deleteRoom()\0"
     "slot_changeColor()\0slot_spread()\0"
     "slot_shrink()\0slot_setExits()\0"
@@ -122,27 +123,28 @@ int T2DMap::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 8: shiftDown(); break;
         case 9: shiftLeft(); break;
         case 10: shiftRight(); break;
-        case 11: slot_setCharacter(); break;
-        case 12: slot_setImage(); break;
-        case 13: slot_movePosition(); break;
-        case 14: slot_defineNewColor(); break;
-        case 15: slot_selectRoomColor((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
-        case 16: slot_moveRoom(); break;
-        case 17: slot_deleteRoom(); break;
-        case 18: slot_changeColor(); break;
-        case 19: slot_spread(); break;
-        case 20: slot_shrink(); break;
-        case 21: slot_setExits(); break;
-        case 22: slot_setUserData(); break;
-        case 23: slot_lockRoom(); break;
-        case 24: slot_setRoomWeight(); break;
-        case 25: slot_setArea(); break;
-        case 26: slot_setCustomLine(); break;
-        case 27: slot_setCustomLine2(); break;
-        case 28: slot_setCustomLine2B((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 11: cleanupMap(); break;
+        case 12: slot_setCharacter(); break;
+        case 13: slot_setImage(); break;
+        case 14: slot_movePosition(); break;
+        case 15: slot_defineNewColor(); break;
+        case 16: slot_selectRoomColor((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
+        case 17: slot_moveRoom(); break;
+        case 18: slot_deleteRoom(); break;
+        case 19: slot_changeColor(); break;
+        case 20: slot_spread(); break;
+        case 21: slot_shrink(); break;
+        case 22: slot_setExits(); break;
+        case 23: slot_setUserData(); break;
+        case 24: slot_lockRoom(); break;
+        case 25: slot_setRoomWeight(); break;
+        case 26: slot_setArea(); break;
+        case 27: slot_setCustomLine(); break;
+        case 28: slot_setCustomLine2(); break;
+        case 29: slot_setCustomLine2B((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 29;
+        _id -= 30;
     }
     return _id;
 }

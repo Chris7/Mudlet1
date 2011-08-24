@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'THighlighter.h'
 **
-** Created: Mon Aug 15 15:07:19 2011
+** Created: Sun Aug 21 15:54:34 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

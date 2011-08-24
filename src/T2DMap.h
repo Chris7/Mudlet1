@@ -54,6 +54,7 @@ public:
     int      _ry;
     QPoint   mPHighlight;
     bool     mPick;
+    QRect    mPickBox;
     int      mTarget;
     int      mRoomSelection;
     bool     mStartSpeedWalk;
