@@ -31,6 +31,7 @@
 
 bool m2DPanMode = false, mLeftDown = false, mRightDown = false;
 float m2DPanXStart=0, m2DPanYStart=0;
+int mViewArea = 0;
 
 T2DMap::T2DMap()
 {
@@ -376,6 +377,7 @@ void T2DMap::switchArea(QString name)
         {
             mAID = areaID;
             mShiftMode = true;
+            mViewArea = areaID;
             mOx = 0;
             mOy = 0;
             mOz = 0;
@@ -430,7 +432,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
     int ox, oy, oz;
     if( mRID != mpMap->mRoomId && mShiftMode ) mShiftMode = false;
-    if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove )
+    if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mViewArea)
     {
         mShiftMode = true;
         mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
@@ -438,6 +440,11 @@ void T2DMap::paintEvent( QPaintEvent * e )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
         mRID = mpMap->mRoomId;
+        if (mViewArea){
+            int oldId = mRID;
+            mRID = mpMap->areas[mViewArea]->rooms.at(0);
+            mViewArea = oldId;
+        }
         mAID = mpMap->rooms[mRID]->area;
         ox = mpMap->rooms[mRID]->x;
         oy = mpMap->rooms[mRID]->y*-1;
@@ -447,6 +454,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     }
     else
     {
+        //switch area goes here
         ox = mOx;
         oy = mOy;
         oz = mOz;
@@ -564,6 +572,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     //mpMap->auditRooms();
     if( ! pArea->gridMode )
     {
+        //swithc goes here
         for( int i=0; i<pArea->rooms.size(); i++ )
         {
             TRoom * pR = mpMap->rooms[pArea->rooms[i]];
@@ -904,6 +913,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
             }
         }
     }
+    //mShiftMode true here for switchArea
     for( int i=0; i<pArea->rooms.size(); i++ )
     {
         TRoom * pR = mpMap->rooms[pArea->rooms[i]];
@@ -1109,7 +1119,8 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 p.drawText(dr, Qt::AlignHCenter|Qt::AlignVCenter,QString::number(pArea->rooms[i]));
                 p.setPen(__pen);
             }
-            if( mShiftMode && pArea->rooms[i] == mpMap->mRoomId )
+            //removed mShiftMode here check, we can override the mShiftMode change if we do have a f
+            if(mShiftMode || pArea->rooms[i] == mpMap->mRoomId )
             {
                 float _radius = (1.2*tx)/2;
                 QPointF _center = QPointF(rx,ry);
@@ -1126,6 +1137,10 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 myPath.addEllipse(_center,_radius,_radius);
                 p.drawPath(myPath);
 
+            }
+            if (mShiftMode){
+                //just select the first room as our entry;
+                mShiftMode=false;
             }
         }
 
@@ -1426,6 +1441,10 @@ void T2DMap::paintEvent( QPaintEvent * e )
         QString text = QString("render time:%1ms").arg(QString::number(__time.elapsed()));
         p.setPen(QColor(255,255,255));
         p.drawText( 10, 4*mFontHeight, text );
+    }
+    if (mViewArea){
+        mRID = mViewArea;
+        mViewArea=0;
     }
 
 }
