@@ -160,9 +160,10 @@ void dlgMapper::downloadMap()
     url.prepend("http://www.");
     url.append("/maps/map.xml");
     //qDebug()<<"DOWNLOADING:"<<url;
-    QNetworkReply * reply = mpDownloader->get( QNetworkRequest( QUrl( url ) ) );
-    mpProgressDialog = new QProgressDialog("downloading map ...", "Abort", 0, 4000000, this);
-    connect(reply, SIGNAL(downloadProgress( qint64, qint64 )), this, SLOT(setDownloadProgress(qint64,qint64)));
+    mpReply = mpDownloader->get( QNetworkRequest( QUrl( url ) ) );
+    mpProgressDialog = new QProgressDialog("Downloading the map ...", "Abort", 0, 4000000, this);
+    connect(mpReply, SIGNAL(downloadProgress( qint64, qint64 )), this, SLOT(setDownloadProgress(qint64,qint64)));
+    connect(mpProgressDialog, SIGNAL(canceled()), this, SLOT(cancel()));
     mpProgressDialog->show();
 }
 
@@ -170,6 +171,15 @@ void dlgMapper::setDownloadProgress( qint64 got, qint64 tot )
 {
     mpProgressDialog->setRange(0, static_cast<int>(tot) );
     mpProgressDialog->setValue(static_cast<int>(got));
+}
+
+void dlgMapper::cancel()
+{
+    qDebug()<<"download was cancalled";
+    mpProgressDialog->close();
+    mpReply->abort();
+    mpHost->mpMap->init( mpHost );
+    glWidget->updateGL();
 }
 
 #include "XMLimport.h"
