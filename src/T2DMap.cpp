@@ -1120,7 +1120,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 p.setPen(__pen);
             }
             //removed mShiftMode here check, we can override the mShiftMode change if we do have a f
-            if(mShiftMode || pArea->rooms[i] == mpMap->mRoomId )
+            if(mShiftMode && pArea->rooms[i] == mpMap->mRoomId )
             {
                 float _radius = (1.2*tx)/2;
                 QPointF _center = QPointF(rx,ry);
@@ -1137,10 +1137,6 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 myPath.addEllipse(_center,_radius,_radius);
                 p.drawPath(myPath);
 
-            }
-            if (mShiftMode){
-                //just select the first room as our entry;
-                mShiftMode=false;
             }
         }
 
