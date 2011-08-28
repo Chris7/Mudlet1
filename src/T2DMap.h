@@ -108,6 +108,7 @@ signals:
 public slots:
 
     void slot_createLabel();
+    void slot_setPlayerLocation();
     void slot_customLineColor();
     void showInfo();
     void shiftZup();

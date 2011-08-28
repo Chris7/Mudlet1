@@ -1550,6 +1550,10 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         QAction * action15 = new QAction("Create Label", this );
         action15->setStatusTip(tr("Create labels to show text or images."));
         connect( action15, SIGNAL(triggered()), this, SLOT(slot_createLabel()));
+        
+        QAction * action16 = new QAction("Set Location Here", this );
+        action16->setStatusTip(tr("Set player location here."));
+        connect( action16, SIGNAL(triggered()), this, SLOT(slot_setPlayerLocation()));
 
         mPopupMenu = true;
         QMenu * popup = new QMenu( this );
@@ -1570,6 +1574,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         popup->addAction( action13 );
 
         popup->addAction( action15 );
+        popup->addAction( action16 );
 
         popup->popup( mapToGlobal( event->pos() ) );
         mLastMouseClick = event->posF();
@@ -2522,6 +2527,24 @@ void T2DMap::slot_setCustomLine2B(QTreeWidgetItem * special_exit, int column )
     mpHost->mpMap->rooms[mCustomLinesRoomFrom]->customLinesStyle[exit] = mpCurrentLineStyle->currentText();
     mpHost->mpMap->rooms[mCustomLinesRoomFrom]->customLinesArrow[exit] = mpCurrentLineArrow->isChecked();
     qDebug()<<"exit="<<exit;
+}
+
+void T2DMap::slot_setPlayerLocation()
+{
+    TLuaInterpreter * LuaInt = mpHost->getLuaInterpreter();
+    QString t1 = "mRoomSet";
+    QString room;
+    room.setNum(mRoomSelection);    
+    if( mpMap->rooms.contains( mRoomSelection ) )
+    {
+        mpMap->mRoomId = mRoomSelection;
+        mpMap->mNewMove = true;
+        update();
+        LuaInt->set_lua_string( t1, room );
+        QString f = "doRoomSet";
+        QString n = "";
+        LuaInt->call(f, n);
+    }
 }
 
 void T2DMap::slot_createLabel()
