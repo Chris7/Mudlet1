@@ -5354,7 +5354,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
     int alpha;
     if( ! lua_isnumber( L, 1 ) )
     {
-        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_pushstring( L, "setCustomEnvColor: wrong first argument type" );
         lua_error( L );
         return 1;
     }
@@ -5365,7 +5365,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
 
     if( ! lua_isnumber( L, 2 ) )
     {
-        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_pushstring( L, "setCustomEnvColor: wrong second argument type" );
         lua_error( L );
         return 1;
     }
@@ -5376,7 +5376,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
 
     if( ! lua_isnumber( L, 3 ) )
     {
-        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_pushstring( L, "setCustomEnvColor: wrong third argument type" );
         lua_error( L );
         return 1;
     }
@@ -5387,7 +5387,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
 
     if( ! lua_isnumber( L, 4 ) )
     {
-        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_pushstring( L, "setCustomEnvColor: wrong fourth argument type" );
         lua_error( L );
         return 1;
     }
@@ -5398,9 +5398,11 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
 
     if( ! lua_isnumber( L, 5 ) )
     {
-        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_pushstring( L, "setCustomEnvColor: invalid or missing alpha value, defaulting to 255" );
         lua_error( L );
-        return 1;
+
+        // Default alpha if none provided (opaque)
+        alpha = 255;
     }
     else
     {
