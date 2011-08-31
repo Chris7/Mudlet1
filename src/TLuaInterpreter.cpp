@@ -1057,9 +1057,6 @@ int TLuaInterpreter::resetStopWatch( lua_State * L )
     return 1;
 }
 
-
-
-
 // cusorPositionInLine = selectSection( from_cursorPos, to_cursorPos ) -1 on not found
 int TLuaInterpreter::selectSection( lua_State * L )
 {
@@ -1351,6 +1348,31 @@ int TLuaInterpreter::saveMap( lua_State * L )
     lua_pushboolean( L, error );
     return 1;
 }
+
+int TLuaInterpreter::loadMap( lua_State * L )
+{
+    string location="";
+    if( lua_gettop( L ) == 1 )
+    {
+        if( ! lua_isstring( L, 1 ) )
+        {
+            lua_pushstring( L, "loadMap: where do you want to load from?" );
+            lua_error( L );
+            return 1;
+        }
+        else
+        {
+            location = lua_tostring( L, 1 );
+        }
+    }
+    QString _location( location.c_str() );
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    bool error = pHost->mpConsole->loadMap(_location);
+    lua_pushboolean( L, error );
+    return 1;
+}
+
+
 
 // enableTimer( sess, timer_name )
 int TLuaInterpreter::enableTimer( lua_State *L )
@@ -4397,9 +4419,10 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
 {
     bool multiLine, matchAll, highlight, playSound, filter, colorTrigger;
     int fireLength, lineDelta;
+    QString fgColor, bgColor;
     QStringList regexList;
     QString script, parent, pattern, soundFile;
-    QColor fgColor, bgColor, hlFgColor, hlBgColor;
+    QColor hlFgColor, hlBgColor;
     if( ! lua_isstring( L, 1 ) )
     {
         lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
@@ -4448,7 +4471,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     else
     {
         colorTrigger = true;
-        fgColor.setNamedColor(lua_tostring( L, 5 ));
+        fgColor = lua_tostring( L, 5 );
     }
     if( lua_isnumber( L, 6 ) )
     {
@@ -4456,7 +4479,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     }
     else
     {
-        bgColor.setNamedColor(lua_tostring( L, 6 ));
+        bgColor = lua_tostring( L, 6 );
     }
     
     if( ! lua_isnumber( L, 7 ) )
@@ -4486,7 +4509,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     else
     {
         highlight = true;
-        hlFgColor = lua_tostring( L, 9 );
+        hlFgColor.setNamedColor(lua_tostring( L, 9 ));
     }
     if(lua_isnumber( L, 9 ) )
     {
@@ -4495,7 +4518,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     else
     {
         highlight = true;
-        hlFgColor = lua_tostring( L, 9 );
+        hlBgColor.setNamedColor(lua_tostring( L, 9 ));
     }
     //lineDelta).
     if(lua_isnumber( L, 10 ) )
@@ -4527,6 +4550,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     {
         lineDelta = lua_tonumber( L, 12 );
     }
+
     Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
     //TLuaInterpreter * pLuaInterpreter = pHost->getLuaInterpreter();
     //mpHost = pLuaInterpreter->mpHost;
@@ -4565,20 +4589,13 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     if (playSound){
         pT->setSound(soundFile);
     }
-    if (colorTrigger){
-        pT->setFgColor( fgColor );
-        pT->setBgColor( bgColor );
-    }
     pT->setIsColorizerTrigger(highlight); //highlight
     if (highlight){
         pT->setFgColor( hlFgColor );
         pT->setBgColor( hlBgColor );
     }
     lua_pushnumber( L, pT->getID() );
-    return pT->getID();
-    /*pT->setName( QString::number( id ) );
-    return id;
-    return 1;*/
+    return 1;
 }
 
 // tempTrigger( string regex, string function to call ) // one shot timer.
@@ -5331,9 +5348,10 @@ int TLuaInterpreter::setRoomCoordinates( lua_State *L )
 int TLuaInterpreter::setCustomEnvColor( lua_State *L )
 {
     int id;
-    int x;
-    int y;
-    int z;
+    int r;
+    int g;
+    int b;
+    int alpha;
     if( ! lua_isnumber( L, 1 ) )
     {
         lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
@@ -5353,7 +5371,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
     }
     else
     {
-        x = lua_tointeger( L, 2 );
+        r = lua_tointeger( L, 2 );
     }
 
     if( ! lua_isnumber( L, 3 ) )
@@ -5364,7 +5382,7 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
     }
     else
     {
-        y = lua_tointeger( L, 3 );
+        g = lua_tointeger( L, 3 );
     }
 
     if( ! lua_isnumber( L, 4 ) )
@@ -5375,11 +5393,22 @@ int TLuaInterpreter::setCustomEnvColor( lua_State *L )
     }
     else
     {
-        z = lua_tointeger( L, 4 );
+        b = lua_tointeger( L, 4 );
+    }
+
+    if( ! lua_isnumber( L, 5 ) )
+    {
+        lua_pushstring( L, "setRoomCoordinates: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        alpha = lua_tointeger( L, 5 );
     }
 
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-    pHost->mpMap->customEnvColors[id] = QColor( x, y, z );
+    pHost->mpMap->customEnvColors[id] = QColor( r,g,b,alpha );
     return 0;
 }
 
@@ -8550,6 +8579,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "setRoomChar", TLuaInterpreter::setRoomChar );
     lua_register( pGlobalLua, "registerAnonymousEventHandler", TLuaInterpreter::registerAnonymousEventHandler );
     lua_register( pGlobalLua, "saveMap", TLuaInterpreter::saveMap );
+    lua_register( pGlobalLua, "loadMap", TLuaInterpreter::loadMap );
     lua_register( pGlobalLua, "setMainWindowSize", TLuaInterpreter::setMainWindowSize );
     // removed because of various Qt crashes
     //lua_register( pGlobalLua, "setAppStyleSheet", TLuaInterpreter::setAppStyleSheet );

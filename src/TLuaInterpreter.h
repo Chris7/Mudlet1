@@ -320,6 +320,7 @@ public:
     static int sendATCP( lua_State * );
     static int sendGMCP( lua_State * );
     static int saveMap( lua_State * L );
+    static int loadMap( lua_State * L );
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;

@@ -1549,7 +1549,7 @@ void mudlet::slot_mapper()
 
     if( pHost->mpMap->rooms.size() < 1 )
     {
-        pHost->mpMap->restore();
+        pHost->mpMap->restore("");
         pHost->mpMap->init( pHost );
         pHost->mpMap->mpMapper->mp2dMap->init();
         pHost->mpMap->mpMapper->show();

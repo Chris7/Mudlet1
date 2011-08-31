@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'TForkedProcess.h'
 **
-** Created: Tue Aug 23 23:14:27 2011
+** Created: Tue Aug 30 00:55:54 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

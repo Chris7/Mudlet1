@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'T2DMap.h'
 **
-** Created: Wed Aug 24 01:17:03 2011
+** Created: Tue Aug 30 21:16:44 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_T2DMap[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-      30,   14, // methods
+      31,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -33,40 +33,42 @@ static const uint qt_meta_data_T2DMap[] = {
  // slots: signature, parameters, type, tag, flags
        8,    7,    7,    7, 0x0a,
       27,    7,    7,    7, 0x0a,
-      50,    7,    7,    7, 0x0a,
-      61,    7,    7,    7, 0x0a,
-      72,    7,    7,    7, 0x0a,
-      85,    7,    7,    7, 0x0a,
-     105,    7,    7,    7, 0x0a,
-     123,    7,    7,    7, 0x0a,
-     133,    7,    7,    7, 0x0a,
-     145,    7,    7,    7, 0x0a,
-     157,    7,    7,    7, 0x0a,
+      52,    7,    7,    7, 0x0a,
+      75,    7,    7,    7, 0x0a,
+      86,    7,    7,    7, 0x0a,
+      97,    7,    7,    7, 0x0a,
+     110,    7,    7,    7, 0x0a,
+     130,    7,    7,    7, 0x0a,
+     148,    7,    7,    7, 0x0a,
+     158,    7,    7,    7, 0x0a,
      170,    7,    7,    7, 0x0a,
-     183,    7,    7,    7, 0x0a,
-     203,    7,    7,    7, 0x0a,
-     219,    7,    7,    7, 0x0a,
-     239,    7,    7,    7, 0x0a,
-     264,  261,    7,    7, 0x0a,
-     303,    7,    7,    7, 0x0a,
-     319,    7,    7,    7, 0x0a,
-     337,    7,    7,    7, 0x0a,
-     356,    7,    7,    7, 0x0a,
-     370,    7,    7,    7, 0x0a,
-     384,    7,    7,    7, 0x0a,
-     400,    7,    7,    7, 0x0a,
-     419,    7,    7,    7, 0x0a,
-     435,    7,    7,    7, 0x0a,
-     456,    7,    7,    7, 0x0a,
-     471,    7,    7,    7, 0x0a,
-     492,    7,    7,    7, 0x0a,
-     516,  514,    7,    7, 0x0a,
+     182,    7,    7,    7, 0x0a,
+     195,    7,    7,    7, 0x0a,
+     208,    7,    7,    7, 0x0a,
+     228,    7,    7,    7, 0x0a,
+     244,    7,    7,    7, 0x0a,
+     264,    7,    7,    7, 0x0a,
+     289,  286,    7,    7, 0x0a,
+     328,    7,    7,    7, 0x0a,
+     344,    7,    7,    7, 0x0a,
+     362,    7,    7,    7, 0x0a,
+     381,    7,    7,    7, 0x0a,
+     395,    7,    7,    7, 0x0a,
+     409,    7,    7,    7, 0x0a,
+     425,    7,    7,    7, 0x0a,
+     444,    7,    7,    7, 0x0a,
+     460,    7,    7,    7, 0x0a,
+     481,    7,    7,    7, 0x0a,
+     496,    7,    7,    7, 0x0a,
+     517,    7,    7,    7, 0x0a,
+     541,  539,    7,    7, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_T2DMap[] = {
     "T2DMap\0\0slot_createLabel()\0"
+    "slot_setPlayerLocation()\0"
     "slot_customLineColor()\0showInfo()\0"
     "shiftZup()\0shiftZdown()\0switchArea(QString)\0"
     "toggleShiftMode()\0shiftUp()\0shiftDown()\0"
@@ -113,38 +115,39 @@ int T2DMap::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: slot_createLabel(); break;
-        case 1: slot_customLineColor(); break;
-        case 2: showInfo(); break;
-        case 3: shiftZup(); break;
-        case 4: shiftZdown(); break;
-        case 5: switchArea((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 6: toggleShiftMode(); break;
-        case 7: shiftUp(); break;
-        case 8: shiftDown(); break;
-        case 9: shiftLeft(); break;
-        case 10: shiftRight(); break;
-        case 11: cleanupMap(); break;
-        case 12: slot_setCharacter(); break;
-        case 13: slot_setImage(); break;
-        case 14: slot_movePosition(); break;
-        case 15: slot_defineNewColor(); break;
-        case 16: slot_selectRoomColor((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
-        case 17: slot_moveRoom(); break;
-        case 18: slot_deleteRoom(); break;
-        case 19: slot_changeColor(); break;
-        case 20: slot_spread(); break;
-        case 21: slot_shrink(); break;
-        case 22: slot_setExits(); break;
-        case 23: slot_setUserData(); break;
-        case 24: slot_lockRoom(); break;
-        case 25: slot_setRoomWeight(); break;
-        case 26: slot_setArea(); break;
-        case 27: slot_setCustomLine(); break;
-        case 28: slot_setCustomLine2(); break;
-        case 29: slot_setCustomLine2B((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 1: slot_setPlayerLocation(); break;
+        case 2: slot_customLineColor(); break;
+        case 3: showInfo(); break;
+        case 4: shiftZup(); break;
+        case 5: shiftZdown(); break;
+        case 6: switchArea((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 7: toggleShiftMode(); break;
+        case 8: shiftUp(); break;
+        case 9: shiftDown(); break;
+        case 10: shiftLeft(); break;
+        case 11: shiftRight(); break;
+        case 12: cleanupMap(); break;
+        case 13: slot_setCharacter(); break;
+        case 14: slot_setImage(); break;
+        case 15: slot_movePosition(); break;
+        case 16: slot_defineNewColor(); break;
+        case 17: slot_selectRoomColor((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
+        case 18: slot_moveRoom(); break;
+        case 19: slot_deleteRoom(); break;
+        case 20: slot_changeColor(); break;
+        case 21: slot_spread(); break;
+        case 22: slot_shrink(); break;
+        case 23: slot_setExits(); break;
+        case 24: slot_setUserData(); break;
+        case 25: slot_lockRoom(); break;
+        case 26: slot_setRoomWeight(); break;
+        case 27: slot_setArea(); break;
+        case 28: slot_setCustomLine(); break;
+        case 29: slot_setCustomLine2(); break;
+        case 30: slot_setCustomLine2B((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 30;
+        _id -= 31;
     }
     return _id;
 }

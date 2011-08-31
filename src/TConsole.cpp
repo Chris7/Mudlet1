@@ -1710,6 +1710,19 @@ bool TConsole::saveMap(QString location)
     return true;
 }
 
+bool TConsole::loadMap(QString location)
+{
+    if (!mpHost || !mpHost->mpMap || !mpHost->mpMap->mpMapper)
+        return false;
+    mpHost->mpMap->restore(location);
+    mpHost->mpMap->init( mpHost );
+    mpHost->mpMap->mpMapper->mp2dMap->init();
+    mpHost->mpMap->mpMapper->show();
+    // previous selections stay, so we need to clear it
+    //mpHost->mpMap->mpMapper->mp2dMap->deselect();
+    return true;
+}
+
 bool TConsole::deleteLine( int y )
 {
     return buffer.deleteLine( y );
@@ -2330,7 +2343,7 @@ void TConsole::createMapper( int x, int y, int width, int height )
         mpHost->mpMap->mpHost = mpHost;
         mpHost->mpMap->mpMapper = mpMapper;
         mpMapper->mpHost = mpHost;
-        mpHost->mpMap->restore();
+        mpHost->mpMap->restore("");
         mpHost->mpMap->init( mpHost );
     }
     mpMapper->resize( width, height );
