@@ -93,6 +93,7 @@ public:
     void initGraph();
     void exportMapToDatabase();
     void importMapFromDatabase();
+    void connectExitStub(int roomId, int dirType);
     QMap<int, TRoom *> rooms;
     QMap<int, TArea *> areas;
     QMap<int, QString> areaNamesMap;
@@ -104,6 +105,8 @@ public:
     QList<int> mPathList;
     QList<QString> mDirList;
     QMap<int,QColor> customEnvColors;
+    QMap<int, QVector3D> unitVectors;
+    QMap<int, int> reverseDirections; //contains complementary directions of dirs on TRoom.h
     GLWidget * mpM;
     dlgMapper * mpMapper;
     QList<int> mTestedNodes;

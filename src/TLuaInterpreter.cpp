@@ -1349,6 +1349,122 @@ int TLuaInterpreter::saveMap( lua_State * L )
     return 1;
 }
 
+int TLuaInterpreter::setExitStub( lua_State * L  ){
+    //args:room id, direction (as given by the #define direction table), status (0 to disable, 1 to enable)
+    int roomId, dirType, status;
+    if (!lua_isnumber(L,1)){
+        lua_pushstring( L, "setExitStub: Need a room number as first argument" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        roomId = lua_tonumber(L,1);
+    }
+    if (!lua_isnumber(L,2)){
+        lua_pushstring( L, "setExitStub: Need a dir number as 2nd argument" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        dirType = lua_tonumber(L,2);
+    }
+    if (!lua_isnumber(L,3)){
+        lua_pushstring( L, "setExitStub: Need a 0 or 1 for third argument" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        status = lua_tonumber(L,3);
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (!pHost->mpMap->rooms.contains( roomId )){
+        lua_pushstring( L, "setExitStub: RoomId doesn't exist" );
+        lua_error( L );
+        return 1;
+    }
+    if (dirType>10 || dirType < 1){
+        lua_pushstring( L, "setExitStub: dirType must be between 1 and 10" );
+        lua_error( L );
+        return 1;
+    }
+    if (status){
+        if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
+            return 1;
+        pHost->mpMap->rooms[roomId]->setExitStub(dirType, 1);
+        }
+    else{
+        if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
+            pHost->mpMap->rooms[roomId]->setExitStub(dirType, 0);
+        }
+    return 1;
+}
+
+int TLuaInterpreter::connectExitStub( lua_State * L  ){
+    //takes exit stubs from the selected room, finds the room in that direction and if
+    //that room has a stub, a two way exit is formed
+    //args:room id, direction
+    int roomId;
+    int dirType;
+    if (!lua_isnumber(L,1)){
+        lua_pushstring( L, "connectExitStub: Need a room number as first argument" );
+        lua_error( L );
+        return 1;
+    }
+    else
+        roomId = lua_tonumber(L,1);
+    if (!lua_isnumber(L,2)){
+        lua_pushstring( L, "connectExitStub: Need a direction number as first argument" );
+        lua_error( L );
+        return 1;
+    }
+    else
+        dirType = lua_tonumber(L,2);
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (!pHost->mpMap->rooms.contains( roomId )){
+        lua_pushstring( L, "connectExitStubs: RoomId doesn't exist" );
+        lua_error( L );
+        return 1;
+    }
+    if (!pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType)){
+        lua_pushstring( L, "connectExitStubs: ExitStub doesn't exist" );
+        lua_error( L );
+        return 1;
+    }
+    pHost->mpMap->connectExitStub(roomId, dirType);
+    return 1;
+}
+
+int TLuaInterpreter::getExitStubs( lua_State * L  ){
+    //args:room id
+    int roomId;
+    if (!lua_isnumber(L,1)){
+        lua_pushstring( L, "getExitStubs: Need a room number as first argument" );
+        lua_error( L );
+        return 1;
+    }
+    else
+        roomId = lua_tonumber(L,1);
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (!pHost->mpMap->rooms.contains( roomId )){
+        lua_pushstring( L, "getExitStubs: RoomId doesn't exist" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        QList<int> stubs = pHost->mpMap->rooms[roomId]->exitStubs;
+        if (stubs.size()){
+            lua_newtable(L);
+            for(int i=0;i<stubs.size();i++){
+                int exitType = stubs[i];
+                lua_pushnumber( L, i );
+                lua_pushnumber( L, exitType );
+                lua_settable(L, -3);
+            }
+        }
+    }
+    return 1;
+}
+
 int TLuaInterpreter::loadMap( lua_State * L )
 {
     string location="";
@@ -8320,6 +8436,7 @@ int TLuaInterpreter::check_for_mappingscript()
     return r;
 }
 
+
 void TLuaInterpreter::threadLuaInterpreterExec( string code )
 {
     /* cout << "TLuaMainThread::threadLuaInterpreterExec(code) executing following code:" << endl;
@@ -8595,6 +8712,10 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "hasExitLock", TLuaInterpreter::hasExitLock );
     lua_register( pGlobalLua, "lockSpecialExit", TLuaInterpreter::lockSpecialExit );
     lua_register( pGlobalLua, "hasSpecialExitLock", TLuaInterpreter::hasSpecialExitLock );
+    lua_register( pGlobalLua, "setExitStub", TLuaInterpreter::setExitStub );
+    lua_register( pGlobalLua, "connectExitStub", TLuaInterpreter::connectExitStub );
+    lua_register( pGlobalLua, "getExitStubs", TLuaInterpreter::getExitStubs );
+
 
     luaopen_yajl(pGlobalLua);
     lua_setglobal( pGlobalLua, "yajl" );

@@ -29,9 +29,11 @@
 #include "TConsole.h"
 #include <QPixmap>
 
+
 bool m2DPanMode = false, mLeftDown = false, mRightDown = false;
 float m2DPanXStart=0, m2DPanYStart=0;
 int mViewArea = 0;
+
 
 T2DMap::T2DMap()
 {
@@ -54,6 +56,7 @@ T2DMap::T2DMap()
     mBubbleMode = false;
     mMapperUseAntiAlias = true;
 }
+
 
 T2DMap::T2DMap(QWidget * parent)
 : QWidget(parent)
@@ -165,6 +168,8 @@ void T2DMap::init()
         }
     }
 }
+
+
 
 QColor T2DMap::_getColor( int id )
 {
@@ -386,6 +391,7 @@ void T2DMap::switchArea(QString name)
         }
     }
 }
+
 
 void T2DMap::paintEvent( QPaintEvent * e )
 {
@@ -743,7 +749,12 @@ void T2DMap::paintEvent( QPaintEvent * e )
             }
 
             int e = pR->z;
-
+            QMap<int, QVector3D> unitVectors = mpMap->unitVectors;
+            for( int k=0; k<pR->exitStubs.size(); k++ ){
+                int direction = pR->exitStubs[k];
+                QVector3D uDirection = unitVectors[direction];
+                p.drawLine((int)pR->x*tx+_rx, (int)pR->y*ty*-1+_ry,(int)pR->x*tx+_rx+(int)uDirection.x()*tx, (int)pR->y*ty*-1+_ry+uDirection.y()*ty);
+            }
             QPen __pen;
             for( int k=0; k<exitList.size(); k++ )
             {

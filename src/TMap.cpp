@@ -49,7 +49,28 @@ TMap::TMap( Host * pH )
     customEnvColors[270] = mpHost->mLightCyan_2;
     customEnvColors[271] = mpHost->mLightWhite_2;
     customEnvColors[272] = mpHost->mLightBlack_2;
-
+    unitVectors[1] = QVector3D(0,-1,0);
+    unitVectors[2] = QVector3D(1,-1,0);
+    unitVectors[3] = QVector3D(-1,-1,0);
+    unitVectors[4] = QVector3D(1, 0,0);
+    unitVectors[5] = QVector3D(-1,0,0);
+    unitVectors[6] = QVector3D(0,1,0);
+    unitVectors[7] = QVector3D(1,1,0);
+    unitVectors[8] = QVector3D(-1,1,0);
+    unitVectors[9] = QVector3D(0,0,1);
+    unitVectors[10] = QVector3D(0,0,-1);
+    reverseDirections[1] = 6; //contains complementary directions
+    reverseDirections[2] = 8;
+    reverseDirections[3] = 7;
+    reverseDirections[4] = 5;
+    reverseDirections[5] = 4;
+    reverseDirections[6] = 1;
+    reverseDirections[7] = 3;
+    reverseDirections[8] = 2;
+    reverseDirections[9] = 10;
+    reverseDirections[10] = 9;
+    reverseDirections[11] = 12;
+    reverseDirections[12] = 11;
 }
 
 #include <QFileDialog>
@@ -177,6 +198,70 @@ bool TMap::setRoomCoordinates( int id, int x, int y, int z )
     rooms[id]->z = z;
 
     return true;
+}
+
+int compSign(int a, int b){
+    return (a < 0) == (b < 0);
+}
+
+void TMap::connectExitStub(int roomId, int dirType){
+    int area = rooms[roomId]->area;
+    int minDistance = 999999;
+    int minDistanceRoom=0, meanSquareDistance=0;
+    QVector3D unitVector = unitVectors[dirType];
+    int ux = unitVector.x(), uy = unitVector.y(), uz = unitVector.z();
+    int rx = rooms[roomId]->x, ry = rooms[roomId]->y, rz = rooms[roomId]->z;
+    int dx=0,dy=0,dz=0;
+    TArea * pA = areas[area];
+    for( int i=0; i< pA->rooms.size(); i++ ){
+        if (rooms[pA->rooms[i]]->id == roomId)
+            continue;
+        if (uz){
+            dz = (int)rooms[pA->rooms[i]]->z-rz;
+            if (!compSign(dz,uz) || !dz)
+                continue;
+        }
+        else{
+            //to avoid lower/upper floors from stealing stubs
+            if ((int)rooms[pA->rooms[i]]->z != rz)
+                continue;
+        }
+        if (ux){
+            dx = (int)rooms[pA->rooms[i]]->x-rx;
+            if (!compSign(dx,ux) || !dx) //we do !dx to make sure we have a component in the desired direction
+                continue;
+        }
+        else{
+            //to avoid rooms on same plane from stealing stubs
+            if ((int)rooms[pA->rooms[i]]->x != rx)
+                continue;
+        }
+        if (uy){
+            dy = (int)rooms[pA->rooms[i]]->y-ry;
+            //if the sign is the SAME here we keep it b/c we flip our y coordinate.
+            if (compSign(dy,uy) || !dy)
+                continue;
+        }
+        else{
+            //to avoid rooms on same plane from stealing stubs
+            if ((int)rooms[pA->rooms[i]]->y != ry)
+                continue;
+        }
+        meanSquareDistance=dx*dx+dy*dy+dz*dz;
+        if (meanSquareDistance < minDistance){
+            minDistanceRoom=rooms[pA->rooms[i]]->id;
+            cout << "new id" << minDistanceRoom;
+            minDistance=meanSquareDistance;
+        }
+    }
+    if (minDistanceRoom){
+        if (rooms[minDistanceRoom]->exitStubs.contains(reverseDirections[dirType])){
+            setExit( roomId, minDistanceRoom, dirType);
+            rooms[roomId]->setExitStub(dirType, 0);
+            setExit( minDistanceRoom, roomId, reverseDirections[dirType]);
+            rooms[minDistanceRoom]->setExitStub(reverseDirections[dirType], 0);
+        }
+    }
 }
 
 int TMap::createNewRoomID()
@@ -1046,6 +1131,7 @@ bool TMap::serialize( QDataStream & ofs )
         ofs << rooms[i]->customLinesColor;
         ofs << rooms[i]->customLinesStyle;
         ofs << rooms[i]->exitLocks;
+        ofs << rooms[i]->exitStubs;
     }
 
     return true;
@@ -1194,7 +1280,9 @@ bool TMap::restore(QString location)
                 ifs >> rooms[i]->customLinesColor;
                 ifs >> rooms[i]->customLinesStyle;
                 ifs >> rooms[i]->exitLocks;
-
+            }
+            if( version>=12){
+                ifs >> rooms[i]->exitStubs;
             }
         }
         customEnvColors[257] = mpHost->mRed_2;

@@ -1,9 +1,0 @@
-Object::connect: No such slot TLuaInterpreter::slotSelect(int,QString,int) in TLuaInterpreter.cpp:69
-Object::connect: No such slot TLuaInterpreter::slotSelectSection(int,int,int) in TLuaInterpreter.cpp:70
-Object::connect: No such slot TLuaInterpreter::slotSetFgColor(int,int,int,int) in TLuaInterpreter.cpp:74
-Object::connect: No such slot TLuaInterpreter::slotSetBgColor(int,int,int,int) in TLuaInterpreter.cpp:75
-RESTORING MAP 
-statistics: areas: 0 
-area exit stats: QMap() 
-statistics: areas: 0 
-area exit stats: QMap() 

@@ -25,6 +25,7 @@
 #include <TMap.h>
 #include <QPixmap>
 
+
 class T2DMap : public QWidget
 {
     Q_OBJECT
@@ -32,7 +33,7 @@ class T2DMap : public QWidget
 public:
 
     T2DMap();
-    explicit T2DMap( QWidget *parent = 0);
+    explicit T2DMap(QWidget *parent = 0);
     QColor   getColor( int id );
     QColor   _getColor( int id );
     void     init();
@@ -45,6 +46,7 @@ public:
     int      getTopLeftSelection();
     void     setRoomSize( double );
     void     setExitSize( double );
+
 
     TMap *   mpMap;
     Host *   mpHost;
