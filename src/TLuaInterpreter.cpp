@@ -4431,7 +4431,8 @@ int TLuaInterpreter::tempTrigger( lua_State *L )
     QString _reg = luaRegex.c_str();
     QString _fun = luaFunction.c_str();
     int timerID = pLuaInterpreter->startTempTrigger( _reg, _fun );
-    lua_pushnumber( L, timerID );
+    //lua_pushnumber( L, timerID );
+    lua_pushstring( L, _reg.toLatin1().data());
     return 1;
 }
 
@@ -4710,7 +4711,8 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
         pT->setFgColor( hlFgColor );
         pT->setBgColor( hlBgColor );
     }
-    lua_pushnumber( L, pT->getID() );
+    //lua_pushnumber( L, pT->getID() );
+    lua_pushstring( L, pattern.toLatin1().data());
     return 1;
 }
 

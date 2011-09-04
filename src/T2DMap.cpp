@@ -1420,7 +1420,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         while( it.hasNext() )
         {
             it.next();
-			if (it.value().pos.z() == mOz)
+            if (it.value().pos.z() == mOz && it.value().pos.x()*tx < _w && it.value().pos.y()*ty*-1 < _h)
 			{
 				QRectF lr = QRectF( 0, 0, 1000, 100 );
 				QPixmap pix( lr.size().toSize() );

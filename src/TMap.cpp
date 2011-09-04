@@ -1055,7 +1055,7 @@ bool TMap::findPath( int from, int to )
 
 bool TMap::serialize( QDataStream & ofs )
 {
-    int version = 12;
+    int version = 13;
     ofs << version;
     ofs << envColors;
     ofs << areaNamesMap;
@@ -1281,7 +1281,7 @@ bool TMap::restore(QString location)
                 ifs >> rooms[i]->customLinesStyle;
                 ifs >> rooms[i]->exitLocks;
             }
-            if( version>=12){
+            if( version>=13){
                 ifs >> rooms[i]->exitStubs;
             }
         }
