@@ -186,6 +186,10 @@ public slots:
    void                          slot_uninstall_package();
    void                          slot_install_package();
    void                          slot_package_manager();
+   void                          slot_uninstall_module();
+   void                          slot_install_module();
+   void                          slot_module_manager();
+   void                          slot_ok_module();
 
 protected:
 
@@ -235,6 +239,10 @@ private:
    QListWidget *                 packageList;
    QPushButton *                 uninstallButton;
    QPushButton *                 installButton;
+
+   QListWidget *                 moduleList;
+   QPushButton *                 moduleUninstallButton;
+   QPushButton *                 moduleInstallButton;
 
 };
 

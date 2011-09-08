@@ -6379,6 +6379,8 @@ void dlgTriggerEditor::slot_profileSaveAction()
         XMLexport writer( mpHost );
         writer.exportHost( & file_xml );
         file_xml.close();
+        qDebug()<<"saving modules";
+        mpHost->saveModules(1);
     }
     else
     {

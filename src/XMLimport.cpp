@@ -26,13 +26,14 @@
 int maxRooms;
 int maxAreas;
 QMap<int,int> areaMap;
+//int module = 0;
 
 XMLimport::XMLimport( Host * pH )
 : mpHost( pH )
 {
 }
 
-bool XMLimport::importPackage( QIODevice * device, QString packName )
+bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleFlag)
 {
     mPackageName = packName;
     setDevice( device );
@@ -43,41 +44,69 @@ bool XMLimport::importPackage( QIODevice * device, QString packName )
     gotKey = false;
     gotAction = false;
     gotScript = false;
+    module = moduleFlag;
+    /*if (moduleFlag)
+        module=1;*/
+    qDebug()<<"module flag:"<<module<<" importing: "<<mPackageName;
 
 
     if( ! packName.isEmpty() )
     {
         mpKey = new TKey( 0, mpHost );
+        if (module){
+            mpKey->mModuleMasterFolder=true;
+            mpKey->mModuleMember=true;
+        }
         mpKey->setPackageName( mPackageName );
         mpKey->setIsActive( true );
         mpKey->setName( mPackageName );
         mpKey->setIsFolder( true );
 
         mpTrigger = new TTrigger( 0, mpHost );
+        if (module){
+            mpTrigger->mModuleMasterFolder=true;
+            mpTrigger->mModuleMember=true;
+        }
         mpTrigger->setPackageName( mPackageName );
         mpTrigger->setIsActive( true );
         mpTrigger->setName( mPackageName );
         mpTrigger->setIsFolder( true );
 
         mpTimer = new TTimer( 0, mpHost );
+        if (module){
+            mpTimer->mModuleMasterFolder=true;
+            mpTimer->mModuleMember=true;
+        }
         mpTimer->setPackageName( mPackageName );
         mpTimer->setIsActive( true );
         mpTimer->setName( mPackageName );
         mpTimer->setIsFolder( true );
 
         mpAlias = new TAlias( 0, mpHost );
+        if (module){
+            mpAlias->mModuleMasterFolder=true;
+            mpAlias->mModuleMember=true;
+        }
         mpAlias->setPackageName( mPackageName );
         mpAlias->setIsActive( true );
         mpAlias->setName( mPackageName );
         mpAlias->setIsFolder( true );
 
         mpAction = new TAction( 0, mpHost );
+        if (module){
+            mpAction->mModuleMasterFolder=true;
+            mpAction->mModuleMember=true;
+        }
         mpAction->setPackageName( mPackageName );
         mpAction->setIsActive( true );
         mpAction->setName( mPackageName );
         mpAction->setIsFolder( true );
 
         mpScript = new TScript( 0, mpHost );
+        if (module){
+            mpScript->mModuleMasterFolder=true;
+            mpScript->mModuleMember=true;
+        }
         mpScript->setPackageName( mPackageName );
         mpScript->setIsActive( true );
         mpScript->setName( mPackageName );
@@ -668,6 +697,11 @@ void XMLimport::readHostPackage( Host * pT )
                 pT->mHostName = readElementText();
                 continue;
             }
+            else if( name() == "mInstalledModules")
+            {
+                readMapList( pT->mInstalledModules );
+                continue;
+            }
             else if( name() == "mInstalledPackages")
             {
                 readStringList( pT->mInstalledPackages );
@@ -979,6 +1013,9 @@ void XMLimport::readTriggerGroup( TTrigger * pParent )
     {
         pT = new TTrigger( 0, mpHost );
     }
+    if (module){
+        pT->mModuleMember = true;
+    }
 
     mpHost->getTriggerUnit()->registerTrigger( pT );
 
@@ -993,7 +1030,6 @@ void XMLimport::readTriggerGroup( TTrigger * pParent )
     pT->mColorTrigger = ( attributes().value("isColorTrigger") == "yes" );
     pT->mColorTriggerBg = ( attributes().value("isColorTriggerBg") == "yes" );
     pT->mColorTriggerFg = ( attributes().value("isColorTriggerFg") == "yes" );
-
 
     while( ! atEnd() )
     {
@@ -1154,6 +1190,8 @@ void XMLimport::readTimerGroup( TTimer * pParent )
     pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     pT->mIsTempTimer = ( attributes().value("isTempTimer") == "yes" );
+    if (module)
+        pT->mModuleMember = true;
 
     while( ! atEnd() )
     {
@@ -1264,6 +1302,8 @@ void XMLimport::readAliasGroup( TAlias * pParent )
     mpHost->getAliasUnit()->registerAlias( pT );
     pT->setIsActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
+    if (module)
+        pT->mModuleMember = true;
 
     while( ! atEnd() )
     {
@@ -1369,6 +1409,9 @@ void XMLimport::readActionGroup( TAction * pParent )
     pT->mIsPushDownButton = ( attributes().value("isPushButton") == "yes" );
     pT->mButtonFlat = ( attributes().value("isFlatButton") == "yes" );
     pT->mUseCustomLayout = ( attributes().value("useCustomLayout") == "yes" );
+    if (module)
+        pT->mModuleMember = true;
+
     while( ! atEnd() )
     {
         readNext();
@@ -1533,6 +1576,8 @@ void XMLimport::readScriptGroup( TScript * pParent )
     mpHost->getScriptUnit()->registerScript( pT );
     pT->setIsActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
+    if (module)
+        pT->mModuleMember = true;
 
     while( ! atEnd() )
     {
@@ -1630,6 +1675,8 @@ void XMLimport::readKeyGroup( TKey * pParent )
     mpHost->getKeyUnit()->registerKey( pT );
     pT->setIsActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
+    if (module)
+        pT->mModuleMember = true;
 
     while( ! atEnd() )
     {
@@ -1681,6 +1728,41 @@ void XMLimport::readKeyGroup( TKey * pParent )
             else
             {
                 readUnknownKeyElement();
+            }
+        }
+    }
+}
+
+void XMLimport::readMapList( QMap<QString, QStringList> & map)
+{
+    QString key;
+    QStringList entry;
+    while( ! atEnd() )
+    {
+        readNext();
+
+        if( isEndElement() ) break;
+
+        if( isStartElement() )
+        {
+            if( name() == "key")
+            {
+                key = readElementText();
+            }
+            else if (name() == "filepath"){
+                entry << readElementText();
+                //map[key] = readElementText();
+                //qDebug()<<"key:"<<key<<"value"<<map[key];
+            }
+            else if (name() == "globalSave"){
+                entry << readElementText();
+                map[key] = entry;
+                qDebug()<<"key:"<<key<<"path"<<entry[0];
+                entry.clear();
+            }
+            else
+            {
+                readUnknownHostElement();
             }
         }
     }

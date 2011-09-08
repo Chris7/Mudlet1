@@ -298,6 +298,70 @@ Host::~Host()
     mErrorLogFile.close();
 }
 
+void Host::saveModules(int sync){
+    qDebug()<<"DONE MAIN WRITING, DOING MODULES NOW";
+    QMapIterator<QString, QStringList> it(modulesToWrite);
+    QStringList modulesToSync;
+    while(it.hasNext()){
+        it.next();
+        QStringList entry = it.value();
+        QString filename_xml = entry[0];
+        QFile file_xml( filename_xml );
+        qDebug()<<"writing module xml for:"<<entry[0];
+        if ( file_xml.open( QIODevice::WriteOnly ) )
+        {
+            XMLexport writer(this);
+            qDebug()<<"successfully wrote module xml for:"<<entry[0];
+            writer.writeModuleXML( & file_xml );
+            file_xml.close();
+            if (entry[1].toInt())
+                modulesToSync << it.key();
+        }
+    }
+    modulesToWrite.clear();
+    if (sync){
+        //synchronize modules across sessions
+        QMap<Host *, TConsole *> activeSessions = mudlet::self()->mConsoleMap;
+        QMapIterator<Host *, TConsole *> it2(activeSessions);
+        while (it2.hasNext()){
+            it2.next();
+            Host * host = it2.key();
+            QMap<QString, QStringList> installedModules = host->mInstalledModules;
+            QMapIterator<QString, QStringList> it3(installedModules);
+            while(it3.hasNext()){
+                it3.next();
+                QString moduleName = it3.key();
+                QStringList entry = it3.value();
+                if (modulesToSync.contains(moduleName)){
+                    qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
+                    host->reloadModule(moduleName);
+                }
+            }
+        }
+    }
+}
+
+void Host::reloadModule(QString moduleName){
+    QMap<QString, QStringList> installedModules = mInstalledModules;
+    QMapIterator<QString, QStringList> it(installedModules);
+    while(it.hasNext()){
+        it.next();
+        QStringList entry = it.value();
+        if (it.key() == moduleName){
+            uninstallPackage(it.key(),2);
+        }
+        installPackage(entry[0],1);
+    }
+    //iterate through mInstalledModules again and reset the entry flag to be correct.
+    //both the installedModules and mInstalled should be in the same order now as well
+    QMapIterator<QString, QStringList> it2(mInstalledModules);
+    while(it2.hasNext()){
+        it2.next();
+        QStringList entry = installedModules[it2.key()];
+        mInstalledModules[it2.key()] = entry;
+    }
+}
+
 void Host::resetProfile()
 {
     getTimerUnit()->stopAllTriggers();
@@ -699,9 +763,11 @@ bool Host::serialize()
     QFile file_xml( filename_xml );
     if ( file_xml.open( QIODevice::WriteOnly ) )
     {
+        modulesToWrite.clear();
         XMLexport writer( this );
         writer.exportHost( & file_xml );
         file_xml.close();
+        saveModules(0);
     }
     else
     {
@@ -754,7 +820,7 @@ void Host::showUnpackingProgress( QString  txt )
 }
 
 #include <QtUiTools>
-bool Host::installPackage( QString fileName )
+bool Host::installPackage( QString fileName, int module )
 {
     if( fileName.isEmpty() ) return false;
 
@@ -772,10 +838,14 @@ bool Host::installPackage( QString fileName )
     packageName.replace( '/' , "" );
     packageName.replace( '\\' , "" );
     packageName.replace( '.' , "" );
-
-    if( mInstalledPackages.contains( packageName ) )
-    {
-        return false;
+    if (module){
+        if( mActiveModules.contains( packageName ) ){
+            uninstallPackage(packageName, 2);
+        }
+    }
+    else{
+        if( mInstalledPackages.contains( packageName ) )
+            return false;
     }
     if( mpEditorDialog )
     {
@@ -829,8 +899,16 @@ bool Host::installPackage( QString fileName )
             QString login = getLogin();
             QString pass = getPass();
             XMLimport reader( this );
-            mInstalledPackages.append( packageName );
-            reader.importPackage( & file2, packageName );
+            if (module){
+                QStringList moduleEntry;
+                moduleEntry << fileName;
+                moduleEntry << "0";
+                mInstalledModules[packageName] = moduleEntry;//.append( packageName );
+                mActiveModules.append(packageName);
+            }
+            else
+                mInstalledPackages.append( packageName );
+            reader.importPackage( & file2, packageName, module);
             setName( profileName );
             setLogin( login );
             setPass( pass );
@@ -840,12 +918,21 @@ bool Host::installPackage( QString fileName )
     {
         file2.setFileName( fileName );
         file2.open(QFile::ReadOnly | QFile::Text);
-        mInstalledPackages.append( packageName );
+        //mInstalledPackages.append( packageName );
         QString profileName = getName();
         QString login = getLogin();
         QString pass = getPass();
         XMLimport reader( this );
-        reader.importPackage( & file2, packageName );
+        if (module){
+            QStringList moduleEntry;
+            moduleEntry << fileName;
+            moduleEntry << "0";
+            mInstalledModules[packageName] = moduleEntry;//.append( packageName );
+            mActiveModules.append(packageName);
+        }
+        else
+            mInstalledPackages.append( packageName );
+        reader.importPackage( & file2, packageName, module);
         setName( profileName );
         setLogin( login );
         setPass( pass );
@@ -868,6 +955,7 @@ bool Host::installPackage( QString fileName )
         writer.exportHost( & file_xml );
         file_xml.close();
     }
+    return true;
 }
 
 // credit: http://john.nachtimwald.com/2010/06/08/qt-remove-directory-and-its-contents/
@@ -900,9 +988,14 @@ bool Host::removeDir( const QString dirName, QString originalPath )
     return result;
 }
 
-bool Host::uninstallPackage( QString packageName )
+bool Host::uninstallPackage( QString packageName, int module)
 {
-    if( ! mInstalledPackages.contains( packageName ) ) return false;
+    if (module){
+        if( ! mInstalledModules.contains( packageName ) ) return false;
+    }
+    else{
+        if( ! mInstalledModules.contains( packageName ) ) return false;
+    }
     if( mpEditorDialog )
     {
         mpEditorDialog->doCleanReset();
@@ -913,16 +1006,26 @@ bool Host::uninstallPackage( QString packageName )
     mActionUnit.uninstall( packageName );
     mScriptUnit.uninstall( packageName );
     mKeyUnit.uninstall( packageName );
+    if (module==2){
+        //if module == 2, this is a temporary uninstall for reloading so we exit here
+        mInstalledModules.remove( packageName );
+        mActiveModules.removeAll(packageName);
+        return true;
+    }
+    else if (module)
+        //if module == 1, we actually uninstall it
+        mInstalledModules.remove( packageName );
+    else
+        mInstalledPackages.removeAll( packageName );
+    if( mpEditorDialog )
+    {
+        mpEditorDialog->doCleanReset();
+    }
     QString _home = QDir::homePath();
     _home.append( "/.config/mudlet/profiles/" );
     _home.append( getName() );
     QString _dest = QString( "%1/%2/").arg( _home ).arg( packageName );
     removeDir( _dest, _dest );
-    mInstalledPackages.removeAll( packageName );
-    if( mpEditorDialog )
-    {
-        mpEditorDialog->doCleanReset();
-    }
     QString directory_xml = QDir::homePath()+"/.config/mudlet/profiles/"+getName()+"/current";
     QString filename_xml = directory_xml + "/"+QDateTime::currentDateTime().toString("dd-MM-yyyy#hh-mm-ss")+".xml";
     QDir dir_xml;
@@ -937,6 +1040,7 @@ bool Host::uninstallPackage( QString packageName )
         writer.exportHost( & file_xml );
         file_xml.close();
     }
+    return true;
 }
 
 #endif

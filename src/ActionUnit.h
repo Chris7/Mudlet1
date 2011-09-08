@@ -80,6 +80,7 @@ private:
     qint64                mMaxID;
     TToolBar *            mpToolBar;
     TEasyButtonBar *      mpEasyButtonBar;
+    bool                  mModuleMember;
     std::list<TToolBar *> mToolBarList;
     std::list<TEasyButtonBar *> mEasyButtonBarList;
 

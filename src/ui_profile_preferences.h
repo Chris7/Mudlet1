@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'profile_preferences.ui'
 **
-** Created: Sun Aug 21 15:41:54 2011
+** Created: Tue Sep 6 18:16:47 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

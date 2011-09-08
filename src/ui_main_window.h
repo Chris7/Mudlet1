@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'main_window.ui'
 **
-** Created: Sun Aug 21 15:41:54 2011
+** Created: Mon Sep 5 20:34:36 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -47,6 +47,7 @@ public:
     QAction *actionPackage_manager;
     QAction *actionTest1;
     QAction *actionAsdf;
+    QAction *actionModule_manager;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QMdiArea *mdiArea;
@@ -109,6 +110,8 @@ public:
         actionTest1->setObjectName(QString::fromUtf8("actionTest1"));
         actionAsdf = new QAction(MainWindow);
         actionAsdf->setObjectName(QString::fromUtf8("actionAsdf"));
+        actionModule_manager = new QAction(MainWindow);
+        actionModule_manager->setObjectName(QString::fromUtf8("actionModule_manager"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -141,7 +144,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         MenuBar = new QMenuBar(MainWindow);
         MenuBar->setObjectName(QString::fromUtf8("MenuBar"));
-        MenuBar->setGeometry(QRect(0, 0, 750, 21));
+        MenuBar->setGeometry(QRect(0, 0, 750, 25));
         menuEditor = new QMenu(MenuBar);
         menuEditor->setObjectName(QString::fromUtf8("menuEditor"));
         menuOptions = new QMenu(MenuBar);
@@ -165,6 +168,7 @@ public:
         menuEditor->addAction(actionLive_Help_Chat);
         menuEditor->addAction(actionPackage_manager);
         menuEditor->addAction(dactionReplay);
+        menuEditor->addAction(actionModule_manager);
         menuOptions->addAction(dactionOptions);
         menuHelp->addAction(dactionHelp);
         menuHelp->addAction(dactionVideo);
@@ -219,6 +223,7 @@ public:
         actionPackage_manager->setShortcut(QApplication::translate("MainWindow", "Alt+P", 0, QApplication::UnicodeUTF8));
         actionTest1->setText(QApplication::translate("MainWindow", "test1", 0, QApplication::UnicodeUTF8));
         actionAsdf->setText(QApplication::translate("MainWindow", "asdf", 0, QApplication::UnicodeUTF8));
+        actionModule_manager->setText(QApplication::translate("MainWindow", "Module manager", 0, QApplication::UnicodeUTF8));
         menuEditor->setTitle(QApplication::translate("MainWindow", "Toolbox", 0, QApplication::UnicodeUTF8));
         menuOptions->setTitle(QApplication::translate("MainWindow", "Options", 0, QApplication::UnicodeUTF8));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0, QApplication::UnicodeUTF8));

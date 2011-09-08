@@ -360,6 +360,7 @@ mudlet::mudlet()
     connect(actionShow_Map, SIGNAL(triggered()), this, SLOT(slot_mapper()));
     connect(dactionDownload, SIGNAL(triggered()), this, SLOT(slot_show_help_dialog_download()));
     connect(actionPackage_manager, SIGNAL(triggered()), this, SLOT(slot_package_manager()));
+    connect(actionModule_manager, SIGNAL(triggered()), this, SLOT(slot_module_manager()));
 
     connect(mactionTriggers, SIGNAL(triggered()), this, SLOT(show_trigger_dialog()));
     connect(dactionScriptEditor, SIGNAL(triggered()), this, SLOT(show_trigger_dialog()));
@@ -398,6 +399,121 @@ mudlet::mudlet()
 
     //qApp->setStyleSheet("QMainWindow::separator{border: 0px;width: 0px; height: 0px; padding: 0px;} QMainWindow::separator:hover {background: red;}");
 
+}
+
+void mudlet::slot_module_manager(){
+    Host * pH = getActiveHost();
+    if( ! pH ) return;
+    QUiLoader loader;
+    QFile file(":/ui/module_manager.ui");
+    file.open(QFile::ReadOnly);
+    QDialog * d = dynamic_cast<QDialog *>(loader.load(&file, this));
+    file.close();
+    if( ! d ) return;
+    moduleList = d->findChild<QListWidget *>("packageList");
+    moduleUninstallButton = d->findChild<QPushButton *>("uninstallButton");
+    moduleInstallButton = d->findChild<QPushButton *>("installButton");
+    QDialogButtonBox * moduleButtonBox = d->findChild<QDialogButtonBox *>("buttonBox");
+    if( ! moduleList || ! moduleUninstallButton ) return;
+    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
+    while( it.hasNext() ){
+        it.next();
+        QStringList moduleInfo = it.value();
+        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
+        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        if (moduleInfo[1].toInt())
+            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
+        else
+            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+        moduleList->addItem(itemEntry);
+    }
+    connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
+    connect(moduleInstallButton, SIGNAL(clicked()), this, SLOT(slot_install_module()));
+    connect(moduleButtonBox, SIGNAL(accepted()), this, SLOT(slot_ok_module()));
+    d->setWindowTitle("Module Manager");
+    d->show();
+    d->raise();
+}
+
+void mudlet::slot_ok_module(){
+    qDebug()<<"ok pressed";
+    QList<QListWidgetItem *> itemList = moduleList->selectedItems();
+    Host * pH = getActiveHost();
+    QStringList moduleStringList;
+    for (int i=0;i<itemList.size();i++){
+        QListWidgetItem * entry = itemList[i];
+        if (entry->checkState() == Qt::Unchecked){
+            moduleStringList = pH->mInstalledModules[entry->text()];
+            moduleStringList[1] = "0";
+        }
+        if (entry->checkState() == Qt::Checked){
+            moduleStringList = pH->mInstalledModules[entry->text()];
+            moduleStringList[1] = "1";
+            qDebug()<<"checked";
+        }
+        pH->mInstalledModules[entry->text()] = moduleStringList;
+    }
+}
+
+void mudlet::slot_install_module()
+{
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Mudlet Module"),
+                                                    QDir::currentPath());
+    if( fileName.isEmpty() ) return;
+
+    QFile file(fileName);
+    if( ! file.open(QFile::ReadOnly | QFile::Text) )
+    {
+        QMessageBox::warning(this, tr("Load Mudlet Module:"),
+                             tr("Cannot read file %1:\n%2.")
+                             .arg(fileName)
+                             .arg(file.errorString()));
+        return;
+    }
+
+    Host * pH = getActiveHost();
+    if( ! pH ) return;
+    pH->installPackage( fileName, 1);
+    moduleList->clear();
+    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
+    while( it.hasNext() ){
+        it.next();
+        QStringList moduleInfo = it.value();
+     /*   QMap<QString, Qt::CheckState> moduleEntry;
+        moduleEntry[it.key()] = it.value();*/
+        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
+        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        if (moduleInfo[1].toInt())
+            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
+        else
+            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+        moduleList->addItem(itemEntry);
+    }
+}
+
+void mudlet::slot_uninstall_module()
+{
+    Host * pH = getActiveHost();
+    if( ! pH ) return;
+    QListWidgetItem * pI = moduleList->currentItem();
+    if( pI )
+        pH->uninstallPackage( pI->text(), 1);
+    moduleList->clear();
+    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
+    while( it.hasNext() ){
+        it.next();
+        QStringList moduleInfo = it.value();
+     /*   QMap<QString, Qt::CheckState> moduleEntry;
+        moduleEntry[it.key()] = it.value();*/
+        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
+        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        if (moduleInfo[1].toInt())
+            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
+        else
+            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+        moduleList->addItem(itemEntry);
+    }
 }
 
 void mudlet::slot_package_manager()
@@ -442,7 +558,7 @@ void mudlet::slot_install_package()
     Host * pH = getActiveHost();
     if( ! pH ) return;
 
-    pH->installPackage( fileName );
+    pH->installPackage( fileName, 0);
     packageList->clear();
     packageList->addItems( pH->mInstalledPackages );
 }
@@ -460,7 +576,7 @@ void mudlet::slot_uninstall_package()
     if( ! pH ) return;
     QListWidgetItem * pI = packageList->currentItem();
     if( pI )
-        pH->uninstallPackage( pI->text() );
+        pH->uninstallPackage( pI->text(), 0);
     packageList->clear();
     packageList->addItems( pH->mInstalledPackages );
 }

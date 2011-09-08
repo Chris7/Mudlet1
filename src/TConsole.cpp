@@ -717,9 +717,11 @@ void TConsole::closeEvent( QCloseEvent *event )
             QFile file_xml( filename_xml );
             if( file_xml.open( QIODevice::WriteOnly ) )
             {
+                mpHost->modulesToWrite.clear();
                 XMLexport writer( mpHost );
                 writer.exportHost( & file_xml );
                 file_xml.close();
+                mpHost->saveModules(0);
 
             }
             if( mpHost->mpMap->rooms.size() > 0 )
@@ -765,9 +767,14 @@ void TConsole::closeEvent( QCloseEvent *event )
             QFile file_xml( filename_xml );
             if( file_xml.open( QIODevice::WriteOnly ) )
             {
+                /*XMLexport writer( mpHost );
+                writer.exportHost( & file_xml );
+                file_xml.close();*/
+                mpHost->modulesToWrite.clear();
                 XMLexport writer( mpHost );
                 writer.exportHost( & file_xml );
                 file_xml.close();
+                mpHost->saveModules(0);
                 if( mpHost->mpMap->rooms.size() > 0 )
                 {
                     QDir dir_map;
