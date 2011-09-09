@@ -1403,8 +1403,12 @@ int TLuaInterpreter::connectExitStub( lua_State * L  ){
     //takes exit stubs from the selected room, finds the room in that direction and if
     //that room has a stub, a two way exit is formed
     //args:room id, direction
+    //OR if 3 arguments, takes first argument as from room, 2nd at to room, 3rd as direction
+    //from start room to end room
     int roomId;
+    int toRoom;
     int dirType;
+    int roomsGiven = 0;
     if (!lua_isnumber(L,1)){
         lua_pushstring( L, "connectExitStub: Need a room number as first argument" );
         lua_error( L );
@@ -1413,12 +1417,22 @@ int TLuaInterpreter::connectExitStub( lua_State * L  ){
     else
         roomId = lua_tonumber(L,1);
     if (!lua_isnumber(L,2)){
-        lua_pushstring( L, "connectExitStub: Need a direction number as first argument" );
+        lua_pushstring( L, "connectExitStub: Need a direction number (or room id) as 2nd argument" );
         lua_error( L );
         return 1;
     }
     else
         dirType = lua_tonumber(L,2);
+    if (!lua_isnumber(L,3)){
+        lua_pushstring( L, "connectExitStub: Need a direction number as 3rd argument" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        roomsGiven = 1;
+        toRoom = lua_tonumber(L,2);
+        dirType = lua_tonumber(L,3);
+    }
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if (!pHost->mpMap->rooms.contains( roomId )){
         lua_pushstring( L, "connectExitStubs: RoomId doesn't exist" );
@@ -1430,7 +1444,27 @@ int TLuaInterpreter::connectExitStub( lua_State * L  ){
         lua_error( L );
         return 1;
     }
-    pHost->mpMap->connectExitStub(roomId, dirType);
+    if (roomsGiven){
+        if (!pHost->mpMap->rooms.contains( toRoom )){
+            lua_pushstring( L, "connectExitStubs: toRoom doesn't exist" );
+            lua_error( L );
+            return 1;
+        }
+        Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+        lua_pushboolean(L, pHost->mpMap->setExit( roomId, toRoom, dirType ) );
+        //pHost->mpMap->rooms[roomId]->setExitStub(dirType, 0);
+        //setExit( toRoom, roomId, pHost->mpMap->reverseDirections[dirType]);
+        //pHost->mpMap->rooms[toRoom]->setExitStub(pHost->mpMap->reverseDirections[dirType], 0);
+    }
+    else{
+        if (!pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType)){
+            lua_pushstring( L, "connectExitStubs: ExitStub doesn't exist" );
+            lua_error( L );
+            return 1;
+        }
+        pHost->mpMap->connectExitStub(roomId, dirType);
+    }
+    pHost->mpMap->mMapGraphNeedsUpdate = true;
     return 1;
 }
 

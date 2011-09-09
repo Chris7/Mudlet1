@@ -257,9 +257,9 @@ void TMap::connectExitStub(int roomId, int dirType){
     if (minDistanceRoom){
         if (rooms[minDistanceRoom]->exitStubs.contains(reverseDirections[dirType])){
             setExit( roomId, minDistanceRoom, dirType);
-            rooms[roomId]->setExitStub(dirType, 0);
+            //rooms[roomId]->setExitStub(dirType, 0);
             setExit( minDistanceRoom, roomId, reverseDirections[dirType]);
-            rooms[minDistanceRoom]->setExitStub(reverseDirections[dirType], 0);
+            //rooms[minDistanceRoom]->setExitStub(reverseDirections[dirType], 0);
         }
     }
 }
@@ -307,6 +307,7 @@ bool TMap::setExit( int from, int to, int dir )
         case DIR_OUT: rooms[from]->out = to; break;
         default: return false;
     }
+    rooms[from]->setExitStub(dir, 0);
     mMapGraphNeedsUpdate = true;
     return true;
 }

@@ -326,6 +326,8 @@ void Host::saveModules(int sync){
         while (it2.hasNext()){
             it2.next();
             Host * host = it2.key();
+            if (host->mHostName == mHostName)
+                continue;
             QMap<QString, QStringList> installedModules = host->mInstalledModules;
             QMapIterator<QString, QStringList> it3(installedModules);
             while(it3.hasNext()){
