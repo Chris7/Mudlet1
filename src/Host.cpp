@@ -144,6 +144,7 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
 , mServerGUI_Package_version( -1 )
 , mServerGUI_Package_name( "nothing" )
 , mAcceptServerGUI     ( true )
+, mModuleSaveBlock(false)
 , mFORCE_MXP_NEGOTIATION_OFF( false )
 {
    // mLogStatus = mudlet::self()->mAutolog;
@@ -221,6 +222,7 @@ Host::Host()
 , mUSE_UNIX_EOL( false )
 , mWrapAt( 100 )
 , mWrapIndentCount( 0 )
+, mModuleSaveBlock(false)
 , mCommandLineBgColor( QColor(  0,  0,  0) )
 , mCommandLineFgColor( QColor(128,128,128) )
 , mBlack             ( QColor(  0,  0,  0) )
@@ -299,6 +301,10 @@ Host::~Host()
 }
 
 void Host::saveModules(int sync){
+    if (mModuleSaveBlock){
+        qDebug()<<"MODULES SAVING DISABLED UNTIL RELOAD";
+        return;
+    }
     qDebug()<<"DONE MAIN WRITING, DOING MODULES NOW";
     QMapIterator<QString, QStringList> it(modulesToWrite);
     QStringList modulesToSync;
@@ -312,10 +318,18 @@ void Host::saveModules(int sync){
         {
             XMLexport writer(this);
             qDebug()<<"successfully wrote module xml for:"<<entry[0];
-            writer.writeModuleXML( & file_xml );
+            writer.writeModuleXML( & file_xml, it.key());
             file_xml.close();
             if (entry[1].toInt())
                 modulesToSync << it.key();
+        }
+        else{
+            qDebug()<<"bytes to write"<<file_xml.bytesToWrite();
+            file_xml.close();
+            qDebug()<<"failed to write xml for module:"<<entry[0]<<", check permissions?";
+            qDebug()<<"aborting process to avoid corruption";
+            mModuleSaveBlock = true;
+            return;
         }
     }
     modulesToWrite.clear();

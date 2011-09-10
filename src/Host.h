@@ -283,6 +283,7 @@ public:
     QMap<QString, QStringList> mInstalledModules;
     QMap<QString, QStringList> modulesToWrite;
     QStringList        mActiveModules;
+    bool               mModuleSaveBlock;
 
     void               showUnpackingProgress( QString  txt );
     QDialog *          mpUnzipDialog;
