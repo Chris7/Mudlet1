@@ -425,6 +425,7 @@ void mudlet::slot_module_manager(){
             itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
         else
             itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+        itemEntry->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
         moduleList->addItem(itemEntry);
     }
     connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
@@ -436,12 +437,10 @@ void mudlet::slot_module_manager(){
 }
 
 void mudlet::slot_ok_module(){
-    qDebug()<<"ok pressed";
-    QList<QListWidgetItem *> itemList = moduleList->selectedItems();
     Host * pH = getActiveHost();
     QStringList moduleStringList;
-    for (int i=0;i<itemList.size();i++){
-        QListWidgetItem * entry = itemList[i];
+    for (int i=0;i<moduleList->count();i++){
+        QListWidgetItem * entry = moduleList->item(i);
         if (entry->checkState() == Qt::Unchecked){
             moduleStringList = pH->mInstalledModules[entry->text()];
             moduleStringList[1] = "0";
@@ -449,7 +448,6 @@ void mudlet::slot_ok_module(){
         if (entry->checkState() == Qt::Checked){
             moduleStringList = pH->mInstalledModules[entry->text()];
             moduleStringList[1] = "1";
-            qDebug()<<"checked";
         }
         pH->mInstalledModules[entry->text()] = moduleStringList;
     }
@@ -480,14 +478,12 @@ void mudlet::slot_install_module()
     while( it.hasNext() ){
         it.next();
         QStringList moduleInfo = it.value();
-     /*   QMap<QString, Qt::CheckState> moduleEntry;
-        moduleEntry[it.key()] = it.value();*/
         QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
         itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         if (moduleInfo[1].toInt())
-            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
+            itemEntry->setCheckState(Qt::Checked);
         else
-            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+            itemEntry->setCheckState(Qt::Unchecked);
         moduleList->addItem(itemEntry);
     }
 }
@@ -504,14 +500,12 @@ void mudlet::slot_uninstall_module()
     while( it.hasNext() ){
         it.next();
         QStringList moduleInfo = it.value();
-     /*   QMap<QString, Qt::CheckState> moduleEntry;
-        moduleEntry[it.key()] = it.value();*/
         QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
         itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         if (moduleInfo[1].toInt())
-            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
+            itemEntry->setCheckState(Qt::Checked);
         else
-            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
+            itemEntry->setCheckState(Qt::Unchecked);
         moduleList->addItem(itemEntry);
     }
 }
