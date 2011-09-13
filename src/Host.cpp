@@ -1010,7 +1010,7 @@ bool Host::uninstallPackage( QString packageName, int module)
         if( ! mInstalledModules.contains( packageName ) ) return false;
     }
     else{
-        if( ! mInstalledModules.contains( packageName ) ) return false;
+        if( ! mInstalledPackages.contains( packageName ) ) return false;
     }
     if( mpEditorDialog )
     {
