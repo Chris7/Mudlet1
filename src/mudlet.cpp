@@ -1954,6 +1954,19 @@ void mudlet::slot_connection_dlg_finnished( QString profile, int historyVersion 
     pHost->getScriptUnit()->compileAll();
     pHost->mIsProfileLoadingSequence = false;
 
+    //do modules here
+    qDebug()<<"loading modules now";
+    QMapIterator<QString, QStringList > it (pHost->mInstalledModules);
+    while( it.hasNext() ){
+        it.next();
+        QStringList entry = it.value();
+        pHost->installPackage(entry[0],1);
+        qDebug()<<entry[0]<<","<<entry[1];
+        //we repeat this step here b/c we use the same installPackage method for initial loading,
+        //where we overwrite the globalSave flag.  This restores saved and loaded packages to their proper flag
+        pHost->mInstalledModules[it.key()] = entry;
+    }
+
     TEvent event;
     event.mArgumentList.append( "sysLoadEvent" );
     event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);

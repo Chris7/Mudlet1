@@ -329,7 +329,6 @@ std::list<TEasyButtonBar *> ActionUnit::getEasyButtonBarList()
             mEasyButtonBarList.push_back( pTB );
             (*it)->mpEasyButtonBar = pTB; // wird fuer drag&drop gebraucht
         }
-
         if( (*it)->mOrientation == 1 )
         {
             pTB->setVerticalOrientation();
@@ -342,7 +341,6 @@ std::list<TEasyButtonBar *> ActionUnit::getEasyButtonBarList()
         (*it)->mpEasyButtonBar = pTB;
         pTB->setStyleSheet( pTB->mpTAction->css );
     }
-
     return mEasyButtonBarList;
 }
 

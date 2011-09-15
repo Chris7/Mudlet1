@@ -91,7 +91,6 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
         mpAlias->setIsActive( true );
         mpAlias->setName( mPackageName );
         mpAlias->setIsFolder( true );
-
         mpAction = new TAction( 0, mpHost );
         if (module){
             mpAction->mModuleMasterFolder=true;
@@ -101,7 +100,6 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
         mpAction->setIsActive( true );
         mpAction->setName( mPackageName );
         mpAction->setIsFolder( true );
-
         mpScript = new TScript( 0, mpHost );
         if (module){
             mpScript->mModuleMasterFolder=true;
@@ -111,14 +109,12 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
         mpScript->setIsActive( true );
         mpScript->setName( mPackageName );
         mpScript->setIsFolder( true );
-
         mpHost->getTriggerUnit()->registerTrigger( mpTrigger );
         mpHost->getTimerUnit()->registerTimer( mpTimer );
         mpHost->getAliasUnit()->registerAlias( mpAlias );
         mpHost->getActionUnit()->registerAction( mpAction );
         mpHost->getKeyUnit()->registerKey( mpKey );
         mpHost->getScriptUnit()->registerScript( mpScript );
-
     }
     while( ! atEnd() )
     {
@@ -144,8 +140,7 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             }
         }
     }
-
-    if( ! packName.isEmpty() )
+    if( ! packName.isEmpty())
     {
        if( ! gotTrigger )
             mpHost->getTriggerUnit()->unregisterTrigger( mpTrigger );
@@ -1365,7 +1360,6 @@ void XMLimport::readActionPackage()
         {
             break;
         }
-
         if( isStartElement() )
         {
             if( name() == "ActionGroup" )

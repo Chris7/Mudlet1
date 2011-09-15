@@ -1183,7 +1183,7 @@ void dlgConnectionProfiles::slot_connectToServer()
     }
 
     //take care of modules
-    qDebug()<<"loading modules now";
+    /*qDebug()<<"loading modules now";
     QMapIterator<QString, QStringList > it (pHost->mInstalledModules);
     while( it.hasNext() ){
         it.next();
@@ -1193,7 +1193,7 @@ void dlgConnectionProfiles::slot_connectToServer()
         //we repeat this step here b/c we use the same installPackage method for initial loading,
         //where we overwrite the globalSave flag.  This restores saved and loaded packages to their proper flag
         pHost->mInstalledModules[it.key()] = entry;
-    }
+    }*/
 
     emit signal_establish_connection( profile_name, 0 );
 }
