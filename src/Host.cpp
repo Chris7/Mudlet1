@@ -1012,6 +1012,9 @@ bool Host::uninstallPackage( QString packageName, int module)
     else{
         if( ! mInstalledPackages.contains( packageName ) ) return false;
     }
+    int dualInstallations=0;
+    if (mInstalledModules.contains(packageName) && mInstalledPackages.contains(packageName))
+        dualInstallations=1;
     if( mpEditorDialog )
     {
         mpEditorDialog->doCleanReset();
@@ -1028,11 +1031,26 @@ bool Host::uninstallPackage( QString packageName, int module)
         mActiveModules.removeAll(packageName);
         return true;
     }
-    else if (module)
-        //if module == 1, we actually uninstall it
+    else if (module){
+        //if module == 1, we actually uninstall it.
+        QStringList entry = mInstalledModules[packageName];
         mInstalledModules.remove( packageName );
-    else
+        //reinstall the module if it was also removed.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
+        if (dualInstallations){
+            //get the pre package list so we don't get duplicates
+            mInstalledPackages.removeAll(packageName); //so we don't get denied from installPackage
+            installPackage(entry[0], 0);
+        }
+    }
+    else{
         mInstalledPackages.removeAll( packageName );
+        if (dualInstallations){
+            QStringList entry = mInstalledModules[packageName];
+            installPackage(entry[0], 1);
+            //restore the module edit flag
+            mInstalledModules[packageName] = entry;
+        }
+    }
     if( mpEditorDialog )
     {
         mpEditorDialog->doCleanReset();
