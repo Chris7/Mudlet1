@@ -410,23 +410,45 @@ void mudlet::slot_module_manager(){
     QDialog * d = dynamic_cast<QDialog *>(loader.load(&file, this));
     file.close();
     if( ! d ) return;
-    moduleList = d->findChild<QListWidget *>("packageList");
+    //moduleList = d->findChild<QListWidget *>("packageList");
+    moduleTable = d->findChild<QTableWidget *>("moduleTable");
     moduleUninstallButton = d->findChild<QPushButton *>("uninstallButton");
     moduleInstallButton = d->findChild<QPushButton *>("installButton");
     QDialogButtonBox * moduleButtonBox = d->findChild<QDialogButtonBox *>("buttonBox");
-    if( ! moduleList || ! moduleUninstallButton ) return;
+    if( ! moduleTable || ! moduleUninstallButton ) return;
     QMapIterator<QString, QStringList > it (pH->mInstalledModules);
+    QStringList sl;
+    // The following seems like a non-intuitive operator
+    // overload but that is how they do it...
+    sl << "Master Module?" << "Module Name" << "Module Location";
+    moduleTable->setHorizontalHeaderLabels(sl);
+    moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    moduleTable->verticalHeader()->hide();
+    moduleTable->setShowGrid(true);
     while( it.hasNext() ){
         it.next();
         QStringList moduleInfo = it.value();
-        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
-        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-        if (moduleInfo[1].toInt())
-            itemEntry->setCheckState(Qt::Checked);//Qt::Checked);
-        else
-            itemEntry->setCheckState(Qt::Unchecked);//Qt::Checked);
-        itemEntry->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
-        moduleList->addItem(itemEntry);
+        int row = moduleTable->rowCount();
+        moduleTable->insertRow(row);
+        QTableWidgetItem *masterModule = new QTableWidgetItem ();
+        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
+        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
+        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        if (moduleInfo[1].toInt()){
+            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
+            masterModule->setText("YES");
+        }
+        else{
+            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
+            masterModule->setText("NO");
+        }
+        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        QString moduleName = it.key();
+        itemEntry->setText(moduleName);
+        itemLocation->setText(moduleInfo[0]);
+        moduleTable->setItem(row, 0, masterModule);
+        moduleTable->setItem(row, 1, itemEntry);
+        moduleTable->setItem(row, 2, itemLocation);
     }
     connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
     connect(moduleInstallButton, SIGNAL(clicked()), this, SLOT(slot_install_module()));
@@ -434,21 +456,20 @@ void mudlet::slot_module_manager(){
     d->setWindowTitle("Module Manager");
     d->show();
     d->raise();
+    moduleTable->resizeColumnsToContents();
 }
 
 void mudlet::slot_ok_module(){
     Host * pH = getActiveHost();
     QStringList moduleStringList;
-    for (int i=0;i<moduleList->count();i++){
-        QListWidgetItem * entry = moduleList->item(i);
-        if (entry->checkState() == Qt::Unchecked){
-            moduleStringList = pH->mInstalledModules[entry->text()];
+    for (int i=0;i<moduleTable->rowCount();i++){
+        QTableWidgetItem * entry = moduleTable->item(i,1);
+        QTableWidgetItem * checkStatus = moduleTable->item(i,0);
+        moduleStringList = pH->mInstalledModules[entry->text()];
+        if (checkStatus->checkState() == Qt::Unchecked)
             moduleStringList[1] = "0";
-        }
-        if (entry->checkState() == Qt::Checked){
-            moduleStringList = pH->mInstalledModules[entry->text()];
+        if (checkStatus->checkState() == Qt::Checked)
             moduleStringList[1] = "1";
-        }
         pH->mInstalledModules[entry->text()] = moduleStringList;
     }
 }
@@ -473,41 +494,67 @@ void mudlet::slot_install_module()
     Host * pH = getActiveHost();
     if( ! pH ) return;
     pH->installPackage( fileName, 1);
-    moduleList->clear();
+    //moduleTable->clearContents();
+    for (int i=moduleTable->rowCount()-1; i >= 0; --i)
+        moduleTable->removeRow(i);
     QMapIterator<QString, QStringList > it (pH->mInstalledModules);
     while( it.hasNext() ){
         it.next();
         QStringList moduleInfo = it.value();
-        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
-        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        int row = moduleTable->rowCount();
+        moduleTable->insertRow(row);
+        QTableWidgetItem *masterModule = new QTableWidgetItem ();
+        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
+        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
+        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         if (moduleInfo[1].toInt())
-            itemEntry->setCheckState(Qt::Checked);
+            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
         else
-            itemEntry->setCheckState(Qt::Unchecked);
-        moduleList->addItem(itemEntry);
+            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
+        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        QString moduleName = it.key();
+        itemEntry->setText(moduleName);
+        itemLocation->setText(moduleInfo[0]);
+        moduleTable->setItem(row, 0, masterModule);
+        moduleTable->setItem(row, 1, itemEntry);
+        moduleTable->setItem(row, 2, itemLocation);
     }
+    moduleTable->resizeColumnsToContents();
 }
 
 void mudlet::slot_uninstall_module()
 {
     Host * pH = getActiveHost();
     if( ! pH ) return;
-    QListWidgetItem * pI = moduleList->currentItem();
+    int cRow = moduleTable->currentRow();
+    QTableWidgetItem * pI = moduleTable->item(cRow, 1);
     if( pI )
         pH->uninstallPackage( pI->text(), 1);
-    moduleList->clear();
+    for (int i=moduleTable->rowCount()-1; i >= 0; --i)
+        moduleTable->removeRow(i);
     QMapIterator<QString, QStringList > it (pH->mInstalledModules);
     while( it.hasNext() ){
         it.next();
         QStringList moduleInfo = it.value();
-        QListWidgetItem *itemEntry = new QListWidgetItem (it.key());
-        itemEntry->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        int row = moduleTable->rowCount();
+        moduleTable->insertRow(row);
+        QTableWidgetItem *masterModule = new QTableWidgetItem ();
+        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
+        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
+        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         if (moduleInfo[1].toInt())
-            itemEntry->setCheckState(Qt::Checked);
+            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
         else
-            itemEntry->setCheckState(Qt::Unchecked);
-        moduleList->addItem(itemEntry);
+            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
+        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        QString moduleName = it.key();
+        itemEntry->setText(moduleName);
+        itemLocation->setText(moduleInfo[0]);
+        moduleTable->setItem(row, 0, masterModule);
+        moduleTable->setItem(row, 1, itemEntry);
+        moduleTable->setItem(row, 2, itemLocation);
     }
+    moduleTable->resizeColumnsToContents();
 }
 
 void mudlet::slot_package_manager()

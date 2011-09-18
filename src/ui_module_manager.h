@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'module_manager.ui'
 **
-** Created: Tue Sep 6 18:30:59 2011
+** Created: Fri Sep 16 19:12:07 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -18,8 +18,8 @@
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
-#include <QtGui/QListWidget>
 #include <QtGui/QPushButton>
+#include <QtGui/QTableWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
@@ -31,7 +31,7 @@ public:
     QVBoxLayout *verticalLayout_3;
     QWidget *widget;
     QVBoxLayout *verticalLayout_2;
-    QListWidget *packageList;
+    QTableWidget *moduleTable;
     QWidget *widget_2;
     QHBoxLayout *horizontalLayout;
     QPushButton *installButton;
@@ -54,34 +54,47 @@ public:
         widget->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(widget);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        packageList = new QListWidget(widget);
-        packageList->setObjectName(QString::fromUtf8("packageList"));
+        moduleTable = new QTableWidget(widget);
+        if (moduleTable->columnCount() < 3)
+            moduleTable->setColumnCount(3);
+        moduleTable->setObjectName(QString::fromUtf8("moduleTable"));
+        QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(moduleTable->sizePolicy().hasHeightForWidth());
+        moduleTable->setSizePolicy(sizePolicy1);
+        moduleTable->setSortingEnabled(true);
+        moduleTable->setRowCount(0);
+        moduleTable->setColumnCount(3);
+        moduleTable->horizontalHeader()->setCascadingSectionResizes(false);
+        moduleTable->horizontalHeader()->setStretchLastSection(true);
+        moduleTable->verticalHeader()->setStretchLastSection(false);
 
-        verticalLayout_2->addWidget(packageList);
+        verticalLayout_2->addWidget(moduleTable);
 
         widget_2 = new QWidget(widget);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
-        widget_2->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
+        widget_2->setSizePolicy(sizePolicy2);
         horizontalLayout = new QHBoxLayout(widget_2);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         installButton = new QPushButton(widget_2);
         installButton->setObjectName(QString::fromUtf8("installButton"));
-        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
-        installButton->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
+        installButton->setSizePolicy(sizePolicy3);
 
         horizontalLayout->addWidget(installButton);
 
         uninstallButton = new QPushButton(widget_2);
         uninstallButton->setObjectName(QString::fromUtf8("uninstallButton"));
-        sizePolicy2.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
-        uninstallButton->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
+        uninstallButton->setSizePolicy(sizePolicy3);
 
         horizontalLayout->addWidget(uninstallButton);
 

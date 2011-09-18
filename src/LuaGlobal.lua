@@ -19,6 +19,9 @@ end
 function doSwitchArea()
 end
 
+function initMapper()
+end
+
 -----------------------------------------------------------------------------
 -- General-purpose useful tools that were needed during development:
 -----------------------------------------------------------------------------

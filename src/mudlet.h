@@ -240,7 +240,7 @@ private:
    QPushButton *                 uninstallButton;
    QPushButton *                 installButton;
 
-   QListWidget *                 moduleList;
+   QTableWidget *                 moduleTable;
    QPushButton *                 moduleUninstallButton;
    QPushButton *                 moduleInstallButton;
 
