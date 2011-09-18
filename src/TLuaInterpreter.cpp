@@ -1423,10 +1423,8 @@ int TLuaInterpreter::connectExitStub( lua_State * L  ){
     }
     else
         dirType = lua_tonumber(L,2);
-    if (!lua_isnumber(L,3)){
-        lua_pushstring( L, "connectExitStub: Need a direction number as 3rd argument" );
-        lua_error( L );
-        return 1;
+    if (!lua_isnumber(L,3) && !lua_isstring(L,3)){
+        roomsGiven = 0;
     }
     else{
         roomsGiven = 1;
