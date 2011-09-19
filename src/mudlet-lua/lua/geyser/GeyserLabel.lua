@@ -72,6 +72,14 @@ function Geyser.Label:setClickCallback (func, ...)
    setLabelClickCallback(self.name, func, ...)
 end
 
+function Geyser.Label:setOnEnter (func, ...)
+   setLabelOnEnter(self.name, func, ...)
+end
+
+function Geyser.Label:setOnLeave (func, ...)
+   setLabelOnLeave(self.name, func, ...)
+end
+
 --- Sets the style sheet of the label
 -- @param css The style sheet string
 function Geyser.Label:setStyleSheet(css)
@@ -106,6 +114,14 @@ function Geyser.Label:new (cons, container)
    if me.callback then
       me:setClickCallback(me.callback, me.args)
    end
+
+    if me.onEnter then
+        me:setOnEnter(me.onEnter, me.args)
+    end
+
+    if me.onLeave then
+        me:setOnLeave(me.onLeave, me.args)
+    end
 
    --print("  New in " .. self.name .. " : " .. me.name)
    return me

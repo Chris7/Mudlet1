@@ -957,19 +957,21 @@ bool Host::installPackage( QString fileName, int module )
     {
         mpEditorDialog->doCleanReset();
     }
-    QString directory_xml = QDir::homePath()+"/.config/mudlet/profiles/"+getName()+"/current";
-    QString filename_xml = directory_xml + "/"+QDateTime::currentDateTime().toString("dd-MM-yyyy#hh-mm-ss")+".xml";
-    QDir dir_xml;
-    if( ! dir_xml.exists( directory_xml ) )
-    {
-        dir_xml.mkpath( directory_xml );
-    }
-    QFile file_xml( filename_xml );
-    if ( file_xml.open( QIODevice::WriteOnly ) )
-    {
-        XMLexport writer( this );
-        writer.exportHost( & file_xml );
-        file_xml.close();
+    if (!module){
+        QString directory_xml = QDir::homePath()+"/.config/mudlet/profiles/"+getName()+"/current";
+        QString filename_xml = directory_xml + "/"+QDateTime::currentDateTime().toString("dd-MM-yyyy#hh-mm-ss")+".xml";
+        QDir dir_xml;
+        if( ! dir_xml.exists( directory_xml ) )
+        {
+            dir_xml.mkpath( directory_xml );
+        }
+        QFile file_xml( filename_xml );
+        if ( file_xml.open( QIODevice::WriteOnly ) )
+        {
+            XMLexport writer( this );
+            writer.exportHost( & file_xml );
+            file_xml.close();
+        }
     }
     return true;
 }

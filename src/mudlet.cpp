@@ -420,7 +420,7 @@ void mudlet::slot_module_manager(){
     QStringList sl;
     // The following seems like a non-intuitive operator
     // overload but that is how they do it...
-    sl << "Master Module?" << "Module Name" << "Module Location";
+    sl << "Save & Resync Module?" << "Module Name" << "Module Location";
     moduleTable->setHorizontalHeaderLabels(sl);
     moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     moduleTable->verticalHeader()->hide();
@@ -442,7 +442,7 @@ void mudlet::slot_module_manager(){
             masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
             masterModule->setText("NO");
         }
-        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
         QString moduleName = it.key();
         itemEntry->setText(moduleName);
         itemLocation->setText(moduleInfo[0]);
@@ -511,7 +511,7 @@ void mudlet::slot_install_module()
             masterModule->setCheckState(Qt::Checked);//Qt::Checked);
         else
             masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
         QString moduleName = it.key();
         itemEntry->setText(moduleName);
         itemLocation->setText(moduleInfo[0]);
@@ -546,7 +546,7 @@ void mudlet::slot_uninstall_module()
             masterModule->setCheckState(Qt::Checked);//Qt::Checked);
         else
             masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-        masterModule->setToolTip(QString("CHECKING THIS BOX WILL CAUSE THIS MODULE TO BE SAVED AND RESYNC'D ACROSS ALL OPEN SESSIONS.  MAKE SURE YOU BACKUP YOUR MODULES BEFORE ENABLING THIS OPTION!!!"));
+        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
         QString moduleName = it.key();
         itemEntry->setText(moduleName);
         itemLocation->setText(moduleInfo[0]);
@@ -1171,6 +1171,30 @@ bool mudlet::setLabelClickCallback( Host * pHost, QString & name, QString & func
     if( labelMap.contains( name ) )
     {
         labelMap[name]->setScript( pHost, func, pA );
+        return true;
+    }
+    else
+        return false;
+}
+
+bool mudlet::setLabelOnEnter( Host * pHost, QString & name, QString & func, TEvent * pA )
+{
+    QMap<QString, TLabel *> & labelMap = mHostLabelMap[pHost];
+    if( labelMap.contains( name ) )
+    {
+        labelMap[name]->setEnter( pHost, func, pA );
+        return true;
+    }
+    else
+        return false;
+}
+
+bool mudlet::setLabelOnLeave( Host * pHost, QString & name, QString & func, TEvent * pA )
+{
+    QMap<QString, TLabel *> & labelMap = mHostLabelMap[pHost];
+    if( labelMap.contains( name ) )
+    {
+        labelMap[name]->setLeave( pHost, func, pA );
         return true;
     }
     else

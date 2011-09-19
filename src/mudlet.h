@@ -91,6 +91,8 @@ public:
    bool                          setBackgroundImage( Host *, QString & name, QString & path );
    bool                          setTextFormat( Host *, QString & name, int, int, int, int, int, int, bool, bool, bool );
    bool                          setLabelClickCallback( Host *, QString &, QString &, TEvent * );
+   bool                          setLabelOnEnter( Host *, QString &, QString &, TEvent * );
+   bool                          setLabelOnLeave( Host *, QString &, QString &, TEvent * );
    bool                          moveWindow( Host *, QString & name, int, int );
    void                          deleteLine( Host *, QString & name );
    void                          insertText( Host *, QString & name, QString );
