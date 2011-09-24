@@ -6606,19 +6606,16 @@ int TLuaInterpreter::getSpecialExits( lua_State * L )
         while( it.hasNext() )
         {
             it.next();
+            lua_newtable(L);
             int id_to = it.key();
             QString dir = it.value();
-			QString exit = dir.section(1,-1);
-			QString exitStatus = dir.left(1);
-			//cout << exit.toLatin1().data() <<endl;
-			//cout << exitStatus.toLatin1().data() <<endl;
-            lua_pushnumber( L, id_to );
-			//lua_newtable(L);
+            QString exitStatus = dir.left(1);
+            QString exit = dir.remove(0,1);
             lua_pushstring( L, exit.toLatin1().data() );//done to remove the prepended special exit status
-			//lua_pushstring( L, exitStatus.toLatin1().data());
-			//lua_settable(F, -3);
-			//lua_pushnumber( L, dir.section(0,1) );//done to remove the prepended special exit status
-			//lua_pushtable(L, F);
+            lua_pushstring( L, exitStatus.toLatin1().data() );//done to remove the prepended special exit status
+            lua_settable(L, -3);
+            lua_pushnumber(L, id_to);
+            lua_insert(L,-2);
             lua_settable(L, -3);
         }
         return 1;

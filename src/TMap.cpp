@@ -345,14 +345,7 @@ void TMap::init( Host * pH )
     qDebug()<<"statistics: areas:"<<s_areas;
     qDebug()<<"area exit stats:" <<s_area_exits;
     //tell mudlet the map is loaded and the information useful like what roomId the map is at
-    QString t1 = "mapVariables";
-    QStringList mapList;
-    QString n = QString::number( mRoomId);
-    mapList.append(n);
-    mpHost->mLuaInterpreter.set_lua_table( t1, mapList );
-    QString f = "initMapper";
-    QString arg = "";
-    mpHost->mLuaInterpreter.call( f, arg );
+    //mapVarsset("mRoomId", mRoomId);
 }
 
 void TMap::auditRooms()
