@@ -44,6 +44,7 @@ public:
                           ActionUnit( Host * pHost ) : mpHost(pHost), mMaxID(0) {;}
     std::list<TAction *>  getActionRootNodeList()   { QMutexLocker locker(& mActionUnitLock); return mActionRootNodeList; }
     TAction *             getAction( int id );
+    TAction *            findAction( QString & );
     void                  compileAll();
     bool                  registerAction( TAction * pT );
     void                  unregisterAction( TAction * pT );

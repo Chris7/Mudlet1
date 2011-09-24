@@ -4563,8 +4563,8 @@ int TLuaInterpreter::tempTrigger( lua_State *L )
     QString _reg = luaRegex.c_str();
     QString _fun = luaFunction.c_str();
     int timerID = pLuaInterpreter->startTempTrigger( _reg, _fun );
-    //lua_pushnumber( L, timerID );
-    lua_pushstring( L, _reg.toLatin1().data());
+    lua_pushnumber( L, timerID );
+    //lua_pushstring( L, _reg.toLatin1().data());
     return 1;
 }
 
@@ -4845,6 +4845,160 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     }
     //lua_pushnumber( L, pT->getID() );
     lua_pushstring( L, pattern.toLatin1().data());
+    return 1;
+}
+
+int TLuaInterpreter::tempButton( lua_State *L){
+    //args: parent, name, orientation
+    QString toolbar, name;
+    QString cmdButtonUp = "";
+    QString cmdButtonDown = "";
+    QString script = "";
+    QStringList nameL;
+    nameL << toolbar;
+    int orientation;
+    if(!lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong first arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        toolbar = lua_tostring( L, 1 );
+    }
+    if(!lua_isstring( L, 2 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong 2nd arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        name = lua_tostring( L, 2 );
+    }
+    if(!lua_isnumber( L, 3 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong first arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        orientation = lua_tonumber( L, 3 );
+    }
+
+
+    Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
+    TAction * pP = mpHost->getActionUnit()->findAction( toolbar );
+    if (!pP) return 0;
+    TAction * pT = mpHost->getActionUnit()->findAction( name );
+    if (pT) return 0;
+    pT = new TAction( pP, mpHost );
+    pT->setName( name );
+    pT->setCommandButtonUp( cmdButtonUp );
+    pT->setCommandButtonDown( cmdButtonDown );
+    pT->setIsPushDownButton( false );
+    pT->mLocation = pP->mLocation;
+    pT->mOrientation = orientation;
+    pT->setScript( script );
+    pT->setIsFolder( false );
+    pT->setIsActive( true );
+
+
+
+//    pT->setIsPushDownButton( isChecked );
+//    pT->mLocation = location;
+//    pT->mOrientation = orientation;
+//    pT->setIsActive( pT->shouldBeActive() );
+//    pT->setButtonColor( color );
+//    pT->setButtonRotation( rotation );
+//    pT->setButtonColumns( columns );
+////      pT->setButtonFlat( flatButton );
+//    pT->mUseCustomLayout = useCustomLayout;
+//    pT->mPosX = posX;
+//    pT->mPosY = posY;
+//    pT->mSizeX = sizeX;
+//    pT->mSizeY = sizeY;
+//    pT->css = mpActionsMainArea->css->toPlainText();
+
+
+    pT->registerAction();
+    int childID = pT->getID();
+    mpHost->getActionUnit()->updateToolbar();
+    return 1;
+}
+
+int TLuaInterpreter::tempButtonToolbar( lua_State *L  )
+{//args: name, location(0-4), orientation(0/1)
+    QString name;
+    QString cmdButtonUp = "";
+    QString cmdButtonDown = "";
+    QString script = "";
+    QStringList nameL;
+    nameL << name;
+    int location, orientation;
+
+    if(!lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong first arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        name = lua_tostring( L, 1 );
+    }
+    if(!lua_isnumber( L, 2 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong first arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        location = lua_tonumber( L, 2 );
+    }
+    if(!lua_isnumber( L, 3 ) )
+    {
+        lua_pushstring( L, "tempButtonToolbar: wrong first arg" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        orientation = lua_tonumber( L, 3 );
+    }
+
+    if( location > 0 ) location++;
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    TAction * pT = pHost->getActionUnit()->findAction( name );
+    if (pT) return 0;
+
+        //insert a new root item
+    //ROOT_ACTION:
+
+    pT = new TAction( name, pHost );
+    pT->setCommandButtonUp( cmdButtonUp );
+    QStringList nl;
+    nl << name;
+
+    pT->setName( name );
+    pT->setCommandButtonUp( cmdButtonUp );
+    pT->setCommandButtonDown( cmdButtonDown );
+    pT->setIsPushDownButton( false );
+    pT->mLocation = location;
+    pT->mOrientation = orientation;
+    pT->setScript( script );
+    pT->setIsFolder( true );
+    pT->setIsActive( true );
+    pT->registerAction();
+    int childID = pT->getID();
+    pHost->getActionUnit()->updateToolbar();
+
+
+
+
     return 1;
 }
 
@@ -8723,6 +8877,8 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "setItalics", TLuaInterpreter::setItalics );
     lua_register( pGlobalLua, "setUnderline", TLuaInterpreter::setUnderline );
     lua_register( pGlobalLua, "disconnect", TLuaInterpreter::disconnect );
+    lua_register( pGlobalLua, "tempButtonToolbar", TLuaInterpreter::tempButtonToolbar );
+    lua_register( pGlobalLua, "tempButton", TLuaInterpreter::tempButton );
     lua_register( pGlobalLua, "reconnect", TLuaInterpreter::reconnect );
     lua_register( pGlobalLua, "getMudletHomeDir", TLuaInterpreter::getMudletHomeDir );
     lua_register( pGlobalLua, "setTriggerStayOpen", TLuaInterpreter::setTriggerStayOpen );
@@ -9310,9 +9466,12 @@ int TLuaInterpreter::startPermRegexTrigger( QString & name, QString & parent, QS
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    //pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     mpHost->mpEditorDialog->mNeedUpdateData = true;
-    return 1;
+    //return 1;
+    return id;
 
 }
 
@@ -9343,9 +9502,11 @@ int TLuaInterpreter::startPermBeginOfLineStringTrigger( QString & name, QString 
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     mpHost->mpEditorDialog->mNeedUpdateData = true;
-    return 1;
+    //return 1;
+    return id;
 
 }
 
@@ -9376,9 +9537,11 @@ int TLuaInterpreter::startPermSubstringTrigger( QString & name, QString & parent
     pT->setIsTempTrigger( false );
     pT->registerTrigger();
     pT->setScript( function );
-    pT->setName( name );
+    int id = pT->getID();
+    pT->setName( QString::number( id ) );
     mpHost->mpEditorDialog->mNeedUpdateData = true;
-    return 1;
+    //return 1;
+    return id;
 
 }
 
