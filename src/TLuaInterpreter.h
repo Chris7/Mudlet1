@@ -328,6 +328,8 @@ public:
     static int setExitStub( lua_State * L  );
     static int connectExitStub( lua_State * L  );
     static int getExitStubs( lua_State * L  );
+    static int getModulePriority( lua_State * L  );
+    static int setModulePriority( lua_State * L  );
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;

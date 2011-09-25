@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'module_manager.ui'
 **
-** Created: Fri Sep 16 19:12:07 2011
+** Created: Sat Sep 24 16:01:23 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -55,8 +55,8 @@ public:
         verticalLayout_2 = new QVBoxLayout(widget);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         moduleTable = new QTableWidget(widget);
-        if (moduleTable->columnCount() < 3)
-            moduleTable->setColumnCount(3);
+        if (moduleTable->columnCount() < 4)
+            moduleTable->setColumnCount(4);
         moduleTable->setObjectName(QString::fromUtf8("moduleTable"));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
@@ -65,7 +65,7 @@ public:
         moduleTable->setSizePolicy(sizePolicy1);
         moduleTable->setSortingEnabled(true);
         moduleTable->setRowCount(0);
-        moduleTable->setColumnCount(3);
+        moduleTable->setColumnCount(4);
         moduleTable->horizontalHeader()->setCascadingSectionResizes(false);
         moduleTable->horizontalHeader()->setStretchLastSection(true);
         moduleTable->verticalHeader()->setStretchLastSection(false);

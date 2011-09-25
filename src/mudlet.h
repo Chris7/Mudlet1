@@ -192,6 +192,7 @@ public slots:
    void                          slot_install_module();
    void                          slot_module_manager();
    void                          slot_ok_module();
+   void                          layoutModules();
 
 protected:
 

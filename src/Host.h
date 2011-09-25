@@ -281,6 +281,7 @@ public:
     QString            mIRCNick;
     QStringList        mInstalledPackages;
     QMap<QString, QStringList> mInstalledModules;
+    QMap<QString, int> mModulePriorities;
     QMap<QString, QStringList> modulesToWrite;
     QStringList        mActiveModules;
     bool               mModuleSaveBlock;

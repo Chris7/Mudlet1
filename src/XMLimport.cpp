@@ -694,7 +694,20 @@ void XMLimport::readHostPackage( Host * pT )
             }
             else if( name() == "mInstalledModules")
             {
-                readMapList( pT->mInstalledModules );
+                QMap<QString, QStringList> entry;
+                readMapList(entry);
+                QMapIterator<QString, QStringList> it(entry);
+                while (it.hasNext()){
+                    it.next();
+                    QStringList moduleList;
+                    QStringList entryList = it.value();
+                    moduleList << entryList[0];
+                    moduleList << entryList[1];
+                    pT->mInstalledModules[it.key()] = moduleList;
+                    pT->mModulePriorities[it.key()] = entryList[2].toInt();
+
+                }
+                //readMapList( pT->mInstalledModules );
                 continue;
             }
             else if( name() == "mInstalledPackages")
@@ -1750,9 +1763,13 @@ void XMLimport::readMapList( QMap<QString, QStringList> & map)
             }
             else if (name() == "globalSave"){
                 entry << readElementText();
+            }
+            else if (name() == "priority"){
+                entry << readElementText();
                 map[key] = entry;
                 qDebug()<<"key:"<<key<<"path"<<entry[0];
                 entry.clear();
+
             }
             else
             {

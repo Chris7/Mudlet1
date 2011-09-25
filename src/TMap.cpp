@@ -344,8 +344,6 @@ void TMap::init( Host * pH )
 
     qDebug()<<"statistics: areas:"<<s_areas;
     qDebug()<<"area exit stats:" <<s_area_exits;
-    //tell mudlet the map is loaded and the information useful like what roomId the map is at
-    //mapVarsset("mRoomId", mRoomId);
 }
 
 void TMap::auditRooms()

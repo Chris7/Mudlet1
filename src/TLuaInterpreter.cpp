@@ -1497,6 +1497,54 @@ int TLuaInterpreter::getExitStubs( lua_State * L  ){
     return 1;
 }
 
+int TLuaInterpreter::getModulePriority( lua_State * L  ){
+    QString moduleName;
+    if (!lua_isstring(L,1)){
+        lua_pushstring(L, "getModulePriority: Module be be a string");
+        lua_error(L);
+        return 1;
+    }
+    else
+        moduleName = lua_tostring(L,1);
+    Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (mpHost->mModulePriorities.contains(moduleName))
+        return mpHost->mModulePriorities[moduleName];
+    else{
+        lua_pushstring(L, "getModulePriority: Module doesn't exist");
+        lua_error(L);
+        return 1;
+    }
+    return 1;
+}
+
+int TLuaInterpreter::setModulePriority( lua_State * L  ){
+    QString moduleName;
+    int modulePriority;
+    if (!lua_isstring(L,1)){
+        lua_pushstring(L, "setModulePriority: Module be be a string");
+        lua_error(L);
+        return 1;
+    }
+    else
+        moduleName = lua_tostring(L,1);
+    if (!lua_isnumber(L,2)){
+        lua_pushstring(L, "setModulePriority: Module priority must be an integer");
+        lua_error(L);
+        return 1;
+    }
+    else
+        modulePriority = lua_tonumber(L,2);
+    Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (mpHost->mModulePriorities.contains(moduleName))
+        mpHost->mModulePriorities[moduleName] = modulePriority;
+    else{
+        lua_pushstring(L, "setModulePriority: Module doesn't exist");
+        lua_error(L);
+        return 1;
+    }
+    return 1;
+}
+
 int TLuaInterpreter::loadMap( lua_State * L )
 {
     string location="";
@@ -9004,6 +9052,8 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "setExitStub", TLuaInterpreter::setExitStub );
     lua_register( pGlobalLua, "connectExitStub", TLuaInterpreter::connectExitStub );
     lua_register( pGlobalLua, "getExitStubs", TLuaInterpreter::getExitStubs );
+    lua_register( pGlobalLua, "setModulePriority", TLuaInterpreter::setModulePriority );
+    lua_register( pGlobalLua, "getModulePriority", TLuaInterpreter::getModulePriority );
 
 
     luaopen_yajl(pGlobalLua);

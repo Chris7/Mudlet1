@@ -54,15 +54,6 @@ public:
     QColor bgColor;
     QPixmap pix;
 };
-/*
-struct mapVars{
-public:
-    void set(QString entry, QVariant value) {mVars[entry] = value;}
-    QVariant get(QString entry) {return mVars[entry];}
-    QMap<QString, QVariant> getVars() {return mVars;}
-private:
-    QMap<QString, QVariant> mVars;
-};*/
 
 class TMap
 {

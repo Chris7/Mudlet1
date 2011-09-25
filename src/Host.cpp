@@ -324,7 +324,6 @@ void Host::saveModules(int sync){
                 modulesToSync << it.key();
         }
         else{
-            qDebug()<<"bytes to write"<<file_xml.bytesToWrite();
             file_xml.close();
             qDebug()<<"failed to write xml for module:"<<entry[0]<<", check permissions?";
             qDebug()<<"aborting process to avoid corruption";
@@ -343,14 +342,26 @@ void Host::saveModules(int sync){
             if (host->mHostName == mHostName)
                 continue;
             QMap<QString, QStringList> installedModules = host->mInstalledModules;
-            QMapIterator<QString, QStringList> it3(installedModules);
-            while(it3.hasNext()){
+            QMap<QString, int> modulePri = host->mModulePriorities;
+            QMapIterator<QString, int> it3(modulePri);
+            QMap<int, QStringList> moduleOrder;
+            while( it3.hasNext() ){
                 it3.next();
-                QString moduleName = it3.key();
-                QStringList entry = it3.value();
-                if (modulesToSync.contains(moduleName)){
-                    qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
-                    host->reloadModule(moduleName);
+                //QStringList moduleEntry = moduleOrder[it3.value()];
+                //moduleEntry.append(it3.key());
+                moduleOrder[it3.value()].append(it3.key());// = moduleEntry;
+            }
+            QMapIterator<int, QStringList> it4(moduleOrder);
+            while(it4.hasNext()){
+                it4.next();
+                qDebug()<<"On priority "<<it4.key();
+                QStringList moduleList = it4.value();
+                for(int i=0;i<moduleList.size();i++){
+                    QString moduleName = moduleList[i];
+                    if (modulesToSync.contains(moduleName)){
+                        qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
+                        host->reloadModule(moduleName);
+                    }
                 }
             }
         }
@@ -365,8 +376,8 @@ void Host::reloadModule(QString moduleName){
         QStringList entry = it.value();
         if (it.key() == moduleName){
             uninstallPackage(it.key(),2);
+            installPackage(entry[0],1);
         }
-        installPackage(entry[0],1);
     }
     //iterate through mInstalledModules again and reset the entry flag to be correct.
     //both the installedModules and mInstalled should be in the same order now as well

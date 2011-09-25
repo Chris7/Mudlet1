@@ -401,6 +401,48 @@ mudlet::mudlet()
 
 }
 
+void mudlet::layoutModules(){
+    Host * pH = getActiveHost();
+    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
+    QStringList sl;
+    // The following seems like a non-intuitive operator
+    // overload but that is how they do it...
+    sl << "Save & Resync Module?" << "Priority" << "Module Name" << "Module Location";
+    moduleTable->setHorizontalHeaderLabels(sl);
+    moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    moduleTable->verticalHeader()->hide();
+    moduleTable->setShowGrid(true);
+    while( it.hasNext() ){
+        it.next();
+        QStringList moduleInfo = it.value();
+        int row = moduleTable->rowCount();
+        moduleTable->insertRow(row);
+        QTableWidgetItem *masterModule = new QTableWidgetItem ();
+        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
+        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
+        QTableWidgetItem *itemPriority = new QTableWidgetItem ();
+        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+        if (moduleInfo[1].toInt()){
+            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
+            masterModule->setText("YES");
+        }
+        else{
+            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
+            masterModule->setText("NO");
+        }
+        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
+        QString moduleName = it.key();
+        itemEntry->setText(moduleName);
+        itemLocation->setText(moduleInfo[0]);
+        itemPriority->setText(QString::number(pH->mModulePriorities[moduleName]));
+        moduleTable->setItem(row, 0, masterModule);
+        moduleTable->setItem(row, 1, itemPriority);
+        moduleTable->setItem(row, 2, itemEntry);
+        moduleTable->setItem(row, 3, itemLocation);
+    }
+    moduleTable->resizeColumnsToContents();
+}
+
 void mudlet::slot_module_manager(){
     Host * pH = getActiveHost();
     if( ! pH ) return;
@@ -416,61 +458,30 @@ void mudlet::slot_module_manager(){
     moduleInstallButton = d->findChild<QPushButton *>("installButton");
     QDialogButtonBox * moduleButtonBox = d->findChild<QDialogButtonBox *>("buttonBox");
     if( ! moduleTable || ! moduleUninstallButton ) return;
-    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
-    QStringList sl;
-    // The following seems like a non-intuitive operator
-    // overload but that is how they do it...
-    sl << "Save & Resync Module?" << "Module Name" << "Module Location";
-    moduleTable->setHorizontalHeaderLabels(sl);
-    moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-    moduleTable->verticalHeader()->hide();
-    moduleTable->setShowGrid(true);
-    while( it.hasNext() ){
-        it.next();
-        QStringList moduleInfo = it.value();
-        int row = moduleTable->rowCount();
-        moduleTable->insertRow(row);
-        QTableWidgetItem *masterModule = new QTableWidgetItem ();
-        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
-        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
-        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-        if (moduleInfo[1].toInt()){
-            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
-            masterModule->setText("YES");
-        }
-        else{
-            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-            masterModule->setText("NO");
-        }
-        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
-        QString moduleName = it.key();
-        itemEntry->setText(moduleName);
-        itemLocation->setText(moduleInfo[0]);
-        moduleTable->setItem(row, 0, masterModule);
-        moduleTable->setItem(row, 1, itemEntry);
-        moduleTable->setItem(row, 2, itemLocation);
-    }
+    layoutModules();
     connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
     connect(moduleInstallButton, SIGNAL(clicked()), this, SLOT(slot_install_module()));
     connect(moduleButtonBox, SIGNAL(accepted()), this, SLOT(slot_ok_module()));
     d->setWindowTitle("Module Manager");
     d->show();
     d->raise();
-    moduleTable->resizeColumnsToContents();
+
 }
 
 void mudlet::slot_ok_module(){
     Host * pH = getActiveHost();
     QStringList moduleStringList;
     for (int i=0;i<moduleTable->rowCount();i++){
-        QTableWidgetItem * entry = moduleTable->item(i,1);
+        QTableWidgetItem * entry = moduleTable->item(i,2);
         QTableWidgetItem * checkStatus = moduleTable->item(i,0);
+        QTableWidgetItem * itemPriority = moduleTable->item(i,1);
         moduleStringList = pH->mInstalledModules[entry->text()];
         if (checkStatus->checkState() == Qt::Unchecked)
             moduleStringList[1] = "0";
         if (checkStatus->checkState() == Qt::Checked)
             moduleStringList[1] = "1";
         pH->mInstalledModules[entry->text()] = moduleStringList;
+        pH->mModulePriorities[entry->text()] = itemPriority->text().toInt();
     }
 }
 
@@ -497,29 +508,7 @@ void mudlet::slot_install_module()
     //moduleTable->clearContents();
     for (int i=moduleTable->rowCount()-1; i >= 0; --i)
         moduleTable->removeRow(i);
-    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
-    while( it.hasNext() ){
-        it.next();
-        QStringList moduleInfo = it.value();
-        int row = moduleTable->rowCount();
-        moduleTable->insertRow(row);
-        QTableWidgetItem *masterModule = new QTableWidgetItem ();
-        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
-        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
-        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-        if (moduleInfo[1].toInt())
-            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
-        else
-            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
-        QString moduleName = it.key();
-        itemEntry->setText(moduleName);
-        itemLocation->setText(moduleInfo[0]);
-        moduleTable->setItem(row, 0, masterModule);
-        moduleTable->setItem(row, 1, itemEntry);
-        moduleTable->setItem(row, 2, itemLocation);
-    }
-    moduleTable->resizeColumnsToContents();
+    layoutModules();
 }
 
 void mudlet::slot_uninstall_module()
@@ -532,29 +521,7 @@ void mudlet::slot_uninstall_module()
         pH->uninstallPackage( pI->text(), 1);
     for (int i=moduleTable->rowCount()-1; i >= 0; --i)
         moduleTable->removeRow(i);
-    QMapIterator<QString, QStringList > it (pH->mInstalledModules);
-    while( it.hasNext() ){
-        it.next();
-        QStringList moduleInfo = it.value();
-        int row = moduleTable->rowCount();
-        moduleTable->insertRow(row);
-        QTableWidgetItem *masterModule = new QTableWidgetItem ();
-        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
-        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
-        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-        if (moduleInfo[1].toInt())
-            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
-        else
-            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
-        QString moduleName = it.key();
-        itemEntry->setText(moduleName);
-        itemLocation->setText(moduleInfo[0]);
-        moduleTable->setItem(row, 0, masterModule);
-        moduleTable->setItem(row, 1, itemEntry);
-        moduleTable->setItem(row, 2, itemLocation);
-    }
-    moduleTable->resizeColumnsToContents();
+    layoutModules();
 }
 
 void mudlet::slot_package_manager()
@@ -2027,15 +1994,33 @@ void mudlet::slot_connection_dlg_finnished( QString profile, int historyVersion 
 
     //do modules here
     qDebug()<<"loading modules now";
-    QMapIterator<QString, QStringList > it (pHost->mInstalledModules);
+    //QMapIterator<QString, QStringList > it (pHost->mInstalledModules);
+    QMapIterator<QString, int> it (pHost->mModulePriorities);
+    QMap<int, QStringList> moduleOrder;
     while( it.hasNext() ){
         it.next();
-        QStringList entry = it.value();
+        QStringList moduleEntry = moduleOrder[it.value()];
+        moduleEntry << it.key();
+        moduleOrder[it.value()] = moduleEntry;
+        /*QStringList entry = it.value();
         pHost->installPackage(entry[0],1);
         qDebug()<<entry[0]<<","<<entry[1];
         //we repeat this step here b/c we use the same installPackage method for initial loading,
         //where we overwrite the globalSave flag.  This restores saved and loaded packages to their proper flag
-        pHost->mInstalledModules[it.key()] = entry;
+        pHost->mInstalledModules[it.key()] = entry;*/
+    }
+    QMapIterator<int, QStringList> it2 (moduleOrder);
+    while (it2.hasNext()){
+        it2.next();
+        QStringList modules = it2.value();
+        for (int i=0;i<modules.size();i++){
+            QStringList entry = pHost->mInstalledModules[modules[i]];
+            pHost->installPackage(entry[0],1);
+            qDebug()<<entry[0]<<","<<entry[1];
+            //we repeat this step here b/c we use the same installPackage method for initial loading,
+            //where we overwrite the globalSave flag.  This restores saved and loaded packages to their proper flag
+            pHost->mInstalledModules[modules[i]] = entry;
+        }
     }
 
     TEvent event;

@@ -260,6 +260,7 @@ bool XMLexport::writeHost( Host * pT )
                 qDebug()<<"adding module to write list:"<<it.key();
                 pT->modulesToWrite[it.key()] = entry;
             }
+            writeTextElement("priority", QString::number(pT->mModulePriorities[it.key()]));
         }
         writeEndElement();
     }
