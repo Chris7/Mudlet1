@@ -1507,8 +1507,10 @@ int TLuaInterpreter::getModulePriority( lua_State * L  ){
     else
         moduleName = lua_tostring(L,1);
     Host * mpHost = TLuaInterpreter::luaInterpreterMap[L];
-    if (mpHost->mModulePriorities.contains(moduleName))
-        return mpHost->mModulePriorities[moduleName];
+    if (mpHost->mModulePriorities.contains(moduleName)){
+        int priority = mpHost->mModulePriorities[moduleName];
+        lua_pushnumber( L, priority );
+    }
     else{
         lua_pushstring(L, "getModulePriority: Module doesn't exist");
         lua_error(L);
