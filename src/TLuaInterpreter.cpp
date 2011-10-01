@@ -2568,7 +2568,7 @@ int TLuaInterpreter::setLabelOnEnter( lua_State *L )
     string luaSendText="";
     if( ! lua_isstring( L, 1 ) )
     {
-        lua_pushstring( L, "setLabelClickCallback: wrong argument type" );
+        lua_pushstring( L, "setLabelOnEnter: wrong first argument type" );
         lua_error( L );
         return 1;
     }
@@ -2579,7 +2579,7 @@ int TLuaInterpreter::setLabelOnEnter( lua_State *L )
     string luaName="";
     if( ! lua_isstring( L, 2 ) )
     {
-        lua_pushstring( L, "setLabelClickCallback: wrong argument type" );
+        lua_pushstring( L, "setLabelOnEnter: wrong second argument type" );
         lua_error( L );
         return 1;
     }
