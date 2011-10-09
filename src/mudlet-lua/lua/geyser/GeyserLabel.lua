@@ -128,6 +128,7 @@ function closeNestChildren(label)
     local nLabels = Geyser.Label:getWindow(label).nestedLabels
     if nLabels then
         for i,v in pairs(nLabels) do
+            v:hide()
             if v.nestedLabels then
                 closeNestChildren(v.name)
             end
@@ -139,7 +140,6 @@ function closeNestChildren(label)
                 Geyser.Label.scrollH[v.nestParent][1]:hide()
                 Geyser.Label.scrollH[v.nestParent][2]:hide()
             end
-            v:hide()
         end
     end
 end
@@ -177,10 +177,10 @@ function closeNest(label)
         end
     end
     --is the current label the parent of the prior label?
-    --[[if (lParent.name == Geyser.Label.currentLabel) then
-       -- echo("new element is parent of prior element\n")
-        --closeNestChildren(lParent.name)
-    end]]
+    if (lParent.name ~= Geyser.Label.currentLabel) then
+       -- echo("new element isn't parent of prior element\n")
+       closeNestChildren(lParent.name)
+    end
 end
 
 --- Internal function.  This is a callback from a nested
@@ -195,9 +195,9 @@ function doNestScroll(label)
     end
     local bothScrolls
     if (string.sub(label, -1, -1) == "V") then
-        bothScrolls = Geyser.Label.scrollV[Geyser.Label:getWindow(label).nestparent]
+        bothScrolls = Geyser.Label.scrollV[Geyser.Label:getWindow(label).nestParent]
     else
-        bothScrolls = Geyser.Label.scrollH[Geyser.Label:getWindow(label).nestparent]
+        bothScrolls = Geyser.Label.scrollH[Geyser.Label:getWindow(label).nestParent]
     end
     local bscroll = bothScrolls[1]
     local fscroll = bothScrolls[2]
@@ -212,7 +212,7 @@ function doNestScroll(label)
         fscroll.scroll=fscroll.maxScroll
         bscroll.scroll=fscroll.scroll-scrollDiff
     end
-    Geyser.Label:displayNest(bscroll.nestparent.name)
+    Geyser.Label:displayNest(bscroll.nestParent.name)
 end
 
 --- Displays the nested elements within label, and orients them
@@ -253,6 +253,7 @@ function Geyser.Label:displayNest(label)
                 scrollV = true
                 table.remove(nestedLabels[v.layoutDir])
                 table.remove(nestedLabels[v.layoutDir])
+                v:hide()
             end
         elseif v.layoutDir == "H" and not scrollH then
             if layout[v.layoutDir]+v.get_height() <= maxDim[v.layoutDir] then
@@ -264,6 +265,7 @@ function Geyser.Label:displayNest(label)
                 scrollH = true
                 table.remove(nestedLabels[v.layoutDir])
                 table.remove(nestedLabels[v.layoutDir])
+                v:hide()
             end
         end
     end
@@ -415,14 +417,14 @@ function Geyser.Label:addScrollbars(parent,layout)
     cons = {name="forScroll"..label.name..layout, x=label:get_x(), y=label:get_y(),
     width=label:get_width(), layoutDir=layoutDir, flyDir=flyDir, height=label:get_height(), message="More..."}
     local forward = Geyser.Label:new(cons, parent.container)
-    forward.nestparent=parent
+    forward.nestParent=parent
     forward.maxScroll=#parent.nestedLabels+1
     setLabelOnEnter(forward.name, "doNestEnter", forward.name)
     setLabelOnLeave(forward.name, "doNestLeave", forward.name)
     forward:setClickCallback("doNestScroll", forward.name)
     cons.name="backScroll"..label.name..layout
     local backward = Geyser.Label:new(cons, label.container)
-    backward.nestparent=parent
+    backward.nestParent=parent
     setLabelOnEnter(backward.name, "doNestEnter", backward.name)
     setLabelOnLeave(backward.name, "doNestLeave", backward.name)
     backward:setClickCallback("doNestScroll", backward.name)
