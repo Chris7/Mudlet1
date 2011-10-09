@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'profile_preferences.ui'
 **
-** Created: Fri Sep 16 19:12:07 2011
+** Created: Sat Oct 8 19:08:44 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -60,15 +60,12 @@ public:
     QCheckBox *mEnableGMCP;
     QLabel *need_reconnect_for_gmcp;
     QSpacerItem *verticalSpacer_8;
-    QGroupBox *groupBox_3;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label_36;
-    QComboBox *mMXPMode;
     QGroupBox *groupBox_16;
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_58;
     QLineEdit *ircNick;
     QWidget *input_line_tab;
+    QGridLayout *gridLayout_11;
     QGroupBox *groupBox_4;
     QGridLayout *gridLayout_5;
     QCheckBox *USE_UNIX_EOL;
@@ -79,9 +76,11 @@ public:
     QLabel *label_38;
     QSpinBox *commandLineMinimumHeight;
     QGroupBox *groupBox_15;
+    QGridLayout *gridLayout_12;
     QLabel *label_57;
-    QCheckBox *enableSpellCheck;
     QListWidget *dictList;
+    QCheckBox *enableSpellCheck;
+    QSpacerItem *verticalSpacer_2;
     QWidget *tab;
     QGridLayout *gridLayout_17;
     QGroupBox *groupBox_6;
@@ -120,11 +119,19 @@ public:
     QWidget *color_view_tab;
     QGridLayout *gridLayout_2;
     QGroupBox *groupBox;
-    QGridLayout *gridLayout_8;
+    QGridLayout *gridLayout_21;
     QLabel *label_22;
     QPushButton *pushButton_foreground_color;
     QLabel *label_21;
     QPushButton *pushButton_background_color;
+    QLabel *label_31;
+    QPushButton *pushButton_command_line_foreground_color;
+    QLabel *label_59;
+    QPushButton *pushButton_command_line_background_color;
+    QLabel *label_32;
+    QPushButton *pushButton_command_foreground_color;
+    QLabel *label_37;
+    QPushButton *pushButton_command_background_color;
     QLabel *label_19;
     QGridLayout *gridLayout_4;
     QLabel *label;
@@ -143,15 +150,15 @@ public:
     QPushButton *pushButton_cyan;
     QPushButton *pushButton_white;
     QLabel *label_4;
-    QGridLayout *gridLayout_3;
-    QLabel *label_13;
-    QLabel *label_14;
-    QLabel *label_9;
-    QLabel *label_15;
-    QLabel *label_16;
-    QLabel *label_11;
-    QLabel *label_12;
-    QLabel *label_10;
+    QGridLayout *gridLayout_20;
+    QLabel *label_68;
+    QLabel *label_69;
+    QLabel *label_70;
+    QLabel *label_71;
+    QLabel *label_72;
+    QLabel *label_73;
+    QLabel *label_74;
+    QLabel *label_75;
     QPushButton *pushButton_Lblack;
     QPushButton *pushButton_Lred;
     QPushButton *pushButton_Lgreen;
@@ -160,17 +167,8 @@ public:
     QPushButton *pushButton_Lmagenta;
     QPushButton *pushButton_Lcyan;
     QPushButton *pushButton_Lwhite;
-    QPushButton *reset_colors_button;
     QSpacerItem *verticalSpacer_3;
-    QLabel *label_32;
-    QPushButton *pushButton_command_foreground_color;
-    QLabel *label_37;
-    QPushButton *pushButton_command_background_color;
-    QPushButton *pushButton_command_line_foreground_color;
-    QLabel *label_31;
-    QPushButton *pushButton_command_line_background_color;
-    QLabel *label_59;
-    QSpacerItem *verticalSpacer_5;
+    QPushButton *reset_colors_button;
     QWidget *tab_4;
     QGridLayout *gridLayout_18;
     QGroupBox *groupBox_14;
@@ -215,7 +213,7 @@ public:
     QPushButton *pushButton_Lwhite_2;
     QPushButton *reset_colors_button_2;
     QCheckBox *mMapperUseAntiAlias;
-    QSpacerItem *verticalSpacer_7;
+    QSpacerItem *verticalSpacer_4;
     QWidget *tab_3;
     QGridLayout *gridLayout_7;
     QGroupBox *groupBox_7;
@@ -227,6 +225,7 @@ public:
     QLabel *need_reconnect_for_specialoption;
     QSpacerItem *verticalSpacer_6;
     QWidget *downloadMapOptions;
+    QGridLayout *gridLayout_22;
     QLabel *label_60;
     QPushButton *buttonDownloadMap;
     QWidget *widget;
@@ -238,7 +237,7 @@ public:
     {
         if (profile_preferences->objectName().isEmpty())
             profile_preferences->setObjectName(QString::fromUtf8("profile_preferences"));
-        profile_preferences->resize(770, 735);
+        profile_preferences->resize(747, 576);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -363,25 +362,7 @@ public:
 
         verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout_19->addItem(verticalSpacer_8, 7, 0, 1, 1);
-
-        groupBox_3 = new QGroupBox(General);
-        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        groupBox_3->setEnabled(false);
-        horizontalLayout_2 = new QHBoxLayout(groupBox_3);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        label_36 = new QLabel(groupBox_3);
-        label_36->setObjectName(QString::fromUtf8("label_36"));
-
-        horizontalLayout_2->addWidget(label_36);
-
-        mMXPMode = new QComboBox(groupBox_3);
-        mMXPMode->setObjectName(QString::fromUtf8("mMXPMode"));
-
-        horizontalLayout_2->addWidget(mMXPMode);
-
-
-        gridLayout_19->addWidget(groupBox_3, 6, 0, 1, 1);
+        gridLayout_19->addItem(verticalSpacer_8, 6, 0, 1, 1);
 
         groupBox_16 = new QGroupBox(General);
         groupBox_16->setObjectName(QString::fromUtf8("groupBox_16"));
@@ -407,10 +388,11 @@ public:
         input_line_tab->setObjectName(QString::fromUtf8("input_line_tab"));
         sizePolicy2.setHeightForWidth(input_line_tab->sizePolicy().hasHeightForWidth());
         input_line_tab->setSizePolicy(sizePolicy2);
+        gridLayout_11 = new QGridLayout(input_line_tab);
+        gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
         groupBox_4 = new QGroupBox(input_line_tab);
         groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
         groupBox_4->setEnabled(true);
-        groupBox_4->setGeometry(QRect(4, 4, 491, 171));
         gridLayout_5 = new QGridLayout(groupBox_4);
         gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
         USE_UNIX_EOL = new QCheckBox(groupBox_4);
@@ -453,19 +435,36 @@ public:
 
         gridLayout_5->addWidget(commandLineMinimumHeight, 4, 1, 1, 2);
 
+
+        gridLayout_11->addWidget(groupBox_4, 0, 0, 1, 1);
+
         groupBox_15 = new QGroupBox(input_line_tab);
         groupBox_15->setObjectName(QString::fromUtf8("groupBox_15"));
-        groupBox_15->setGeometry(QRect(9, 200, 491, 241));
+        gridLayout_12 = new QGridLayout(groupBox_15);
+        gridLayout_12->setObjectName(QString::fromUtf8("gridLayout_12"));
         label_57 = new QLabel(groupBox_15);
         label_57->setObjectName(QString::fromUtf8("label_57"));
-        label_57->setGeometry(QRect(10, 30, 161, 20));
-        enableSpellCheck = new QCheckBox(groupBox_15);
-        enableSpellCheck->setObjectName(QString::fromUtf8("enableSpellCheck"));
-        enableSpellCheck->setGeometry(QRect(10, 180, 151, 17));
-        enableSpellCheck->setChecked(true);
+
+        gridLayout_12->addWidget(label_57, 0, 0, 1, 1);
+
         dictList = new QListWidget(groupBox_15);
         dictList->setObjectName(QString::fromUtf8("dictList"));
-        dictList->setGeometry(QRect(200, 20, 278, 131));
+
+        gridLayout_12->addWidget(dictList, 0, 1, 1, 1);
+
+        enableSpellCheck = new QCheckBox(groupBox_15);
+        enableSpellCheck->setObjectName(QString::fromUtf8("enableSpellCheck"));
+        enableSpellCheck->setChecked(true);
+
+        gridLayout_12->addWidget(enableSpellCheck, 1, 0, 1, 1);
+
+
+        gridLayout_11->addWidget(groupBox_15, 1, 0, 1, 1);
+
+        verticalSpacer_2 = new QSpacerItem(20, 26, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_11->addItem(verticalSpacer_2, 2, 0, 1, 1);
+
         tabWidgeta->addTab(input_line_tab, QString());
         tab = new QWidget();
         tab->setObjectName(QString::fromUtf8("tab"));
@@ -694,36 +693,80 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         groupBox = new QGroupBox(color_view_tab);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        gridLayout_8 = new QGridLayout(groupBox);
-        gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
+        gridLayout_21 = new QGridLayout(groupBox);
+        gridLayout_21->setObjectName(QString::fromUtf8("gridLayout_21"));
         label_22 = new QLabel(groupBox);
         label_22->setObjectName(QString::fromUtf8("label_22"));
 
-        gridLayout_8->addWidget(label_22, 0, 0, 1, 1);
+        gridLayout_21->addWidget(label_22, 0, 0, 1, 1);
 
         pushButton_foreground_color = new QPushButton(groupBox);
         pushButton_foreground_color->setObjectName(QString::fromUtf8("pushButton_foreground_color"));
         pushButton_foreground_color->setAutoFillBackground(true);
         pushButton_foreground_color->setStyleSheet(QString::fromUtf8(""));
 
-        gridLayout_8->addWidget(pushButton_foreground_color, 0, 1, 1, 1);
+        gridLayout_21->addWidget(pushButton_foreground_color, 0, 1, 1, 1);
 
         label_21 = new QLabel(groupBox);
         label_21->setObjectName(QString::fromUtf8("label_21"));
 
-        gridLayout_8->addWidget(label_21, 1, 0, 1, 1);
+        gridLayout_21->addWidget(label_21, 0, 2, 1, 1);
 
         pushButton_background_color = new QPushButton(groupBox);
         pushButton_background_color->setObjectName(QString::fromUtf8("pushButton_background_color"));
         pushButton_background_color->setAutoFillBackground(true);
 
-        gridLayout_8->addWidget(pushButton_background_color, 1, 1, 1, 1);
+        gridLayout_21->addWidget(pushButton_background_color, 0, 3, 1, 1);
+
+        label_31 = new QLabel(groupBox);
+        label_31->setObjectName(QString::fromUtf8("label_31"));
+
+        gridLayout_21->addWidget(label_31, 1, 0, 1, 1);
+
+        pushButton_command_line_foreground_color = new QPushButton(groupBox);
+        pushButton_command_line_foreground_color->setObjectName(QString::fromUtf8("pushButton_command_line_foreground_color"));
+
+        gridLayout_21->addWidget(pushButton_command_line_foreground_color, 1, 1, 1, 1);
+
+        label_59 = new QLabel(groupBox);
+        label_59->setObjectName(QString::fromUtf8("label_59"));
+
+        gridLayout_21->addWidget(label_59, 1, 2, 1, 1);
+
+        pushButton_command_line_background_color = new QPushButton(groupBox);
+        pushButton_command_line_background_color->setObjectName(QString::fromUtf8("pushButton_command_line_background_color"));
+
+        gridLayout_21->addWidget(pushButton_command_line_background_color, 1, 3, 1, 1);
+
+        label_32 = new QLabel(groupBox);
+        label_32->setObjectName(QString::fromUtf8("label_32"));
+
+        gridLayout_21->addWidget(label_32, 2, 0, 1, 1);
+
+        pushButton_command_foreground_color = new QPushButton(groupBox);
+        pushButton_command_foreground_color->setObjectName(QString::fromUtf8("pushButton_command_foreground_color"));
+        pushButton_command_foreground_color->setAutoFillBackground(true);
+
+        gridLayout_21->addWidget(pushButton_command_foreground_color, 2, 1, 1, 1);
+
+        label_37 = new QLabel(groupBox);
+        label_37->setObjectName(QString::fromUtf8("label_37"));
+
+        gridLayout_21->addWidget(label_37, 2, 2, 1, 1);
+
+        pushButton_command_background_color = new QPushButton(groupBox);
+        pushButton_command_background_color->setObjectName(QString::fromUtf8("pushButton_command_background_color"));
+        pushButton_command_background_color->setAutoFillBackground(true);
+
+        gridLayout_21->addWidget(pushButton_command_background_color, 2, 3, 1, 1);
 
         label_19 = new QLabel(groupBox);
         label_19->setObjectName(QString::fromUtf8("label_19"));
+        sizePolicy.setHeightForWidth(label_19->sizePolicy().hasHeightForWidth());
+        label_19->setSizePolicy(sizePolicy);
         label_19->setWordWrap(true);
 
-        gridLayout_8->addWidget(label_19, 8, 0, 1, 2);
+        gridLayout_21->addWidget(label_19, 3, 0, 1, 4);
 
         gridLayout_4 = new QGridLayout();
         gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
@@ -816,158 +859,112 @@ public:
         gridLayout_4->addWidget(label_4, 3, 0, 1, 1);
 
 
-        gridLayout_8->addLayout(gridLayout_4, 9, 0, 1, 1);
+        gridLayout_21->addLayout(gridLayout_4, 4, 0, 1, 2);
 
-        gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
-        label_13 = new QLabel(groupBox);
-        label_13->setObjectName(QString::fromUtf8("label_13"));
+        gridLayout_20 = new QGridLayout();
+        gridLayout_20->setObjectName(QString::fromUtf8("gridLayout_20"));
+        label_68 = new QLabel(groupBox);
+        label_68->setObjectName(QString::fromUtf8("label_68"));
 
-        gridLayout_3->addWidget(label_13, 0, 0, 1, 1);
+        gridLayout_20->addWidget(label_68, 0, 0, 1, 1);
 
-        label_14 = new QLabel(groupBox);
-        label_14->setObjectName(QString::fromUtf8("label_14"));
+        label_69 = new QLabel(groupBox);
+        label_69->setObjectName(QString::fromUtf8("label_69"));
 
-        gridLayout_3->addWidget(label_14, 1, 0, 1, 1);
+        gridLayout_20->addWidget(label_69, 1, 0, 1, 1);
 
-        label_9 = new QLabel(groupBox);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_70 = new QLabel(groupBox);
+        label_70->setObjectName(QString::fromUtf8("label_70"));
 
-        gridLayout_3->addWidget(label_9, 2, 0, 1, 1);
+        gridLayout_20->addWidget(label_70, 2, 0, 1, 1);
 
-        label_15 = new QLabel(groupBox);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
+        label_71 = new QLabel(groupBox);
+        label_71->setObjectName(QString::fromUtf8("label_71"));
 
-        gridLayout_3->addWidget(label_15, 3, 0, 1, 1);
+        gridLayout_20->addWidget(label_71, 3, 0, 1, 1);
 
-        label_16 = new QLabel(groupBox);
-        label_16->setObjectName(QString::fromUtf8("label_16"));
+        label_72 = new QLabel(groupBox);
+        label_72->setObjectName(QString::fromUtf8("label_72"));
 
-        gridLayout_3->addWidget(label_16, 4, 0, 1, 1);
+        gridLayout_20->addWidget(label_72, 4, 0, 1, 1);
 
-        label_11 = new QLabel(groupBox);
-        label_11->setObjectName(QString::fromUtf8("label_11"));
+        label_73 = new QLabel(groupBox);
+        label_73->setObjectName(QString::fromUtf8("label_73"));
 
-        gridLayout_3->addWidget(label_11, 5, 0, 1, 1);
+        gridLayout_20->addWidget(label_73, 5, 0, 1, 1);
 
-        label_12 = new QLabel(groupBox);
-        label_12->setObjectName(QString::fromUtf8("label_12"));
+        label_74 = new QLabel(groupBox);
+        label_74->setObjectName(QString::fromUtf8("label_74"));
 
-        gridLayout_3->addWidget(label_12, 6, 0, 1, 1);
+        gridLayout_20->addWidget(label_74, 6, 0, 1, 1);
 
-        label_10 = new QLabel(groupBox);
-        label_10->setObjectName(QString::fromUtf8("label_10"));
+        label_75 = new QLabel(groupBox);
+        label_75->setObjectName(QString::fromUtf8("label_75"));
 
-        gridLayout_3->addWidget(label_10, 7, 0, 1, 1);
+        gridLayout_20->addWidget(label_75, 7, 0, 1, 1);
 
         pushButton_Lblack = new QPushButton(groupBox);
         pushButton_Lblack->setObjectName(QString::fromUtf8("pushButton_Lblack"));
         pushButton_Lblack->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lblack, 0, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lblack, 0, 1, 1, 1);
 
         pushButton_Lred = new QPushButton(groupBox);
         pushButton_Lred->setObjectName(QString::fromUtf8("pushButton_Lred"));
         pushButton_Lred->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lred, 1, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lred, 1, 1, 1, 1);
 
         pushButton_Lgreen = new QPushButton(groupBox);
         pushButton_Lgreen->setObjectName(QString::fromUtf8("pushButton_Lgreen"));
         pushButton_Lgreen->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lgreen, 2, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lgreen, 2, 1, 1, 1);
 
         pushButton_Lyellow = new QPushButton(groupBox);
         pushButton_Lyellow->setObjectName(QString::fromUtf8("pushButton_Lyellow"));
         pushButton_Lyellow->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lyellow, 3, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lyellow, 3, 1, 1, 1);
 
         pushButton_Lblue = new QPushButton(groupBox);
         pushButton_Lblue->setObjectName(QString::fromUtf8("pushButton_Lblue"));
         pushButton_Lblue->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lblue, 4, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lblue, 4, 1, 1, 1);
 
         pushButton_Lmagenta = new QPushButton(groupBox);
         pushButton_Lmagenta->setObjectName(QString::fromUtf8("pushButton_Lmagenta"));
         pushButton_Lmagenta->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lmagenta, 5, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lmagenta, 5, 1, 1, 1);
 
         pushButton_Lcyan = new QPushButton(groupBox);
         pushButton_Lcyan->setObjectName(QString::fromUtf8("pushButton_Lcyan"));
         pushButton_Lcyan->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lcyan, 6, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lcyan, 6, 1, 1, 1);
 
         pushButton_Lwhite = new QPushButton(groupBox);
         pushButton_Lwhite->setObjectName(QString::fromUtf8("pushButton_Lwhite"));
         pushButton_Lwhite->setAutoFillBackground(true);
 
-        gridLayout_3->addWidget(pushButton_Lwhite, 7, 1, 1, 1);
+        gridLayout_20->addWidget(pushButton_Lwhite, 7, 1, 1, 1);
 
 
-        gridLayout_8->addLayout(gridLayout_3, 9, 1, 1, 1);
+        gridLayout_21->addLayout(gridLayout_20, 4, 2, 1, 2);
+
+        verticalSpacer_3 = new QSpacerItem(678, 58, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_21->addItem(verticalSpacer_3, 5, 0, 1, 4);
 
         reset_colors_button = new QPushButton(groupBox);
         reset_colors_button->setObjectName(QString::fromUtf8("reset_colors_button"));
 
-        gridLayout_8->addWidget(reset_colors_button, 11, 1, 1, 1);
-
-        verticalSpacer_3 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
-
-        gridLayout_8->addItem(verticalSpacer_3, 10, 1, 1, 1);
-
-        label_32 = new QLabel(groupBox);
-        label_32->setObjectName(QString::fromUtf8("label_32"));
-
-        gridLayout_8->addWidget(label_32, 4, 0, 1, 1);
-
-        pushButton_command_foreground_color = new QPushButton(groupBox);
-        pushButton_command_foreground_color->setObjectName(QString::fromUtf8("pushButton_command_foreground_color"));
-        pushButton_command_foreground_color->setAutoFillBackground(true);
-
-        gridLayout_8->addWidget(pushButton_command_foreground_color, 4, 1, 1, 1);
-
-        label_37 = new QLabel(groupBox);
-        label_37->setObjectName(QString::fromUtf8("label_37"));
-
-        gridLayout_8->addWidget(label_37, 5, 0, 1, 1);
-
-        pushButton_command_background_color = new QPushButton(groupBox);
-        pushButton_command_background_color->setObjectName(QString::fromUtf8("pushButton_command_background_color"));
-        pushButton_command_background_color->setAutoFillBackground(true);
-
-        gridLayout_8->addWidget(pushButton_command_background_color, 5, 1, 1, 1);
-
-        pushButton_command_line_foreground_color = new QPushButton(groupBox);
-        pushButton_command_line_foreground_color->setObjectName(QString::fromUtf8("pushButton_command_line_foreground_color"));
-
-        gridLayout_8->addWidget(pushButton_command_line_foreground_color, 2, 1, 1, 1);
-
-        label_31 = new QLabel(groupBox);
-        label_31->setObjectName(QString::fromUtf8("label_31"));
-
-        gridLayout_8->addWidget(label_31, 2, 0, 1, 1);
-
-        pushButton_command_line_background_color = new QPushButton(groupBox);
-        pushButton_command_line_background_color->setObjectName(QString::fromUtf8("pushButton_command_line_background_color"));
-
-        gridLayout_8->addWidget(pushButton_command_line_background_color, 3, 1, 1, 1);
-
-        label_59 = new QLabel(groupBox);
-        label_59->setObjectName(QString::fromUtf8("label_59"));
-
-        gridLayout_8->addWidget(label_59, 3, 0, 1, 1);
+        gridLayout_21->addWidget(reset_colors_button, 6, 2, 1, 1);
 
 
         gridLayout_2->addWidget(groupBox, 0, 0, 1, 1);
-
-        verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout_2->addItem(verticalSpacer_5, 1, 0, 1, 1);
 
         tabWidgeta->addTab(color_view_tab, QString());
         tab_4 = new QWidget();
@@ -1195,11 +1192,11 @@ public:
         mMapperUseAntiAlias = new QCheckBox(groupBox_14);
         mMapperUseAntiAlias->setObjectName(QString::fromUtf8("mMapperUseAntiAlias"));
 
-        gridLayout_14->addWidget(mMapperUseAntiAlias, 6, 0, 1, 1);
+        gridLayout_14->addWidget(mMapperUseAntiAlias, 5, 0, 1, 1);
 
-        verticalSpacer_7 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout_14->addItem(verticalSpacer_7, 5, 0, 1, 1);
+        gridLayout_14->addItem(verticalSpacer_4, 8, 0, 1, 2);
 
 
         gridLayout_18->addWidget(groupBox_14, 0, 0, 1, 1);
@@ -1254,9 +1251,10 @@ public:
         downloadMapOptions->setObjectName(QString::fromUtf8("downloadMapOptions"));
         sizePolicy2.setHeightForWidth(downloadMapOptions->sizePolicy().hasHeightForWidth());
         downloadMapOptions->setSizePolicy(sizePolicy2);
+        gridLayout_22 = new QGridLayout(downloadMapOptions);
+        gridLayout_22->setObjectName(QString::fromUtf8("gridLayout_22"));
         label_60 = new QLabel(downloadMapOptions);
         label_60->setObjectName(QString::fromUtf8("label_60"));
-        label_60->setGeometry(QRect(10, 20, 281, 101));
         QSizePolicy sizePolicy5(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -1276,9 +1274,14 @@ public:
         label_60->setPalette(palette);
         label_60->setScaledContents(true);
         label_60->setWordWrap(true);
+
+        gridLayout_22->addWidget(label_60, 0, 0, 1, 1);
+
         buttonDownloadMap = new QPushButton(downloadMapOptions);
         buttonDownloadMap->setObjectName(QString::fromUtf8("buttonDownloadMap"));
-        buttonDownloadMap->setGeometry(QRect(380, 60, 281, 23));
+
+        gridLayout_22->addWidget(buttonDownloadMap, 0, 1, 1, 1);
+
 
         gridLayout_7->addWidget(downloadMapOptions, 1, 0, 1, 1);
 
@@ -1317,26 +1320,10 @@ public:
         label_38->setBuddy(command_separator_lineedit);
 #endif // QT_NO_SHORTCUT
         QWidget::setTabOrder(show_sent_text_checkbox, command_separator_lineedit);
-        QWidget::setTabOrder(command_separator_lineedit, pushButton_black);
-        QWidget::setTabOrder(pushButton_black, pushButton_red);
-        QWidget::setTabOrder(pushButton_red, pushButton_green);
-        QWidget::setTabOrder(pushButton_green, pushButton_yellow);
-        QWidget::setTabOrder(pushButton_yellow, pushButton_blue);
-        QWidget::setTabOrder(pushButton_blue, pushButton_magenta);
-        QWidget::setTabOrder(pushButton_magenta, pushButton_cyan);
-        QWidget::setTabOrder(pushButton_cyan, pushButton_white);
-        QWidget::setTabOrder(pushButton_white, pushButton_Lblack);
-        QWidget::setTabOrder(pushButton_Lblack, pushButton_Lred);
-        QWidget::setTabOrder(pushButton_Lred, pushButton_Lgreen);
-        QWidget::setTabOrder(pushButton_Lgreen, pushButton_Lyellow);
-        QWidget::setTabOrder(pushButton_Lyellow, pushButton_Lblue);
-        QWidget::setTabOrder(pushButton_Lblue, pushButton_Lmagenta);
-        QWidget::setTabOrder(pushButton_Lmagenta, pushButton_Lcyan);
-        QWidget::setTabOrder(pushButton_Lcyan, pushButton_Lwhite);
 
         retranslateUi(profile_preferences);
 
-        tabWidgeta->setCurrentIndex(0);
+        tabWidgeta->setCurrentIndex(4);
 
 
         QMetaObject::connectSlotsByName(profile_preferences);
@@ -1371,13 +1358,6 @@ public:
 #endif // QT_NO_TOOLTIP
         mEnableGMCP->setText(QApplication::translate("profile_preferences", "Enable GMCP", 0, QApplication::UnicodeUTF8));
         need_reconnect_for_gmcp->setText(QApplication::translate("profile_preferences", "Please reconnect to your game for GMCP to take effect", 0, QApplication::UnicodeUTF8));
-        groupBox_3->setTitle(QApplication::translate("profile_preferences", "MXP", 0, QApplication::UnicodeUTF8));
-        label_36->setText(QApplication::translate("profile_preferences", "MXP Mode", 0, QApplication::UnicodeUTF8));
-        mMXPMode->clear();
-        mMXPMode->insertItems(0, QStringList()
-         << QApplication::translate("profile_preferences", "MXP auto detect (default)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("profile_preferences", "MXP off", 0, QApplication::UnicodeUTF8)
-        );
         groupBox_16->setTitle(QApplication::translate("profile_preferences", "IRC", 0, QApplication::UnicodeUTF8));
         label_58->setText(QApplication::translate("profile_preferences", "Nick name in mudlet IRC channel:", 0, QApplication::UnicodeUTF8));
         tabWidgeta->setTabText(tabWidgeta->indexOf(General), QApplication::translate("profile_preferences", "General", 0, QApplication::UnicodeUTF8));
@@ -1436,10 +1416,18 @@ public:
         checkBox_USE_SMALL_SCREEN->setText(QApplication::translate("profile_preferences", "Use Mudlet on a netbook with a small screen", 0, QApplication::UnicodeUTF8));
         tabWidgeta->setTabText(tabWidgeta->indexOf(tab), QApplication::translate("profile_preferences", "Main display", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("profile_preferences", "Select your color preferences", 0, QApplication::UnicodeUTF8));
-        label_22->setText(QApplication::translate("profile_preferences", "Foreground color:", 0, QApplication::UnicodeUTF8));
+        label_22->setText(QApplication::translate("profile_preferences", "Foreground:", 0, QApplication::UnicodeUTF8));
         pushButton_foreground_color->setText(QString());
-        label_21->setText(QApplication::translate("profile_preferences", "Background color:", 0, QApplication::UnicodeUTF8));
+        label_21->setText(QApplication::translate("profile_preferences", "Background:", 0, QApplication::UnicodeUTF8));
         pushButton_background_color->setText(QString());
+        label_31->setText(QApplication::translate("profile_preferences", "Command line foreground:", 0, QApplication::UnicodeUTF8));
+        pushButton_command_line_foreground_color->setText(QString());
+        label_59->setText(QApplication::translate("profile_preferences", "Command line background:", 0, QApplication::UnicodeUTF8));
+        pushButton_command_line_background_color->setText(QString());
+        label_32->setText(QApplication::translate("profile_preferences", "Command foreground:", 0, QApplication::UnicodeUTF8));
+        pushButton_command_foreground_color->setText(QString());
+        label_37->setText(QApplication::translate("profile_preferences", "Command background:", 0, QApplication::UnicodeUTF8));
+        pushButton_command_background_color->setText(QString());
         label_19->setText(QApplication::translate("profile_preferences", "These preferences set how do you want a particular color to be represented visually in the main display", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("profile_preferences", "Black:", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("profile_preferences", "Red:", 0, QApplication::UnicodeUTF8));
@@ -1457,14 +1445,14 @@ public:
         pushButton_cyan->setText(QString());
         pushButton_white->setText(QString());
         label_4->setText(QApplication::translate("profile_preferences", "Yellow:", 0, QApplication::UnicodeUTF8));
-        label_13->setText(QApplication::translate("profile_preferences", "Light black:", 0, QApplication::UnicodeUTF8));
-        label_14->setText(QApplication::translate("profile_preferences", "Light red:", 0, QApplication::UnicodeUTF8));
-        label_9->setText(QApplication::translate("profile_preferences", "Light green:", 0, QApplication::UnicodeUTF8));
-        label_15->setText(QApplication::translate("profile_preferences", "Light yellow:", 0, QApplication::UnicodeUTF8));
-        label_16->setText(QApplication::translate("profile_preferences", "Light blue:", 0, QApplication::UnicodeUTF8));
-        label_11->setText(QApplication::translate("profile_preferences", "Light magenta:", 0, QApplication::UnicodeUTF8));
-        label_12->setText(QApplication::translate("profile_preferences", "Light cyan:", 0, QApplication::UnicodeUTF8));
-        label_10->setText(QApplication::translate("profile_preferences", "Light white:", 0, QApplication::UnicodeUTF8));
+        label_68->setText(QApplication::translate("profile_preferences", "Light black:", 0, QApplication::UnicodeUTF8));
+        label_69->setText(QApplication::translate("profile_preferences", "Light red:", 0, QApplication::UnicodeUTF8));
+        label_70->setText(QApplication::translate("profile_preferences", "Light green:", 0, QApplication::UnicodeUTF8));
+        label_71->setText(QApplication::translate("profile_preferences", "Light yellow:", 0, QApplication::UnicodeUTF8));
+        label_72->setText(QApplication::translate("profile_preferences", "Light blue:", 0, QApplication::UnicodeUTF8));
+        label_73->setText(QApplication::translate("profile_preferences", "Light magenta:", 0, QApplication::UnicodeUTF8));
+        label_74->setText(QApplication::translate("profile_preferences", "Light cyan:", 0, QApplication::UnicodeUTF8));
+        label_75->setText(QApplication::translate("profile_preferences", "Light white:", 0, QApplication::UnicodeUTF8));
         pushButton_Lblack->setText(QString());
         pushButton_Lred->setText(QString());
         pushButton_Lgreen->setText(QString());
@@ -1474,16 +1462,8 @@ public:
         pushButton_Lcyan->setText(QString());
         pushButton_Lwhite->setText(QString());
         reset_colors_button->setText(QApplication::translate("profile_preferences", "Reset all colors to default", 0, QApplication::UnicodeUTF8));
-        label_32->setText(QApplication::translate("profile_preferences", "Command foreground color:", 0, QApplication::UnicodeUTF8));
-        pushButton_command_foreground_color->setText(QString());
-        label_37->setText(QApplication::translate("profile_preferences", "Command background color:", 0, QApplication::UnicodeUTF8));
-        pushButton_command_background_color->setText(QString());
-        pushButton_command_line_foreground_color->setText(QString());
-        label_31->setText(QApplication::translate("profile_preferences", "Command line foreground color:", 0, QApplication::UnicodeUTF8));
-        pushButton_command_line_background_color->setText(QString());
-        label_59->setText(QApplication::translate("profile_preferences", "Command line background color:", 0, QApplication::UnicodeUTF8));
         tabWidgeta->setTabText(tabWidgeta->indexOf(color_view_tab), QApplication::translate("profile_preferences", "Color view", 0, QApplication::UnicodeUTF8));
-        groupBox_14->setTitle(QApplication::translate("profile_preferences", "Select your color preferences for the Map display and override ANSI color defaults:", 0, QApplication::UnicodeUTF8));
+        groupBox_14->setTitle(QApplication::translate("profile_preferences", "Select your color preferences for the Map display and override ANSI color defaults", 0, QApplication::UnicodeUTF8));
         label_39->setText(QApplication::translate("profile_preferences", "Link color", 0, QApplication::UnicodeUTF8));
         pushButton_foreground_color_2->setText(QString());
         label_40->setText(QApplication::translate("profile_preferences", "Background color:", 0, QApplication::UnicodeUTF8));
@@ -1533,7 +1513,7 @@ public:
         checkBox_mUSE_FORCE_LF_AFTER_PROMPT->setText(QApplication::translate("profile_preferences", "Force new line on empty commands", 0, QApplication::UnicodeUTF8));
         mFORCE_MXP_NEGOTIATION_OFF->setText(QApplication::translate("profile_preferences", "Force MXP negotiation off", 0, QApplication::UnicodeUTF8));
         need_reconnect_for_specialoption->setText(QApplication::translate("profile_preferences", "Please reconnect to your game for the change to take effect", 0, QApplication::UnicodeUTF8));
-        label_60->setText(QApplication::translate("profile_preferences", "download Map from server (NOTE: This will override all of your personal changes to the map. To get back to an older version of the map you can manually delete the most recent snapshot of the map in the folder <mudlet_home_dir>/<yourprofile>/map)", 0, QApplication::UnicodeUTF8));
+        label_60->setText(QApplication::translate("profile_preferences", "Download map from server (NOTE: This will override all of your personal changes to the map. To get back to an older version of the map you can manually delete the most recent snapshot of the map in the folder <mudlet_home_dir>/<yourprofile>/map)", 0, QApplication::UnicodeUTF8));
         buttonDownloadMap->setText(QApplication::translate("profile_preferences", "download latest map version from server", 0, QApplication::UnicodeUTF8));
         tabWidgeta->setTabText(tabWidgeta->indexOf(tab_3), QApplication::translate("profile_preferences", "Special Options", 0, QApplication::UnicodeUTF8));
         closeButton->setText(QApplication::translate("profile_preferences", "Save", 0, QApplication::UnicodeUTF8));

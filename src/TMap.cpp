@@ -339,9 +339,10 @@ void TMap::init( Host * pH )
         s_area_exits[areas[id]->exits.size()]++;
         it.value()->calcSpan();
     }
+    //mVarTable[0].name = "RoomId";
+    //mVarTable[0].var = &mRoodId;
 
     auditRooms();
-
     qDebug()<<"statistics: areas:"<<s_areas;
     qDebug()<<"area exit stats:" <<s_area_exits;
 }
@@ -1191,6 +1192,8 @@ bool TMap::restore(QString location)
         }
         if (version >= 12){
             ifs >> mRoomId;
+            mVars["RoomId"].i = &mRoomId;
+            mVars["RoomId"].c[8] = 'I';
         }
         if( version >= 11 )
         {

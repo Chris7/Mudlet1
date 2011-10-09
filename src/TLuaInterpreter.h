@@ -133,6 +133,7 @@ public:
     static int setMainWindowSize( lua_State * L );
     static int registerAnonymousEventHandler( lua_State * L );
     static int setRoomChar( lua_State * );
+    static int getRoomChar( lua_State * );
     static int deleteArea( lua_State * );
     static int deleteRoom( lua_State * );
     static int getRoomAreaName( lua_State * );
@@ -330,6 +331,9 @@ public:
     static int getExitStubs( lua_State * L  );
     static int getModulePriority( lua_State * L  );
     static int setModulePriority( lua_State * L  );
+    static int getMapVar( lua_State * L  );
+    static int setMapVar( lua_State * L  );
+    static int updateMap(lua_State * L);
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;

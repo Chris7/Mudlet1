@@ -55,6 +55,27 @@ public:
     QPixmap pix;
 };
 
+union mVarTypes {
+    //pointer takes up 4 or 8 bits (32 vs 64 bit)
+    int * i;
+    float * f;
+    bool * b;
+    string * s;
+    QString * qs;
+    //we set the last bit to indicate what type is being used.
+    //Currently supported in setMapVar/getMapVar are Int(I)/Boolean(B)
+    char c[9];
+};
+
+/*template <class T>
+class mapVar {
+public:
+    void set(T &value) {ptr=&value;};
+    T get() {return *ptr;};
+private:
+    T* ptr;
+};*/
+
 class TMap
 {
 public:
@@ -101,6 +122,11 @@ public:
     QVector3D span;
     Host * mpHost;
     int mRoomId;
+    //mapVar mVars[20];
+    //mapVar <int> mvRoomId;
+    QMap<QString, mVarTypes> mVars;
+    //QMap<QString, *QVariant> mVars;
+    //mVars.insert("RoomId", &mRoomId);
     int mTargetID;
     QList<int> mPathList;
     QList<QString> mDirList;
