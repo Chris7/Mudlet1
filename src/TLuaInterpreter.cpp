@@ -6626,7 +6626,7 @@ int TLuaInterpreter::deleteMapLabel( lua_State * L )
 
 int TLuaInterpreter::getMapLabels( lua_State * L )
 {
-    int area, labelID;
+    int area;
     if( ! lua_isnumber( L, 1 ) )
     {
         lua_pushstring( L, "deleteMapLabel: wrong argument type" );
@@ -6652,6 +6652,120 @@ int TLuaInterpreter::getMapLabels( lua_State * L )
     }
     return 1;
 }
+
+int TLuaInterpreter::getMapLabel( lua_State * L )
+{
+    int area, labelId = -1;
+    QString labelText;
+    if( ! lua_isnumber( L, 1 ) )
+    {
+        lua_pushstring( L, "getMapLabel: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        area = lua_tointeger( L, 1 );
+    }
+    if (!lua_isstring(L,2) && !lua_isnumber(L,2)){
+        lua_pushstring( L, "getMapLabel: wrong argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else{
+        if (lua_isnumber(L,2))
+            labelId = lua_tointeger(L,2);
+        else
+            labelText = lua_tostring( L, 2 );
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap->mapLabels.contains( area ) )
+    {
+        lua_newtable(L);
+        if (labelId != -1){
+            if (pHost->mpMap->mapLabels[area].contains(labelId)){
+                TMapLabel label =  pHost->mpMap->mapLabels[area][labelId];
+                qDebug()<<"here";
+                int x = label.pos.x();
+                int y = label.pos.y();
+                int z = label.pos.z();
+                qDebug()<<"herea";
+                float height = label.size.height();
+                float width = label.size.width();
+                qDebug()<<"hereb";
+                QString text = label.text;
+                qDebug()<<"herec";
+
+                lua_pushstring( L, "X" );
+                lua_pushnumber( L, x );
+                lua_settable(L, -3);
+                lua_pushstring( L, "Y" );
+                lua_pushnumber( L, y );
+                lua_settable(L, -3);
+                lua_pushstring( L, "Z" );
+                lua_pushnumber( L, z );
+                lua_settable(L, -3);
+                lua_pushstring( L, "Height" );
+                lua_pushnumber( L, height );
+                lua_settable(L, -3);
+                lua_pushstring( L, "Width" );
+                lua_pushnumber( L, width );
+                lua_settable(L, -3);
+                lua_pushstring( L, "Text" );
+                lua_pushstring( L, text.toLatin1().data() );
+                lua_settable(L, -3);
+            }
+            else{
+                lua_pushstring( L, "getMapLabel: labelId doesn't exist" );
+                lua_error( L );
+                return 1;
+            }
+        }
+        else{
+            QMapIterator<int,TMapLabel> it(pHost->mpMap->mapLabels[area]);
+            while( it.hasNext() )
+            {
+                it.next();
+                if(it.value().text==labelText){
+                    TMapLabel label = it.value();
+                    lua_newtable(L);
+                    int id = it.key();
+                    int x = label.pos.x();
+                    int y = label.pos.y();
+                    int z = label.pos.z();
+                    float height = label.size.height();
+                    float width = label.size.width();
+                    QString text = label.text;
+                    qDebug()<<"here";
+                    lua_pushstring( L, "X" );
+                    lua_pushnumber( L, x );
+                    lua_settable(L, -3);
+                    lua_pushstring( L, "Y" );
+                    lua_pushnumber( L, y );
+                    lua_settable(L, -3);
+                    lua_pushstring( L, "Z" );
+                    lua_pushnumber( L, z );
+                    lua_settable(L, -3);
+                    lua_pushstring( L, "Height" );
+                    lua_pushnumber( L, height );
+                    lua_settable(L, -3);
+                    lua_pushstring( L, "Width" );
+                    lua_pushnumber( L, width );
+                    lua_settable(L, -3);
+                    lua_pushstring( L, "Text" );
+                    lua_pushstring( L, text.toLatin1().data() );
+                    lua_settable(L, -3);
+                    lua_pushnumber(L, id);
+                    lua_insert(L,-2);
+                    lua_settable(L, -3);
+
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 
 int TLuaInterpreter::addSpecialExit( lua_State * L )
 {
@@ -9185,6 +9299,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "highlightRoom", TLuaInterpreter::highlightRoom );
     lua_register( pGlobalLua, "unHighlightRoom", TLuaInterpreter::unHighlightRoom );
     lua_register( pGlobalLua, "getMapLabels", TLuaInterpreter::getMapLabels );
+    lua_register( pGlobalLua, "getMapLabel", TLuaInterpreter::getMapLabel );
     lua_register( pGlobalLua, "lockExit", TLuaInterpreter::lockExit );
     lua_register( pGlobalLua, "hasExitLock", TLuaInterpreter::hasExitLock );
     lua_register( pGlobalLua, "lockSpecialExit", TLuaInterpreter::lockSpecialExit );

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'composer.ui'
 **
-** Created: Fri Sep 16 19:12:07 2011
+** Created: Sun Oct 9 19:22:21 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,7 +45,7 @@ public:
     {
         if (composer->objectName().isEmpty())
             composer->setObjectName(QString::fromUtf8("composer"));
-        composer->resize(588, 424);
+        composer->resize(567, 412);
         centralwidget = new QWidget(composer);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -112,6 +112,9 @@ public:
         statusbar = new QStatusBar(composer);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
         composer->setStatusBar(statusbar);
+        QWidget::setTabOrder(edit, saveButton);
+        QWidget::setTabOrder(saveButton, cancelButton);
+        QWidget::setTabOrder(cancelButton, titel);
 
         retranslateUi(composer);
 
@@ -122,6 +125,13 @@ public:
     {
         composer->setWindowTitle(QApplication::translate("composer", "News & Message Composer", 0, QApplication::UnicodeUTF8));
         cancelButton->setText(QApplication::translate("composer", "Cancel", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        saveButton->setToolTip(QApplication::translate("composer", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Save (<span style=\" color:#565656;\">Shift+Tab</span>)</p></body></html>", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
         saveButton->setText(QApplication::translate("composer", "Save", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

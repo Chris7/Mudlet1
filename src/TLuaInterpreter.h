@@ -120,6 +120,7 @@ public:
     static int hasExitLock( lua_State * );
     static int hasSpecialExitLock( lua_State * );
     static int getMapLabels( lua_State * );
+    static int getMapLabel( lua_State * );
     static int highlightRoom( lua_State * );
     static int unHighlightRoom( lua_State * );
     static int createMapLabel( lua_State * );
