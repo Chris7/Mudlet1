@@ -6685,17 +6685,12 @@ int TLuaInterpreter::getMapLabel( lua_State * L )
         if (labelId != -1){
             if (pHost->mpMap->mapLabels[area].contains(labelId)){
                 TMapLabel label =  pHost->mpMap->mapLabels[area][labelId];
-                qDebug()<<"here";
                 int x = label.pos.x();
                 int y = label.pos.y();
                 int z = label.pos.z();
-                qDebug()<<"herea";
                 float height = label.size.height();
                 float width = label.size.width();
-                qDebug()<<"hereb";
                 QString text = label.text;
-                qDebug()<<"herec";
-
                 lua_pushstring( L, "X" );
                 lua_pushnumber( L, x );
                 lua_settable(L, -3);
@@ -6736,7 +6731,6 @@ int TLuaInterpreter::getMapLabel( lua_State * L )
                     float height = label.size.height();
                     float width = label.size.width();
                     QString text = label.text;
-                    qDebug()<<"here";
                     lua_pushstring( L, "X" );
                     lua_pushnumber( L, x );
                     lua_settable(L, -3);

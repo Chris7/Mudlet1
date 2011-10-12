@@ -1435,8 +1435,8 @@ void T2DMap::paintEvent( QPaintEvent * e )
             it.next();
             if (it.value().pos.z() == mOz && it.value().pos.x()*tx < _w && it.value().pos.y()*ty*-1 < _h)
 			{
-				QRectF lr = QRectF( 0, 0, 1000, 100 );
-				QPixmap pix( lr.size().toSize() );
+                QRectF lr = QRectF( 0, 0, 1000, 100 );
+                QPixmap pix( lr.size().toSize() );
 				pix.fill(QColor(0,0,0,0));
 				QPainter lp( &pix );
 
@@ -1445,10 +1445,12 @@ void T2DMap::paintEvent( QPaintEvent * e )
 				lpen.setColor( it.value().fgColor );
 				lp.setPen( lpen );
 				QRectF br;
-				lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
-				QPointF lpos;
-				lpos.setX( it.value().pos.x()*tx+_rx );
-				lpos.setY( it.value().pos.y()*ty*-1+_ry );
+                lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+                QSizeF labelSize = QSizeF(br.width(),br.height());
+                mpMap->mapLabels[mAID][it.key()].size=labelSize;
+                QPointF lpos;
+                lpos.setX( it.value().pos.x()*tx+_rx );
+                lpos.setY( it.value().pos.y()*ty*-1+_ry );
 				p.drawPixmap( lpos, pix, br.toRect() );
 			}
         }
