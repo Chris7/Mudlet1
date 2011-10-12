@@ -250,7 +250,6 @@ void TMap::connectExitStub(int roomId, int dirType){
         meanSquareDistance=dx*dx+dy*dy+dz*dz;
         if (meanSquareDistance < minDistance){
             minDistanceRoom=rooms[pA->rooms[i]]->id;
-            cout << "new id" << minDistanceRoom;
             minDistance=meanSquareDistance;
         }
     }
