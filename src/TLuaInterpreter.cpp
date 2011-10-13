@@ -803,6 +803,7 @@ int TLuaInterpreter::centerview( lua_State * L )
     if( pHost->mpMap && pHost->mpMap->rooms.contains( roomid ) )
     {
         pHost->mpMap->mRoomId = roomid;
+        pHost->mpMap->mViewArea = 0;//pHost->mpMap->rooms[roomid]->area;
         pHost->mpMap->mNewMove = true;
         if( pHost->mpMap->mpM )
         {
