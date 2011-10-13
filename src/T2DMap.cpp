@@ -453,7 +453,6 @@ void T2DMap::paintEvent( QPaintEvent * e )
         if( mpMap->rooms.contains(mpMap->mRoomId) )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
-        mRID = mpMap->mRoomId;
         if (mpMap->mViewArea){
             if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 )
             {
@@ -462,6 +461,8 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 //mpMap->mViewArea = oldId;
             }
         }
+        else
+            mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
         if (mShiftMode){
             ox = mOx;
