@@ -463,7 +463,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         else
             mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
-        if (mpMap->mNewMove || !mOx){
+        if (mpMap->mNewMove || !mOx){//do it for centerview and for initialization
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
             mOx = ox;
