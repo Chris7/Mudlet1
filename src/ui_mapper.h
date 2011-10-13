@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mapper.ui'
 **
-** Created: Sun Oct 9 19:22:21 2011
+** Created: Wed Oct 12 20:59:07 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
