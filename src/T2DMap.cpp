@@ -449,7 +449,6 @@ void T2DMap::paintEvent( QPaintEvent * e )
     if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mpMap->mViewArea)
     {
         mShiftMode = true;
-        mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
         if( mpMap->rooms.contains(mpMap->mRoomId) )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
@@ -464,17 +463,18 @@ void T2DMap::paintEvent( QPaintEvent * e )
         else
             mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
-        if (mShiftMode){
-            ox = mOx;
-            oy = mOy;
-            oz = mOz;
-        }
-        else{
+        if (mpMap->mNewMove || !mOx){
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
             mOx = ox;
             mOy = oy;
             mOz = mpMap->rooms[mRID]->z;
+            mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
+        }
+        else{
+            ox = mOx;
+            oy = mOy;
+            oz = mOz;
         }
     }
     else
