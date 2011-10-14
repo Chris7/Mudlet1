@@ -97,6 +97,7 @@ void T2DMap::init()
     mpMap->mVars["YZoom"].c[8] = 'I';
     mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
     mpMap->mVars["SelectedRoom"].c[8] = 'I';
+    mpMap->mViewArea=0;
     mMapperUseAntiAlias = mpHost->mMapperUseAntiAlias;
     mPixMap.clear();
     mGridPix.clear();
@@ -453,16 +454,18 @@ void T2DMap::paintEvent( QPaintEvent * e )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
         if (mpMap->mViewArea){
-            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 )
-            {
+            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 ){
                 oldId = mRID;
                 mRID = mpMap->areas[mpMap->mViewArea]->rooms.at(0);
-                //mpMap->mViewArea = oldId;
             }
         }
         else
             mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
+        /*if (mpMap->rooms.contains(mRID))
+
+        else
+            return;*/
         if (mpMap->mNewMove || !mOx){//do it for centerview and for initialization
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
