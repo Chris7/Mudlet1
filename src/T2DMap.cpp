@@ -95,6 +95,10 @@ void T2DMap::init()
     mpMap->mVars["XZoom"].c[8] = 'I';
     mpMap->mVars["YZoom"].i = &yzoom;
     mpMap->mVars["YZoom"].c[8] = 'I';
+    mpMap->mVars["mWidth"].f = &xspan;
+    mpMap->mVars["mWidth"].c[8] = 'F';
+    mpMap->mVars["mHeight"].f = &yspan;
+    mpMap->mVars["mHeight"].c[8] = 'F';
     mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
     mpMap->mVars["SelectedRoom"].c[8] = 'I';
     mpMap->mViewArea=0;

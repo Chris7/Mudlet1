@@ -6242,6 +6242,9 @@ int TLuaInterpreter::getMapVar( lua_State * L )
             case 'I':
                 lua_pushnumber( L, *(it.value().i) );
                 break;
+            case 'F':
+                lua_pushnumber( L, *(it.value().f) );
+                break;
             }
             lua_settable(L, -3);
         }
@@ -6261,8 +6264,13 @@ int TLuaInterpreter::getMapVar( lua_State * L )
         switch (mapVars[name].c[8]){
         case 'B':
             lua_pushboolean( L, *(mapVars[name].b) );
+            break;
         case 'I':
             lua_pushnumber( L, *(mapVars[name].i) );
+            break;
+        case 'F':
+            lua_pushnumber( L, *(mapVars[name].f) );
+            break;
         }
 //        lua_pushnumber(L, *(mapVars[name].i));
     else{
@@ -6297,6 +6305,10 @@ int TLuaInterpreter::setMapVar( lua_State * L )
         case 'I':
             if (lua_isnumber(L,2))
                 *(mapVars[name].i)=lua_tonumber(L,2);
+            break;
+        case 'F':
+            if (lua_isnumber(L,2))
+                *(mapVars[name].f)=lua_tonumber(L,2);
             break;
         default:
             lua_pushstring( L, "setMapVar: Wrong argument type for variable" );
