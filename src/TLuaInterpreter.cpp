@@ -6815,6 +6815,7 @@ int TLuaInterpreter::addSpecialExit( lua_State * L )
         if( pHost->mpMap->rooms.contains( id_to ) )
         {
             pHost->mpMap->rooms[id_from]->addSpecialExit( id_to, _dir );
+            pHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, _dir, false );
             pHost->mpMap->mMapGraphNeedsUpdate = true;
         }
     }

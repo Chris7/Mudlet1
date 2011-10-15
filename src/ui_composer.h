@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'composer.ui'
 **
-** Created: Sun Oct 9 19:22:21 2011
-**      by: Qt User Interface Compiler version 4.7.2
+** Created: Sat Oct 15 13:23:43 2011
+**      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
