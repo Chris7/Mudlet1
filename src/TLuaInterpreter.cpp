@@ -803,7 +803,6 @@ int TLuaInterpreter::centerview( lua_State * L )
     if( pHost->mpMap && pHost->mpMap->rooms.contains( roomid ) )
     {
         pHost->mpMap->mRoomId = roomid;
-        pHost->mpMap->mViewArea = 0;//pHost->mpMap->rooms[roomid]->area;
         pHost->mpMap->mNewMove = true;
         if( pHost->mpMap->mpM )
         {
@@ -2110,14 +2109,20 @@ int TLuaInterpreter::createBuffer( lua_State *L )
     return 0;
 }
 
+#include "TTextEdit.h"
+
 int TLuaInterpreter::clearUserWindow( lua_State *L )
 {
     string luaSendText="";
     if( ! lua_isstring( L, 1 ) )
     {
-        lua_pushstring( L, "clearUserWindow: wrong argument type" );
-        lua_error( L );
-        return 1;
+        Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+        pHost->mpConsole->buffer.clear();
+        pHost->mpConsole->console->forceUpdate();
+        return 0;
+//        lua_pushstring( L, "clearUserWindow: wrong argument type" );
+//        lua_error( L );
+//        return 1;
     }
     else
     {
@@ -3567,10 +3572,10 @@ int TLuaInterpreter::searchRoom( lua_State *L )
 
 int TLuaInterpreter::searchRoomUserData( lua_State *L )
 {
-	//basically stolen from searchRoom
-	//if we have, searchUserData(key, value)
-	//we look through all room ids in a given field for the string and
-	//return a table of roomids matching
+        //basically stolen from searchRoom
+        //if we have, searchUserData(key, value)
+        //we look through all room ids in a given field for the string and
+        //return a table of roomids matching
     string key, value;
     if( lua_isstring( L, 1 ) )
     {
@@ -3582,7 +3587,7 @@ int TLuaInterpreter::searchRoomUserData( lua_State *L )
         lua_error( L );
         return 1;
     }
-	if( lua_isstring( L, 2 ) )
+        if( lua_isstring( L, 2 ) )
     {
         value = lua_tostring( L, 2 );
     }
@@ -3593,26 +3598,26 @@ int TLuaInterpreter::searchRoomUserData( lua_State *L )
         return 1;
     }
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-	QMapIterator<int, TRoom *> it( pHost->mpMap->rooms );
-	lua_newtable(L);
-	while( it.hasNext() )
-	{
-		it.next();
-		int i = it.key();
-		QString _key = key.c_str();
+        QMapIterator<int, TRoom *> it( pHost->mpMap->rooms );
+        lua_newtable(L);
+        while( it.hasNext() )
+        {
+                it.next();
+                int i = it.key();
+                QString _key = key.c_str();
         QString _value = value.c_str();
-		if (pHost->mpMap->rooms[i]->userData.contains( _key ))
-		{
-			QString _keyValue = pHost->mpMap->rooms[i]->userData[_key];
-			if (_keyValue.contains(_value))
-			{
-				lua_pushnumber( L, i );
-				lua_pushstring( L, _keyValue.toLatin1().data() );
-				lua_settable(L, -3);
-			}
-		}
-	}
-	return 1;
+                if (pHost->mpMap->rooms[i]->userData.contains( _key ))
+                {
+                        QString _keyValue = pHost->mpMap->rooms[i]->userData[_key];
+                        if (_keyValue.contains(_value))
+                        {
+                                lua_pushnumber( L, i );
+                                lua_pushstring( L, _keyValue.toLatin1().data() );
+                                lua_settable(L, -3);
+                        }
+                }
+        }
+        return 1;
 }
 
 int TLuaInterpreter::getAreaTable( lua_State *L )
@@ -4753,7 +4758,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     {
         parent = lua_tostring( L, 1 );
     }
-    
+
     if( ! lua_isstring( L, 2 ) )
     {
         lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
@@ -4801,7 +4806,7 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     {
         bgColor = lua_tostring( L, 6 );
     }
-    
+
     if( ! lua_isnumber( L, 7 ) )
     {
         lua_pushstring( L, "tempComplexRegexTrigger: wrong argument type" );
@@ -4876,9 +4881,9 @@ int TLuaInterpreter::tempComplexRegexTrigger( lua_State *L )
     //mpHost = pLuaInterpreter->mpHost;
     TTrigger * pT;
     QList<int> propertyList;
-    
+
     TTrigger * pP = mpHost->getTriggerUnit()->findTrigger( parent );
-    
+
     if( !pP )
     {
         regexList << pattern;
@@ -6242,9 +6247,6 @@ int TLuaInterpreter::getMapVar( lua_State * L )
             case 'I':
                 lua_pushnumber( L, *(it.value().i) );
                 break;
-            case 'F':
-                lua_pushnumber( L, *(it.value().f) );
-                break;
             }
             lua_settable(L, -3);
         }
@@ -6264,13 +6266,8 @@ int TLuaInterpreter::getMapVar( lua_State * L )
         switch (mapVars[name].c[8]){
         case 'B':
             lua_pushboolean( L, *(mapVars[name].b) );
-            break;
         case 'I':
             lua_pushnumber( L, *(mapVars[name].i) );
-            break;
-        case 'F':
-            lua_pushnumber( L, *(mapVars[name].f) );
-            break;
         }
 //        lua_pushnumber(L, *(mapVars[name].i));
     else{
@@ -6305,10 +6302,6 @@ int TLuaInterpreter::setMapVar( lua_State * L )
         case 'I':
             if (lua_isnumber(L,2))
                 *(mapVars[name].i)=lua_tonumber(L,2);
-            break;
-        case 'F':
-            if (lua_isnumber(L,2))
-                *(mapVars[name].f)=lua_tonumber(L,2);
             break;
         default:
             lua_pushstring( L, "setMapVar: Wrong argument type for variable" );
@@ -6523,8 +6516,8 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     {
         posy = lua_tonumber( L, 4 );
     }
-	
-	if( ! lua_isnumber( L, 5 ) )
+
+        if( ! lua_isnumber( L, 5 ) )
     {
         lua_pushstring( L, "createMapLabel: wrong argument type" );
         lua_error( L );
@@ -6698,12 +6691,17 @@ int TLuaInterpreter::getMapLabel( lua_State * L )
         if (labelId != -1){
             if (pHost->mpMap->mapLabels[area].contains(labelId)){
                 TMapLabel label =  pHost->mpMap->mapLabels[area][labelId];
+                qDebug()<<"here";
                 int x = label.pos.x();
                 int y = label.pos.y();
                 int z = label.pos.z();
+                qDebug()<<"herea";
                 float height = label.size.height();
                 float width = label.size.width();
+                qDebug()<<"hereb";
                 QString text = label.text;
+                qDebug()<<"herec";
+
                 lua_pushstring( L, "X" );
                 lua_pushnumber( L, x );
                 lua_settable(L, -3);
@@ -6744,6 +6742,7 @@ int TLuaInterpreter::getMapLabel( lua_State * L )
                     float height = label.size.height();
                     float width = label.size.width();
                     QString text = label.text;
+                    qDebug()<<"here";
                     lua_pushstring( L, "X" );
                     lua_pushnumber( L, x );
                     lua_settable(L, -3);
@@ -6815,7 +6814,6 @@ int TLuaInterpreter::addSpecialExit( lua_State * L )
         if( pHost->mpMap->rooms.contains( id_to ) )
         {
             pHost->mpMap->rooms[id_from]->addSpecialExit( id_to, _dir );
-            pHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, _dir, false );
             pHost->mpMap->mMapGraphNeedsUpdate = true;
         }
     }
@@ -9277,7 +9275,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getRoomEnv", TLuaInterpreter::getRoomEnv );
     lua_register( pGlobalLua, "getRoomUserData", TLuaInterpreter::getRoomUserData );
     lua_register( pGlobalLua, "setRoomUserData", TLuaInterpreter::setRoomUserData );
-	lua_register( pGlobalLua, "searchRoomUserData", TLuaInterpreter::searchRoomUserData );
+        lua_register( pGlobalLua, "searchRoomUserData", TLuaInterpreter::searchRoomUserData );
     lua_register( pGlobalLua, "getRoomsByPosition", TLuaInterpreter::getRoomsByPosition );
     //lua_register( pGlobalLua, "dumpRoomUserData", TLuaInterpreter::dumpRoomUserData );
     lua_register( pGlobalLua, "clearRoomUserData", TLuaInterpreter::clearRoomUserData );

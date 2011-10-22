@@ -30,6 +30,11 @@
 #include <QPixmap>
 
 
+bool m2DPanMode = false, mLeftDown = false, mRightDown = false;
+float m2DPanXStart=0, m2DPanYStart=0;
+int mViewArea = 0;
+
+
 T2DMap::T2DMap()
 {
     xzoom = 30;
@@ -83,25 +88,18 @@ void T2DMap::init()
     if( ! mpMap ) return;
     eSize = mpMap->mpHost->mLineSize;
     rSize = mpMap->mpHost->mRoomSize;
+    mpMap->mVars["updateView"].b = &mShiftMode;
+    mpMap->mVars["updateView"].c[8] = 'B';
     mpMap->mVars["XView"].i = &mOx;
     mpMap->mVars["XView"].c[8] = 'I';
     mpMap->mVars["YView"].i = &mOy;
     mpMap->mVars["YView"].c[8] = 'I';
     mpMap->mVars["ZView"].i = &mOz;
     mpMap->mVars["ZView"].c[8] = 'I';
-    mpMap->mVars["GridZoom"].i = &gzoom;
-    mpMap->mVars["GridZoom"].c[8] = 'I';
-    mpMap->mVars["XZoom"].i = &xzoom;
-    mpMap->mVars["XZoom"].c[8] = 'I';
-    mpMap->mVars["YZoom"].i = &yzoom;
-    mpMap->mVars["YZoom"].c[8] = 'I';
-    mpMap->mVars["mWidth"].f = &xspan;
-    mpMap->mVars["mWidth"].c[8] = 'F';
-    mpMap->mVars["mHeight"].f = &yspan;
-    mpMap->mVars["mHeight"].c[8] = 'F';
+    mpMap->mVars["Zoom"].i = &gzoom;
+    mpMap->mVars["Zoom"].c[8] = 'I';
     mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
     mpMap->mVars["SelectedRoom"].c[8] = 'I';
-    mpMap->mViewArea=0;
     mMapperUseAntiAlias = mpHost->mMapperUseAntiAlias;
     mPixMap.clear();
     mGridPix.clear();
@@ -395,7 +393,7 @@ void T2DMap::switchArea(QString name)
         {
             mAID = areaID;
             mShiftMode = true;
-            mpMap->mViewArea = areaID;
+            mViewArea = areaID;
             mOx = 0;
             mOy = 0;
             mOz = 0;
@@ -441,7 +439,6 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
 
     int px,py;
-    int oldId;
     QList<int> exitList;
     if( ! mpMap->rooms.contains( mpMap->mRoomId ) )
     {
@@ -449,40 +446,32 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
         return;
     }
+
     int ox, oy, oz;
     if( mRID != mpMap->mRoomId && mShiftMode ) mShiftMode = false;
-    if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mpMap->mViewArea)
+    if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mViewArea)
     {
         mShiftMode = true;
+        mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
         if( mpMap->rooms.contains(mpMap->mRoomId) )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
-        if (mpMap->mViewArea){
-            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 ){
-                oldId = mRID;
-                mRID = mpMap->areas[mpMap->mViewArea]->rooms.at(0);
+        mRID = mpMap->mRoomId;
+        if (mViewArea)
+        {
+            if( mpMap->areas.contains( mViewArea ) && mpMap->areas[mViewArea]->rooms.size() > 0 )
+            {
+                int oldId = mRID;
+                mRID = mpMap->areas[mViewArea]->rooms.at(0);
+                mViewArea = oldId;
             }
         }
-        else
-            mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
-        /*if (mpMap->rooms.contains(mRID))
-
-        else
-            return;*/
-        if (mpMap->mNewMove || !mOx){//do it for centerview and for initialization
-            ox = mpMap->rooms[mRID]->x;
-            oy = mpMap->rooms[mRID]->y*-1;
-            mOx = ox;
-            mOy = oy;
-            mOz = mpMap->rooms[mRID]->z;
-            mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
-        }
-        else{
-            ox = mOx;
-            oy = mOy;
-            oz = mOz;
-        }
+        ox = mpMap->rooms[mRID]->x;
+        oy = mpMap->rooms[mRID]->y*-1;
+        mOx = ox;
+        mOy = oy;
+        mOz = mpMap->rooms[mRID]->z;
     }
     else
     {
@@ -1399,6 +1388,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
     if( ! mShiftMode )
     {
+
         if( mpHost->mMapStrongHighlight )
         {
             QRectF dr = QRectF(px-(tx*rSize)/2,py-(ty*rSize)/2,tx*rSize,ty*rSize);
@@ -1446,25 +1436,23 @@ void T2DMap::paintEvent( QPaintEvent * e )
         {
             it.next();
             if (it.value().pos.z() == mOz && it.value().pos.x()*tx < _w && it.value().pos.y()*ty*-1 < _h)
-			{
-                QRectF lr = QRectF( 0, 0, 1000, 100 );
-                QPixmap pix( lr.size().toSize() );
-				pix.fill(QColor(0,0,0,0));
-				QPainter lp( &pix );
+                        {
+                                QRectF lr = QRectF( 0, 0, 1000, 100 );
+                                QPixmap pix( lr.size().toSize() );
+                                pix.fill(QColor(0,0,0,0));
+                                QPainter lp( &pix );
 
-				lp.fillRect( lr, it.value().bgColor );
-				QPen lpen;
-				lpen.setColor( it.value().fgColor );
-				lp.setPen( lpen );
-				QRectF br;
-                lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
-                QSizeF labelSize = QSizeF(br.width(),br.height());
-                mpMap->mapLabels[mAID][it.key()].size=labelSize;
-                QPointF lpos;
-                lpos.setX( it.value().pos.x()*tx+_rx );
-                lpos.setY( it.value().pos.y()*ty*-1+_ry );
-				p.drawPixmap( lpos, pix, br.toRect() );
-			}
+                                lp.fillRect( lr, it.value().bgColor );
+                                QPen lpen;
+                                lpen.setColor( it.value().fgColor );
+                                lp.setPen( lpen );
+                                QRectF br;
+                                lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+                                QPointF lpos;
+                                lpos.setX( it.value().pos.x()*tx+_rx );
+                                lpos.setY( it.value().pos.y()*ty*-1+_ry );
+                                p.drawPixmap( lpos, pix, br.toRect() );
+                        }
         }
     }
     if( mShowInfo )
@@ -1476,11 +1464,9 @@ void T2DMap::paintEvent( QPaintEvent * e )
         p.setPen(QColor(255,255,255));
         p.drawText( 10, 4*mFontHeight, text );
     }
-    if (mpMap->mViewArea){
-        if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 ){
-        mRID = oldId;//mpMap->mViewArea;
-        //mpMap->mViewArea=0;
-        }
+    if (mViewArea){
+        mRID = mViewArea;
+        mViewArea=0;
     }
 
 }
@@ -1498,9 +1484,9 @@ void T2DMap::mouseDoubleClickEvent ( QMouseEvent * event )
 
 void T2DMap::mouseReleaseEvent(QMouseEvent * event )
 {
-    if (mpMap->mLeftDown){
-        mpMap->mLeftDown = false;
-        mpMap->m2DPanMode=false;
+    if (mLeftDown){
+        mLeftDown = false;
+        m2DPanMode=false;
         if( event->buttons() && event->modifiers().testFlag(Qt::ControlModifier))
         {
             if( mCustomLinesRoomFrom > 0 )
@@ -1529,8 +1515,8 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
             }
         }
     }
-    if (mpMap->mRightDown){
-        mpMap->mRightDown = false;
+    if (mRightDown){
+        mRightDown = false;
         if( mCustomLinesRoomFrom > 0 )//why do we even bother wasting a cycle on this if?
             mCustomLinesRoomFrom = 0;
         //int x = event->x();
@@ -1590,7 +1576,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         QAction * action15 = new QAction("Create Label", this );
         action15->setStatusTip(tr("Create labels to show text or images."));
         connect( action15, SIGNAL(triggered()), this, SLOT(slot_createLabel()));
-        
+
         QAction * action16 = new QAction("Set Location Here", this );
         action16->setStatusTip(tr("Set player location here."));
         connect( action16, SIGNAL(triggered()), this, SLOT(slot_setPlayerLocation()));
@@ -1641,7 +1627,7 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
         mPopupMenu = false;
     mNewMoveAction = true;
     if (event->buttons() & Qt::LeftButton){
-            mpMap->mLeftDown = true;
+            mLeftDown = true;
     //if we're outside the realm for mPick, set it false
         if (!mPickBox.contains(event->pos())){
             //we clicked outside the selected room, deselect it
@@ -1665,7 +1651,7 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
         }
     }
     else if (event->buttons() & Qt::RightButton)
-        mpMap->mRightDown = true;
+        mRightDown = true;
     update();
 }
 
@@ -2037,31 +2023,31 @@ void T2DMap::slot_setRoomWeight()
 
 void T2DMap::mouseMoveEvent( QMouseEvent * event )
 {
-    if (mpMap->mLeftDown & !mpMap->m2DPanMode & !event->modifiers().testFlag(Qt::ControlModifier)){
-        mpMap->m2DPanXStart = event->x();
-        mpMap->m2DPanYStart = event->y();
-        mpMap->m2DPanMode=true;
+    if (mLeftDown & !m2DPanMode & !event->modifiers().testFlag(Qt::ControlModifier)){
+        m2DPanXStart = event->x();
+        m2DPanYStart = event->y();
+        m2DPanMode=true;
         cleanupMap();
     }
-    if (mpMap->m2DPanMode)
+    if (m2DPanMode)
     {
         int x = event->x();
         int y = height()-event->y();//opengl ursprungspunkt liegt unten links
-        if ((mpMap->m2DPanXStart-x) > 1){
+        if ((m2DPanXStart-x) > 1){
             shiftRight();
-            mpMap->m2DPanXStart = x;
+            m2DPanXStart = x;
         }
-        else if ((mpMap->m2DPanXStart-x) < -1){
+        else if ((m2DPanXStart-x) < -1){
             shiftLeft();
-            mpMap->m2DPanXStart = x;
+            m2DPanXStart = x;
         }
-        if ((mpMap->m2DPanYStart-y) > 1){
+        if ((m2DPanYStart-y) > 1){
             shiftDown();
-            mpMap->m2DPanYStart = y;
+            m2DPanYStart = y;
         }
-        else if ((mpMap->m2DPanYStart-y) < -1){
+        else if ((m2DPanYStart-y) < -1){
             shiftUp();
-            mpMap->m2DPanYStart = y;
+            m2DPanYStart = y;
         }
     }
     else{
@@ -2304,7 +2290,7 @@ int T2DMap::getTopLeftSelection()
     if( mMultiSelectionList.size() < 1 ) return -1;
     min_x = mpMap->rooms[mMultiSelectionList[0]]->x;
     min_y = mpMap->rooms[mMultiSelectionList[0]]->y;
-	min_z = mpMap->rooms[mMultiSelectionList[0]]->z;
+        min_z = mpMap->rooms[mMultiSelectionList[0]]->z;
     for( int j=0; j<mMultiSelectionList.size(); j++ )
     {
         if( ! mpMap->rooms.contains( mMultiSelectionList[j] ) ) return -1;
@@ -2315,14 +2301,14 @@ int T2DMap::getTopLeftSelection()
             if( pR->y <= min_y )
             {
                 min_y = pR->y;
-				if (pR->z <= min_z and mMultiZSelection){
-					min_z = pR->z;
-					id = j;
-				}
-				else{
-					id=j;
-				}
-			}
+                                if (pR->z <= min_z and mMultiZSelection){
+                                        min_z = pR->z;
+                                        id = j;
+                                }
+                                else{
+                                        id=j;
+                                }
+                        }
         }
     }
     return id;
@@ -2574,7 +2560,7 @@ void T2DMap::slot_setPlayerLocation()
     TLuaInterpreter * LuaInt = mpHost->getLuaInterpreter();
     QString t1 = "mRoomSet";
     QString room;
-    room.setNum(mRoomSelection);    
+    room.setNum(mRoomSelection);
     if( mpMap->rooms.contains( mRoomSelection ) )
     {
         mpMap->mRoomId = mRoomSelection;
@@ -2615,7 +2601,7 @@ void T2DMap::slot_createLabel()
     mx = mx - xspan/2;
     my = yspan/2 - my;
     label.pos = QVector3D( mx, my, mOz);
-	//label.posz = mOz;
+        //label.posz = mOz;
     if( ! mpMap->areas.contains(mAID) ) return;
     int labelID;
     if( ! mpMap->mapLabels.contains( mAID ) )
