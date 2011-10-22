@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'module_manager.ui'
 **
-** Created: Sat Oct 22 10:04:25 2011
+** Created: Sat Oct 22 13:30:29 2011
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -20,6 +20,7 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QPushButton>
 #include <QtGui/QTableWidget>
+#include <QtGui/QTextBrowser>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
@@ -32,6 +33,7 @@ public:
     QWidget *widget;
     QVBoxLayout *verticalLayout_2;
     QTableWidget *moduleTable;
+    QTextBrowser *textBrowser;
     QWidget *widget_2;
     QHBoxLayout *horizontalLayout;
     QPushButton *installButton;
@@ -72,44 +74,56 @@ public:
 
         verticalLayout_2->addWidget(moduleTable);
 
-        widget_2 = new QWidget(widget);
-        widget_2->setObjectName(QString::fromUtf8("widget_2"));
-        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        verticalLayout_3->addWidget(widget);
+
+        textBrowser = new QTextBrowser(packageDialog);
+        textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
+        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
-        widget_2->setSizePolicy(sizePolicy2);
+        sizePolicy2.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
+        textBrowser->setSizePolicy(sizePolicy2);
+
+        verticalLayout_3->addWidget(textBrowser);
+
+        widget_2 = new QWidget(packageDialog);
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
+        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
+        widget_2->setSizePolicy(sizePolicy3);
         horizontalLayout = new QHBoxLayout(widget_2);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         installButton = new QPushButton(widget_2);
         installButton->setObjectName(QString::fromUtf8("installButton"));
-        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
-        installButton->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy4(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
+        installButton->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(installButton);
 
         uninstallButton = new QPushButton(widget_2);
         uninstallButton->setObjectName(QString::fromUtf8("uninstallButton"));
-        sizePolicy3.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
-        uninstallButton->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
+        uninstallButton->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(uninstallButton);
 
-
-        verticalLayout_2->addWidget(widget_2);
-
-
-        verticalLayout_3->addWidget(widget);
-
-        buttonBox = new QDialogButtonBox(packageDialog);
+        buttonBox = new QDialogButtonBox(widget_2);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
+        sizePolicy2.setHeightForWidth(buttonBox->sizePolicy().hasHeightForWidth());
+        buttonBox->setSizePolicy(sizePolicy2);
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
-        verticalLayout_3->addWidget(buttonBox);
+        horizontalLayout->addWidget(buttonBox);
+
+
+        verticalLayout_3->addWidget(widget_2);
 
 
         retranslateUi(packageDialog);
@@ -122,6 +136,11 @@ public:
     void retranslateUi(QDialog *packageDialog)
     {
         packageDialog->setWindowTitle(QApplication::translate("packageDialog", "Dialog", 0, QApplication::UnicodeUTF8));
+        textBrowser->setHtml(QApplication::translate("packageDialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Modules are a way to utilize a common package across many sessions.  The priority system is the order is which modules are loaded, modules with the same priority will be loaded alphabetically.  The 'save &amp; sync' option, if it is enabled, will save the module to disk, and then reload the module for all open sessions which also are using that module.  For each save operation, modules are backed up to a directory, moduleBackups, within your mudlet directory.</p></body></html>", 0, QApplication::UnicodeUTF8));
         installButton->setText(QApplication::translate("packageDialog", "Install", 0, QApplication::UnicodeUTF8));
         uninstallButton->setText(QApplication::translate("packageDialog", "Uninstall", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

@@ -339,8 +339,6 @@ void TMap::init( Host * pH )
         s_area_exits[areas[id]->exits.size()]++;
         it.value()->calcSpan();
     }
-    //mVarTable[0].name = "RoomId";
-    //mVarTable[0].var = &mRoodId;
 
     auditRooms();
     qDebug()<<"statistics: areas:"<<s_areas;
