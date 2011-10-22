@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'module_manager.ui'
 **
-** Created: Sat Oct 22 13:30:29 2011
+** Created: Sat Oct 22 15:00:28 2011
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -36,9 +36,9 @@ public:
     QTextBrowser *textBrowser;
     QWidget *widget_2;
     QHBoxLayout *horizontalLayout;
+    QDialogButtonBox *buttonBox;
     QPushButton *installButton;
     QPushButton *uninstallButton;
-    QDialogButtonBox *buttonBox;
 
     void setupUi(QDialog *packageDialog)
     {
@@ -74,53 +74,60 @@ public:
 
         verticalLayout_2->addWidget(moduleTable);
 
+        textBrowser = new QTextBrowser(widget);
+        textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(100);
+        sizePolicy2.setVerticalStretch(200);
+        sizePolicy2.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
+        textBrowser->setSizePolicy(sizePolicy2);
+        textBrowser->setFrameShape(QFrame::Box);
+        textBrowser->setFrameShadow(QFrame::Sunken);
+
+        verticalLayout_2->addWidget(textBrowser);
+
 
         verticalLayout_3->addWidget(widget);
 
-        textBrowser = new QTextBrowser(packageDialog);
-        textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
-        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(textBrowser->sizePolicy().hasHeightForWidth());
-        textBrowser->setSizePolicy(sizePolicy2);
-
-        verticalLayout_3->addWidget(textBrowser);
-
         widget_2 = new QWidget(packageDialog);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
-        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy3(QSizePolicy::Maximum, QSizePolicy::Maximum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(widget_2->sizePolicy().hasHeightForWidth());
         widget_2->setSizePolicy(sizePolicy3);
+        widget_2->setLayoutDirection(Qt::RightToLeft);
         horizontalLayout = new QHBoxLayout(widget_2);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        installButton = new QPushButton(widget_2);
-        installButton->setObjectName(QString::fromUtf8("installButton"));
-        QSizePolicy sizePolicy4(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        buttonBox = new QDialogButtonBox(widget_2);
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
+        QSizePolicy sizePolicy4(QSizePolicy::Maximum, QSizePolicy::MinimumExpanding);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
-        installButton->setSizePolicy(sizePolicy4);
+        sizePolicy4.setHeightForWidth(buttonBox->sizePolicy().hasHeightForWidth());
+        buttonBox->setSizePolicy(sizePolicy4);
+        buttonBox->setOrientation(Qt::Horizontal);
+        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+        buttonBox->setCenterButtons(false);
+
+        horizontalLayout->addWidget(buttonBox);
+
+        installButton = new QPushButton(widget_2);
+        installButton->setObjectName(QString::fromUtf8("installButton"));
+        QSizePolicy sizePolicy5(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(0);
+        sizePolicy5.setHeightForWidth(installButton->sizePolicy().hasHeightForWidth());
+        installButton->setSizePolicy(sizePolicy5);
 
         horizontalLayout->addWidget(installButton);
 
         uninstallButton = new QPushButton(widget_2);
         uninstallButton->setObjectName(QString::fromUtf8("uninstallButton"));
-        sizePolicy4.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
-        uninstallButton->setSizePolicy(sizePolicy4);
+        sizePolicy5.setHeightForWidth(uninstallButton->sizePolicy().hasHeightForWidth());
+        uninstallButton->setSizePolicy(sizePolicy5);
 
         horizontalLayout->addWidget(uninstallButton);
-
-        buttonBox = new QDialogButtonBox(widget_2);
-        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        sizePolicy2.setHeightForWidth(buttonBox->sizePolicy().hasHeightForWidth());
-        buttonBox->setSizePolicy(sizePolicy2);
-        buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
-
-        horizontalLayout->addWidget(buttonBox);
 
 
         verticalLayout_3->addWidget(widget_2);

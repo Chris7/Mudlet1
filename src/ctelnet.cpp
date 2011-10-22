@@ -1103,7 +1103,7 @@ void cTelnet::atcpComposerSave( QString txt )
         if( txt != "" )
         {
             _h += "  ";
-            _h += txt.toLatin1().data();
+            _h += txt.replace(QString("\\"), QString("\\\\")).toLatin1().data();
             _h += " ";
         }
         _h += TN_IAC;
