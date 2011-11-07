@@ -50,6 +50,9 @@ T2DMap::T2DMap()
     mShowGrid = false;
     mBubbleMode = false;
     mMapperUseAntiAlias = true;
+    mOx = 0;
+    mOy = 0;
+    mOz = 0;
 }
 
 
@@ -76,6 +79,9 @@ T2DMap::T2DMap(QWidget * parent)
     mShowGrid = false;
     mBubbleMode = false;
     mMapperUseAntiAlias = true;
+    mOx = 0;
+    mOy = 0;
+    mOz = 0;
 }
 
 void T2DMap::init()
@@ -83,25 +89,6 @@ void T2DMap::init()
     if( ! mpMap ) return;
     eSize = mpMap->mpHost->mLineSize;
     rSize = mpMap->mpHost->mRoomSize;
-    mpMap->mVars["XView"].i = &mOx;
-    mpMap->mVars["XView"].c[8] = 'I';
-    mpMap->mVars["YView"].i = &mOy;
-    mpMap->mVars["YView"].c[8] = 'I';
-    mpMap->mVars["ZView"].i = &mOz;
-    mpMap->mVars["ZView"].c[8] = 'I';
-    mpMap->mVars["GridZoom"].i = &gzoom;
-    mpMap->mVars["GridZoom"].c[8] = 'I';
-    mpMap->mVars["XZoom"].i = &xzoom;
-    mpMap->mVars["XZoom"].c[8] = 'I';
-    mpMap->mVars["YZoom"].i = &yzoom;
-    mpMap->mVars["YZoom"].c[8] = 'I';
-    mpMap->mVars["mWidth"].f = &xspan;
-    mpMap->mVars["mWidth"].c[8] = 'F';
-    mpMap->mVars["mHeight"].f = &yspan;
-    mpMap->mVars["mHeight"].c[8] = 'F';
-    mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
-    mpMap->mVars["SelectedRoom"].c[8] = 'I';
-    mpMap->mViewArea=0;
     mMapperUseAntiAlias = mpHost->mMapperUseAntiAlias;
     mPixMap.clear();
     mGridPix.clear();
@@ -180,6 +167,27 @@ void T2DMap::init()
             mGridPix[mpMap->rooms[mpMap->areas[kL[i]]->rooms[0]]->area] = pix;
         }
     }
+    mpMap->mViewArea=0;
+    mpMap->mVars["XView"].i = &mOx;
+    mpMap->mVars["XView"].c[8] = 'I';
+    mpMap->mVars["YView"].i = &mOy;
+    mpMap->mVars["YView"].c[8] = 'I';
+    mpMap->mVars["ZView"].i = &mOz;
+    mpMap->mVars["ZView"].c[8] = 'I';
+    mpMap->mVars["GridZoom"].i = &gzoom;
+    mpMap->mVars["GridZoom"].c[8] = 'I';
+    mpMap->mVars["XZoom"].i = &xzoom;
+    mpMap->mVars["XZoom"].c[8] = 'I';
+    mpMap->mVars["YZoom"].i = &yzoom;
+    mpMap->mVars["YZoom"].c[8] = 'I';
+    mpMap->mVars["mWidth"].f = &xspan;
+    mpMap->mVars["mWidth"].c[8] = 'F';
+    mpMap->mVars["mHeight"].f = &yspan;
+    mpMap->mVars["mHeight"].c[8] = 'F';
+    mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
+    mpMap->mVars["SelectedRoom"].c[8] = 'I';
+    mpMap->mVars["ViewArea"].i = &(mpMap->mViewArea);
+    mpMap->mVars["ViewArea"].c[8] = 'I';
 }
 
 
@@ -405,6 +413,53 @@ void T2DMap::switchArea(QString name)
     }
 }
 
+void T2DMap::drawPlayerLocation(QPointF _center, float _radius, QPainter * p){
+    QRadialGradient _gradient(_center,_radius);
+    _gradient.setColorAt(0.95, QColor(255,0,0,150));
+    _gradient.setColorAt(0.80, QColor(150,100,100,150));
+    _gradient.setColorAt(0.799,QColor(150,100,100,100));
+    _gradient.setColorAt(0.7, QColor(255,0,0,200));
+    _gradient.setColorAt(0, QColor(255,255,255,255));
+    QPen myPen(QColor(0,0,0,0));
+    QPainterPath myPath;
+    (*p).setBrush(_gradient);
+    (*p).setPen(myPen);
+    myPath.addEllipse(_center,_radius,_radius);
+    (*p).drawPath(myPath);
+}
+
+void T2DMap::drawMapInfo(bool gridMode, QTime __time, QPainter * p){
+    if (gridMode){
+        QString text = QString("Area: %1 ID:%2").arg(mpMap->areaNamesMap[mpMap->rooms[mRID]->area]).arg(mpMap->rooms[mRID]->area);
+        (*p).drawText( 10, mFontHeight, text );
+        text = QString("Room Name: %1").arg(mpMap->rooms[mRID]->name);
+        (*p).drawText( 10, 2*mFontHeight, text );
+        text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(mRID)).arg(QString::number(mpMap->rooms[mRID]->x)).arg(QString::number(mpMap->rooms[mRID]->y)).arg(QString::number(mpMap->rooms[mRID]->z));
+        (*p).drawText( 10, 3*mFontHeight, text );
+        (*p).fillRect(mMultiRect,QColor(190,190,190,60));
+        text = QString("render time:%1ms").arg(QString::number(__time.elapsed()));
+        (*p).setPen(QColor(255,255,255));
+        (*p).drawText( 10, 4*mFontHeight, text );
+    }
+    else{
+        (*p).fillRect( 0,0,width(), 5*mFontHeight, QColor(150,150,150,80) );
+        QString text;
+        int __rid = mRID;
+        if( mRoomSelection > 0 && mpMap->rooms.contains( mRoomSelection ) )
+        {
+            __rid = mRoomSelection;
+        }
+        if( mpMap->areaNamesMap.contains(__rid))
+        {
+            text = QString("Area: %1 ID:%2 x:%3-%4 y:%5-%6").arg(mpMap->areaNamesMap[mpMap->rooms[__rid]->area]).arg(mpMap->rooms[__rid]->area).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_y).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_y);
+            (*p).drawText( 10, mFontHeight, text );
+        }
+        text = QString("Room Name: %1").arg(mpMap->rooms[__rid]->name);
+        (*p).drawText( 10, 2*mFontHeight, text );
+        text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(__rid)).arg(QString::number(mpMap->rooms[__rid]->x)).arg(QString::number(mpMap->rooms[__rid]->y)).arg(QString::number(mpMap->rooms[__rid]->z));
+        (*p).drawText( 10, 3*mFontHeight, text );
+    }
+}
 
 void T2DMap::paintEvent( QPaintEvent * e )
 {
@@ -432,7 +487,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         xspan = yzoom;
         yspan = yzoom*(_h/_w);
     }
-
+    //these are our 'translated' x/y, which take into account our zoom levels
     float tx = _w/xspan;
     float ty = _h/yspan;
 
@@ -446,10 +501,10 @@ void T2DMap::paintEvent( QPaintEvent * e )
     if( ! mpMap->rooms.contains( mpMap->mRoomId ) )
     {
         p.drawText(_w/2,_h/2,"No map or no valid position.");
-
         return;
     }
     int ox, oy, oz;
+    //Removed by Chris--why do we need this?
     if( mRID != mpMap->mRoomId && mShiftMode ) mShiftMode = false;
     if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mpMap->mViewArea)
     {
@@ -466,11 +521,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         else
             mRID = mpMap->mRoomId;
         mAID = mpMap->rooms[mRID]->area;
-        /*if (mpMap->rooms.contains(mRID))
-
-        else
-            return;*/
-        if (mpMap->mNewMove || !mOx){//do it for centerview and for initialization
+        if (mpMap->mNewMove){//centerview will trigger this
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
             mOx = ox;
@@ -486,16 +537,19 @@ void T2DMap::paintEvent( QPaintEvent * e )
     }
     else
     {
-        //switch area goes here
+        //switch area chooses this part of the if
         ox = mOx;
         oy = mOy;
         oz = mOz;
     }
-    if( ox*tx > xspan/2*tx )
+    //ox/oy/oz are either the room id's coordinates or our shifted ones.  In anycase,
+    //they correspond to the 'center' of our mapper view.  This code means to
+    //recenter it.  tx*xspan=width
+    if( ox > xspan/2 )
         _rx = -(tx*ox-xspan/2*tx);
     else
         _rx = xspan/2*tx-tx*ox;
-    if( oy*ty > yspan/2*ty )
+    if( oy > yspan/2 )
         _ry = -(ty*oy-yspan/2*ty);
     else
         _ry = yspan/2*ty-ty*oy;
@@ -506,13 +560,13 @@ void T2DMap::paintEvent( QPaintEvent * e )
     TArea * pArea = mpMap->areas[mAID];
     if( ! pArea ) return;
 
-    int zEbene;
-    zEbene = mOz;
-
-    if( ! mpMap ) return;
+    int zPlane;
+    zPlane = mOz;
+    //pointless, we already check--Chris
+    //if( ! mpMap ) return;
     if( ! mpMap->rooms.contains( mRID ) ) return;
 
-    float wegBreite = 1/eSize * tx * rSize;
+    float wegBreite = 1/eSize * tx * rSize;//something path/width?
 
     p.fillRect( 0, 0, width(), height(), mpHost->mBgColor_2 );
 
@@ -546,31 +600,9 @@ void T2DMap::paintEvent( QPaintEvent * e )
             float _px = (width()/gzoom/2)*gzoom+gzoom/2;
             float _py = (height()/gzoom/2)*gzoom+gzoom/2;
             if( mShowInfo )
-            {
-                QString text = QString("Area: %1 ID:%2").arg(mpMap->areaNamesMap[mpMap->rooms[mRID]->area]).arg(mpMap->rooms[mRID]->area);
-                p.drawText( 10, mFontHeight, text );
-                text = QString("Room Name: %1").arg(mpMap->rooms[mRID]->name);
-                p.drawText( 10, 2*mFontHeight, text );
-                text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(mRID)).arg(QString::number(mpMap->rooms[mRID]->x)).arg(QString::number(mpMap->rooms[mRID]->y)).arg(QString::number(mpMap->rooms[mRID]->z));
-                p.drawText( 10, 3*mFontHeight, text );
-                p.fillRect(mMultiRect,QColor(190,190,190,60));
-                text = QString("render time:%1ms").arg(QString::number(__time.elapsed()));
-                p.setPen(QColor(255,255,255));
-                p.drawText( 10, 4*mFontHeight, text );
-            }
+                drawMapInfo(pArea->gridMode, __time, &p);
             QPointF _center = QPointF( _px, _py );
-            QRadialGradient _gradient(_center,_radius);
-            _gradient.setColorAt(0.95, QColor(255,0,0,150));
-            _gradient.setColorAt(0.80, QColor(150,100,100,150));
-            _gradient.setColorAt(0.799,QColor(150,100,100,100));
-            _gradient.setColorAt(0.7, QColor(255,0,0,200));
-            _gradient.setColorAt(0, QColor(255,255,255,255));
-            QPen myPen(QColor(0,0,0,0));
-            QPainterPath myPath;
-            p.setBrush(_gradient);
-            p.setPen(myPen);
-            myPath.addEllipse(_center,_radius,_radius);
-            p.drawPath(myPath);
+            drawPlayerLocation(_center, _radius, &p);
             return;
         }
     }
@@ -604,7 +636,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     //mpMap->auditRooms();
     if( ! pArea->gridMode )
     {
-        //swithc goes here
+        //switch area goes here
         for( int i=0; i<pArea->rooms.size(); i++ )
         {
             TRoom * pR = mpMap->rooms[pArea->rooms[i]];
@@ -613,7 +645,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
             float ry = pR->y*-1*ty+_ry;
             int rz = pR->z;
 
-            if( rz != zEbene ) continue;
+            if( rz != zPlane ) continue;
             if( rx < 0 || ry < 0 || rx > _w || ry > _h ) continue;
 
             pR->rendered = true;
@@ -803,7 +835,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 float ex = pE->x*tx+_rx;
                 float ey = pE->y*ty*-1+_ry;
                 int ez = pE->z;
-//                if( ez != zEbene || e != ez ) continue;
+//                if( ez != zPlane || e != ez ) continue;
 
                 //p.setPen(QPen( mpHost->mFgColor_2) );
 //                pen = p.pen();
@@ -962,7 +994,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
         float ry = pR->y*-1*ty+_ry;
         int rz = pR->z;
 
-        if( rz != zEbene ) continue;
+        if( rz != zPlane ) continue;
         if( rx < 0 || ry < 0 || rx > _w || ry > _h ) continue;
 
         pR->rendered = false;
@@ -1058,20 +1090,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 mStartSpeedWalk = false;
                 float _radius = (0.8*tx)/2;
                 QPointF _center = QPointF(rx,ry);
-                QRadialGradient _gradient(_center,_radius);
-                _gradient.setColorAt(0.95, QColor(255,0,0,150));
-                _gradient.setColorAt(0.80, QColor(150,100,100,150));
-                _gradient.setColorAt(0.799,QColor(150,100,100,100));
-                _gradient.setColorAt(0.7, QColor(255,0,0,200));
-                _gradient.setColorAt(0, QColor(255,255,255,255));
-                QPen myPen(QColor(0,0,0,0));
-                QPainterPath myPath;
-                p.setBrush(_gradient);
-                p.setPen(myPen);
-                myPath.addEllipse(_center,_radius,_radius);
-                p.drawPath(myPath);
-
-
+                drawPlayerLocation(_center, _radius, &p);
                 mTarget = pArea->rooms[i];
                 if( mpMap->rooms.contains(mTarget) )
                 {
@@ -1161,19 +1180,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
             {
                 float _radius = (1.2*tx)/2;
                 QPointF _center = QPointF(rx,ry);
-                QRadialGradient _gradient(_center,_radius);
-                _gradient.setColorAt(0.95, QColor(255,0,0,150));
-                _gradient.setColorAt(0.80, QColor(150,100,100,150));
-                _gradient.setColorAt(0.799,QColor(150,100,100,100));
-                _gradient.setColorAt(0.7, QColor(255,0,0,200));
-                _gradient.setColorAt(0, QColor(255,255,255,255));
-                QPen myPen(QColor(0,0,0,0));
-                QPainterPath myPath;
-                p.setBrush(_gradient);
-                p.setPen(myPen);
-                myPath.addEllipse(_center,_radius,_radius);
-                p.drawPath(myPath);
-
+                drawPlayerLocation(_center, _radius, &p);
             }
         }
 
@@ -1321,19 +1328,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                     mStartSpeedWalk = false;
                     float _radius = (0.8*tx)/2;
                     QPointF _center = QPointF(rx,ry);
-                    QRadialGradient _gradient(_center,_radius);
-                    _gradient.setColorAt(0.95, QColor(255,0,0,150));
-                    _gradient.setColorAt(0.80, QColor(150,100,100,150));
-                    _gradient.setColorAt(0.799,QColor(150,100,100,100));
-                    _gradient.setColorAt(0.7, QColor(255,0,0,200));
-                    _gradient.setColorAt(0, QColor(255,255,255,255));
-                    QPen myPen(QColor(0,0,0,0));
-                    QPainterPath myPath;
-                    p.setBrush(_gradient);
-                    p.setPen(myPen);
-                    myPath.addEllipse(_center,_radius,_radius);
-                    p.drawPath(myPath);
-
+                    drawPlayerLocation(_center, _radius, &p);
                     mPick = false;
                     mPickBox = QRect(dr.x(), dr.y(), 2*(tx*rSize), 2*(ty*rSize)); //set it as the bounds from upper left to bottom right
                     mTarget = it.key();
@@ -1365,36 +1360,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     p.setPen(_infoCol);
 
     if( mShowInfo )
-    {
-        p.fillRect( 0,0,width(), 5*mFontHeight, QColor(150,150,150,80) );
-        QString text;
-
-        //if( mpMap->rooms.contains( mRoomSelection ) && __Pick )
-        //{
-        int __rid = mRID;
-        if( mRoomSelection > 0 && mpMap->rooms.contains( mRoomSelection ) )
-        {
-            __rid = mRoomSelection;
-        }
-        if( mpMap->areaNamesMap.contains(__rid))
-        {
-            text = QString("Area: %1 ID:%2 x:%3-%4 y:%5-%6").arg(mpMap->areaNamesMap[mpMap->rooms[__rid]->area]).arg(mpMap->rooms[__rid]->area).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_y).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_y);
-            p.drawText( 10, mFontHeight, text );
-        }
-        text = QString("Room Name: %1").arg(mpMap->rooms[__rid]->name);
-        p.drawText( 10, 2*mFontHeight, text );
-        text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(__rid)).arg(QString::number(mpMap->rooms[__rid]->x)).arg(QString::number(mpMap->rooms[__rid]->y)).arg(QString::number(mpMap->rooms[__rid]->z));
-        p.drawText( 10, 3*mFontHeight, text );
-//        else
-//        {
-//            text = QString("Area: %1 ID:%2").arg(mpMap->areaNamesMap[mpMap->rooms[mRID]->area]).arg(mpMap->rooms[mRID]->area);
-//            p.drawText( 10, mFontHeight, text );
-//            text = QString("Room Name: %1").arg(mpMap->rooms[mRID]->name);
-//            p.drawText( 10, 2*mFontHeight, text );
-//            text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(mRID)).arg(QString::number(mpMap->rooms[mRID]->x)).arg(QString::number(mpMap->rooms[mRID]->y)).arg(QString::number(mpMap->rooms[mRID]->z));
-//            p.drawText( 10, 3*mFontHeight, text );
-//        }
-    }
+        drawMapInfo(pArea->gridMode, __time, &p);
     if( mMapInfoRect == QRect(0,0,0,0) ) mMapInfoRect = QRect(0,0,width(),height()/10);
 
     if( ! mShiftMode )
@@ -1406,37 +1372,14 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
             float _radius = (1.9*tx)/2;
             QPointF _center = QPointF(px,py);
-            QRadialGradient _gradient(_center,_radius);
-            _gradient.setColorAt(0.95, QColor(255,0,0,150));
-            _gradient.setColorAt(0.80, QColor(150,100,100,150));
-            _gradient.setColorAt(0.799,QColor(150,100,100,100));
-            _gradient.setColorAt(0.7, QColor(255,0,0,200));
-            _gradient.setColorAt(0, QColor(255,255,255,255));
-            QPen myPen(QColor(0,0,0,0));
-            QPainterPath myPath;
-            p.setBrush(_gradient);
-            p.setPen(myPen);
-            myPath.addEllipse(_center,_radius,_radius);
-            p.drawPath(myPath);
+            drawPlayerLocation(_center, _radius, &p);
         }
         else
         {
             QPen _pen = p.pen();
             float _radius = (1.9*tx)/2;
             QPointF _center = QPointF(px,py);
-            QRadialGradient _gradient(_center,_radius);
-            _gradient.setColorAt(0.95, QColor(255,0,0,150));
-            _gradient.setColorAt(0.80, QColor(150,100,100,150));
-            _gradient.setColorAt(0.799,QColor(150,100,100,100));
-            _gradient.setColorAt(0.3,QColor(150,150,150,100));
-            _gradient.setColorAt(0.1, QColor(255,255,255,100));
-            _gradient.setColorAt(0, QColor(255,255,255,255));
-            QPen myPen(QColor(0,0,0,0));
-            QPainterPath myPath;
-            p.setBrush(_gradient);
-            p.setPen(myPen);
-            myPath.addEllipse(_center,_radius,_radius);
-            p.drawPath(myPath);
+            drawPlayerLocation(_center, _radius, &p);
         }
     }
     if( mpMap->mapLabels.contains( mAID ) )

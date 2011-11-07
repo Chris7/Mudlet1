@@ -37,6 +37,8 @@ public:
     QColor   getColor( int id );
     QColor   _getColor( int id );
     void     init();
+    void     drawPlayerLocation(QPointF _center, float _radius, QPainter * p);
+    void     drawMapInfo(bool gridMode, QTime __time, QPainter * p);
     void     paintEvent( QPaintEvent * );
     void     mousePressEvent(QMouseEvent * );
     void     mouseDoubleClickEvent ( QMouseEvent * event );

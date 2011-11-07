@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'options_area_triggers.ui'
 **
-** Created: Sat Oct 22 10:04:25 2011
+** Created: Sat Oct 29 20:50:44 2011
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

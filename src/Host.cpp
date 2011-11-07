@@ -1055,7 +1055,7 @@ bool Host::uninstallPackage( QString packageName, int module)
         //if module == 1, we actually uninstall it.
         QStringList entry = mInstalledModules[packageName];
         mInstalledModules.remove( packageName );
-        //reinstall the module if it was also removed.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
+        //reinstall the package if it shared a module name.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
         if (dualInstallations){
             //get the pre package list so we don't get duplicates
             mInstalledPackages.removeAll(packageName); //so we don't get denied from installPackage

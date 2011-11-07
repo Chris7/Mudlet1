@@ -804,13 +804,15 @@ int TLuaInterpreter::centerview( lua_State * L )
     {
         pHost->mpMap->mRoomId = roomid;
         pHost->mpMap->mNewMove = true;
+        pHost->mpMap->mViewArea=0;
         if( pHost->mpMap->mpM )
         {
             pHost->mpMap->mpM->update();
         }
-        if( pHost->mpMap->mpM )
+        if( pHost->mpMap->mpMapper)
         {
-            pHost->mpMap->mpMapper->mp2dMap->update();
+            if (pHost->mpMap->mpMapper->mp2dMap)
+                pHost->mpMap->mpMapper->mp2dMap->update();
         }
 
     }
@@ -1409,14 +1411,13 @@ int TLuaInterpreter::setExitStub( lua_State * L  ){
     }
     if (status){
         if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
-            return 1;
-        pHost->mpMap->rooms[roomId]->setExitStub(dirType, 1);
+            pHost->mpMap->rooms[roomId]->setExitStub(dirType, 1);
         }
     else{
         if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
             pHost->mpMap->rooms[roomId]->setExitStub(dirType, 0);
         }
-    return 1;
+    return 0;
 }
 
 int TLuaInterpreter::connectExitStub( lua_State * L  ){
@@ -1483,7 +1484,7 @@ int TLuaInterpreter::connectExitStub( lua_State * L  ){
         pHost->mpMap->connectExitStub(roomId, dirType);
     }
     pHost->mpMap->mMapGraphNeedsUpdate = true;
-    return 1;
+    return 0;
 }
 
 int TLuaInterpreter::getExitStubs( lua_State * L  ){
@@ -1512,9 +1513,10 @@ int TLuaInterpreter::getExitStubs( lua_State * L  ){
                 lua_pushnumber( L, exitType );
                 lua_settable(L, -3);
             }
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
 int TLuaInterpreter::getModulePriority( lua_State * L  ){
@@ -1530,13 +1532,14 @@ int TLuaInterpreter::getModulePriority( lua_State * L  ){
     if (mpHost->mModulePriorities.contains(moduleName)){
         int priority = mpHost->mModulePriorities[moduleName];
         lua_pushnumber( L, priority );
+        return 1;
     }
     else{
         lua_pushstring(L, "getModulePriority: Module doesn't exist");
         lua_error(L);
         return 1;
     }
-    return 1;
+    return 0;
 }
 
 int TLuaInterpreter::setModulePriority( lua_State * L  ){
@@ -1564,7 +1567,7 @@ int TLuaInterpreter::setModulePriority( lua_State * L  ){
         lua_error(L);
         return 1;
     }
-    return 1;
+    return 0;
 }
 
 int TLuaInterpreter::loadMap( lua_State * L )
@@ -6826,7 +6829,6 @@ int TLuaInterpreter::addSpecialExit( lua_State * L )
         if( pHost->mpMap->rooms.contains( id_to ) )
         {
             pHost->mpMap->rooms[id_from]->addSpecialExit( id_to, _dir );
-            pHost->mpMap->rooms[id_from]->setSpecialExitLock( id_to, _dir, false );
             pHost->mpMap->mMapGraphNeedsUpdate = true;
         }
     }

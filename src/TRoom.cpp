@@ -193,10 +193,10 @@ void TRoom::addSpecialExit( int to, QString cmd )
     }
     else
     {
+        _cmd = cmd;
         _cmd.prepend("0");
-        _cmd.append( cmd );
     }
-    other.insertMulti( to, cmd );
+    other.insertMulti( to, _cmd );
 }
 
 
@@ -205,10 +205,3 @@ void TRoom::removeSpecialExit( int to, QString cmd )
     other.remove(to, cmd.prepend("0"));
     other.remove(to, cmd.prepend("1"));
 }
-
-
-
-
-
-
-

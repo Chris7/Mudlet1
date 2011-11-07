@@ -62,7 +62,7 @@ union mVarTypes {
     bool * b;
     string * s;
     QString * qs;
-    //we set the last bit to indicate what type is being used.
+    //we set the last bit(8) to indicate what type is being used.
     //Currently supported in setMapVar/getMapVar are Int(I)/Boolean(B)
     char c[9];
 };
@@ -128,11 +128,7 @@ public:
     float m2DPanXStart;
     float m2DPanYStart;
     int mViewArea;
-    //mapVar mVars[20];
-    //mapVar <int> mvRoomId;
     QMap<QString, mVarTypes> mVars;
-    //QMap<QString, *QVariant> mVars;
-    //mVars.insert("RoomId", &mRoomId);
     int mTargetID;
     QList<int> mPathList;
     QList<QString> mDirList;
@@ -159,8 +155,6 @@ public:
     bool mMapGraphNeedsUpdate;
     bool mNewMove;
     QMap<qint32, QMap<qint32, TMapLabel> > mapLabels;
-
-
 };
 
 
