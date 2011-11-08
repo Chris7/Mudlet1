@@ -1409,14 +1409,7 @@ int TLuaInterpreter::setExitStub( lua_State * L  ){
         lua_error( L );
         return 1;
     }
-    if (status){
-        if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
-            pHost->mpMap->rooms[roomId]->setExitStub(dirType, 1);
-        }
-    else{
-        if (pHost->mpMap->rooms[roomId]->exitStubs.contains(dirType))
-            pHost->mpMap->rooms[roomId]->setExitStub(dirType, 0);
-        }
+    pHost->mpMap->rooms[roomId]->setExitStub(dirType, status);
     return 0;
 }
 
