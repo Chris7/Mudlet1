@@ -6930,10 +6930,16 @@ int TLuaInterpreter::getSpecialExitsSwap( lua_State * L )
         while( it.hasNext() )
         {
             it.next();
+            lua_newtable(L);
             int id_to = it.key();
             QString dir = it.value();
-            lua_pushstring( L, dir.toLatin1().data() );
-            lua_pushnumber( L, id_to );
+            QString exitStatus = dir.left(1);
+            QString exit = dir.remove(0,1);
+            lua_pushnumber( L, id_to );//done to remove the prepended special exit status
+            lua_pushstring( L, exitStatus.toLatin1().data() );//done to remove the prepended special exit status
+            lua_settable(L, -3);
+            lua_pushstring(L, exit.toLatin1().data());
+            lua_insert(L,-2);
             lua_settable(L, -3);
         }
         return 1;
