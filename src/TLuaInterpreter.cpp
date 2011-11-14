@@ -779,8 +779,12 @@ int TLuaInterpreter::updateMap(lua_State * L){
     {
         if (pHost->mpMap->mpM)
             pHost->mpMap->mpM->update();
-        if (pHost->mpMap->mpMapper->mp2dMap)
-            pHost->mpMap->mpMapper->mp2dMap->update();
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                pHost->mpMap->mpMapper->mp2dMap->mNewMoveAction=true;
+                pHost->mpMap->mpMapper->mp2dMap->update();
+            }
+        }
     }
     return 0;
 }
@@ -6226,6 +6230,8 @@ int TLuaInterpreter::createRoomID( lua_State * L )
 int TLuaInterpreter::getMapVar( lua_State * L )
 {
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if (!(pHost->mpMap))
+        return 0;
     QString name;
     QMap<QString, mVarTypes> mapVars = pHost->mpMap->mVars;
     if (!lua_objlen(L,1)){

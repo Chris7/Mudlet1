@@ -415,6 +415,7 @@ void T2DMap::switchArea(QString name)
 
 void T2DMap::drawPlayerLocation(QPointF _center, float _radius, QPainter * p){
     QRadialGradient _gradient(_center,_radius);
+    qDebug()<<_center;
     _gradient.setColorAt(0.95, QColor(255,0,0,150));
     _gradient.setColorAt(0.80, QColor(150,100,100,150));
     _gradient.setColorAt(0.799,QColor(150,100,100,100));
@@ -442,13 +443,16 @@ void T2DMap::drawMapInfo(bool gridMode, QTime __time, QPainter * p){
         (*p).drawText( 10, 4*mFontHeight, text );
     }
     else{
+        qDebug() << "Drawing Map Info";
         (*p).fillRect( 0,0,width(), 5*mFontHeight, QColor(150,150,150,80) );
         QString text;
         int __rid = mRID;
+        qDebug() << __rid;
         if( mRoomSelection > 0 && mpMap->rooms.contains( mRoomSelection ) )
         {
             __rid = mRoomSelection;
         }
+        qDebug() << mRoomSelection;
         if( mpMap->areaNamesMap.contains(__rid))
         {
             text = QString("Area: %1 ID:%2 x:%3-%4 y:%5-%6").arg(mpMap->areaNamesMap[mpMap->rooms[__rid]->area]).arg(mpMap->rooms[__rid]->area).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_y).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_y);
@@ -458,6 +462,7 @@ void T2DMap::drawMapInfo(bool gridMode, QTime __time, QPainter * p){
         (*p).drawText( 10, 2*mFontHeight, text );
         text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(__rid)).arg(QString::number(mpMap->rooms[__rid]->x)).arg(QString::number(mpMap->rooms[__rid]->y)).arg(QString::number(mpMap->rooms[__rid]->z));
         (*p).drawText( 10, 3*mFontHeight, text );
+        qDebug() << "finished drawing";
     }
 }
 
@@ -504,8 +509,8 @@ void T2DMap::paintEvent( QPaintEvent * e )
         return;
     }
     int ox, oy, oz;
-    //Removed by Chris--why do we need this?
-    if( mRID != mpMap->mRoomId && mShiftMode ) mShiftMode = false;
+    //Removed by Chris--why do we need this, it also screws up with updateMap() function from TLuaInt.?
+    //if( mRID != mpMap->mRoomId && mShiftMode ) mShiftMode = false;
     if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mpMap->mViewArea)
     {
         mShiftMode = true;
@@ -530,6 +535,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
             mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
         }
         else{
+            qDebug()<<"in her nowe";
             ox = mOx;
             oy = mOy;
             oz = mOz;
@@ -538,6 +544,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     else
     {
         //switch area chooses this part of the if
+        qDebug()<<"in here";
         ox = mOx;
         oy = mOy;
         oz = mOz;
@@ -1362,7 +1369,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     if( mShowInfo )
         drawMapInfo(pArea->gridMode, __time, &p);
     if( mMapInfoRect == QRect(0,0,0,0) ) mMapInfoRect = QRect(0,0,width(),height()/10);
-
+    qDebug()<<"px/py are :"<<px<<","<<py;
     if( ! mShiftMode )
     {
         if( mpHost->mMapStrongHighlight )
