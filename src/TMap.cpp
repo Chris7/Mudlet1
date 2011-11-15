@@ -344,12 +344,14 @@ void TMap::init( Host * pH )
         s_area_exits[areas[id]->exits.size()]++;
         it.value()->calcSpan();
     }
-    //mVarTable[0].name = "RoomId";
-    //mVarTable[0].var = &mRoodId;
 
     auditRooms();
     qDebug()<<"statistics: areas:"<<s_areas;
     qDebug()<<"area exit stats:" <<s_area_exits;
+    TEvent event;
+    event.mArgumentList.append( "sysMapLoad" );
+    event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    mpHost->raiseEvent( & event );
 }
 
 void TMap::auditRooms()

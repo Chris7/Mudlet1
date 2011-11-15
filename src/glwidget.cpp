@@ -297,6 +297,10 @@ void GLWidget::setZDist(int angle)
 
 void GLWidget::initializeGL()
 {
+    TEvent event;
+    event.mArgumentList.append( "sys3DMapLoad" );
+    event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    mpMap->mpHost->raiseEvent( & event );
     qglClearColor( Qt::black );
     xRot = 1;
     yRot = 5;

@@ -188,6 +188,10 @@ void T2DMap::init()
     mpMap->mVars["SelectedRoom"].c[8] = 'I';
     mpMap->mVars["ViewArea"].i = &(mpMap->mViewArea);
     mpMap->mVars["ViewArea"].c[8] = 'I';
+    TEvent event;
+    event.mArgumentList.append( "sys2DMapLoad" );
+    event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    mpHost->raiseEvent( & event );
 }
 
 
