@@ -516,7 +516,7 @@ void mudlet::slot_uninstall_module()
     Host * pH = getActiveHost();
     if( ! pH ) return;
     int cRow = moduleTable->currentRow();
-    QTableWidgetItem * pI = moduleTable->item(cRow, 1);
+    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
     if( pI )
         pH->uninstallPackage( pI->text(), 1);
     for (int i=moduleTable->rowCount()-1; i >= 0; --i)
