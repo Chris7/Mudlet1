@@ -337,6 +337,7 @@ public:
     static int getMapVar( lua_State * L  );
     static int setMapVar( lua_State * L  );
     static int updateMap(lua_State * L);
+    static int addMapEvent(lua_State * L);
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;

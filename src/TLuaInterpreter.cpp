@@ -789,6 +789,40 @@ int TLuaInterpreter::updateMap(lua_State * L){
     return 0;
 }
 
+int TLuaInterpreter::addMapEvent(lua_State * L){
+    QString displayName, eventName;
+    if( ! lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "addMapEvent: wrong first argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        displayName = lua_tostring( L, 1 );
+    }
+    if( ! lua_isstring( L, 2 ) )
+    {
+        lua_pushstring( L, "addMapEvent: wrong second argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        eventName = lua_tostring( L, 2 );
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                pHost->mpMap->mpMapper->mp2dMap->mUserActions.insert(displayName, eventName);
+            }
+        }
+    }
+    return 0;
+}
+
 int TLuaInterpreter::centerview( lua_State * L )
 {
     int roomid;
@@ -9417,6 +9451,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getMapVar", TLuaInterpreter::getMapVar );
     lua_register( pGlobalLua, "setMapVar", TLuaInterpreter::setMapVar );
     lua_register( pGlobalLua, "updateMap", TLuaInterpreter::updateMap );
+    lua_register( pGlobalLua, "addMapEvent", TLuaInterpreter::addMapEvent );
 
 
     luaopen_yajl(pGlobalLua);

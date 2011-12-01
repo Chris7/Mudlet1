@@ -63,6 +63,7 @@ public:
     int      mRoomSelection;
     bool     mStartSpeedWalk;
     QMap<int, QPoint> mAreaExitList;
+    QMap<QString, QString> mUserActions;
     QPoint   mMoveTarget;
     bool     mRoomBeingMoved;
     QPoint   mPHighlightMove;
@@ -141,6 +142,7 @@ public slots:
     void slot_setArea();
     void slot_setCustomLine();
     void slot_setCustomLine2();
+    void slot_userAction(QString);
     void slot_setCustomLine2B(QTreeWidgetItem*, int);
 };
 

@@ -20,6 +20,7 @@
 
 #include <QColorDialog>
 #include <QInputDialog>
+#include <QSignalMapper>
 
 #include "T2DMap.h"
 #include "TMap.h"
@@ -1548,6 +1549,21 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         QAction * action16 = new QAction("Set Location Here", this );
         action16->setStatusTip(tr("Set player location here."));
         connect( action16, SIGNAL(triggered()), this, SLOT(slot_setPlayerLocation()));
+        QList<QAction *> actionList;
+        QMapIterator<QString, QString> it(mUserActions);
+        QSignalMapper* mapper = new QSignalMapper(this);
+        while (it.hasNext()){
+            it.next();
+            QAction * action = new QAction(it.key(), this );
+            qDebug()<<it.key();
+            qDebug()<<it.value();
+            QString eventName = it.value();
+            //connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
+            mapper->setMapping(action, eventName);
+            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
+            actionList.append(action);
+        }
+        connect(mapper, SIGNAL(mapped(QString)), this, SLOT(slot_userAction(QString)));
 
         mPopupMenu = true;
         QMenu * popup = new QMenu( this );
@@ -1569,6 +1585,13 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
 
         popup->addAction( action15 );
         popup->addAction( action16 );
+        QList<QAction *>::iterator i;
+        for (i = actionList.begin(); i != actionList.end(); ++i){
+            popup->addAction( *i );
+        }
+
+        //go through user actions
+
 
         popup->popup( mapToGlobal( event->pos() ) );
         mLastMouseClick = event->posF();
@@ -1621,6 +1644,31 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
     else if (event->buttons() & Qt::RightButton)
         mpMap->mRightDown = true;
     update();
+}
+
+void T2DMap::slot_userAction(QString userEvent){
+    TEvent event;
+    event.mArgumentList.append( userEvent );
+    event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    QList<int> roomList = mMultiSelectionList;
+    qDebug()<<roomList.size();
+    if (roomList.size()){
+        QList<int> roomList = mMultiSelectionList;
+        QList<int>::iterator i;
+        for (i = roomList.begin();i != roomList.end(); ++i){
+            qDebug()<<*i;
+            event.mArgumentList.append(QString::number(*i));
+            event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
+        }
+        mpHost->raiseEvent( & event );
+    }
+    else if (mRoomSelection){
+        qDebug()<<"inside here now";
+    qDebug()<<mRoomSelection;
+        event.mArgumentList.append(QString::number(mRoomSelection));
+        event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
+        mpHost->raiseEvent( & event );
+    }
 }
 
 void T2DMap::slot_movePosition()
