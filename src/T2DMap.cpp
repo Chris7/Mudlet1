@@ -30,7 +30,6 @@
 #include "TConsole.h"
 #include <QPixmap>
 
-
 T2DMap::T2DMap()
 {
     xzoom = 30;
@@ -1549,22 +1548,6 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         QAction * action16 = new QAction("Set Location Here", this );
         action16->setStatusTip(tr("Set player location here."));
         connect( action16, SIGNAL(triggered()), this, SLOT(slot_setPlayerLocation()));
-        QList<QAction *> actionList;
-        QMapIterator<QString, QString> it(mUserActions);
-        QSignalMapper* mapper = new QSignalMapper(this);
-        while (it.hasNext()){
-            it.next();
-            QAction * action = new QAction(it.key(), this );
-            qDebug()<<it.key();
-            qDebug()<<it.value();
-            QString eventName = it.value();
-            //connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
-            mapper->setMapping(action, eventName);
-            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
-            actionList.append(action);
-        }
-        connect(mapper, SIGNAL(mapped(QString)), this, SLOT(slot_userAction(QString)));
-
         mPopupMenu = true;
         QMenu * popup = new QMenu( this );
 
@@ -1585,12 +1568,46 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
 
         popup->addAction( action15 );
         popup->addAction( action16 );
-        QList<QAction *>::iterator i;
-        for (i = actionList.begin(); i != actionList.end(); ++i){
-            popup->addAction( *i );
+        QMap<QString, QMenu *> userMenus;
+        QMapIterator<QString, QString> it(mUserMenus);
+        while (it.hasNext()){
+            it.next();
+            QMenu * userMenu = new QMenu(it.key(), this);
+            userMenus.insert(it.key(), userMenu);
         }
+        qDebug()<<"menus made";
+        it.toFront();
+        while (it.hasNext()){//take care of nested menus now since they're all made
+            it.next();
+            if (it.value() != ""){
+                userMenus[it.value()]->addMenu(userMenus[it.key()]);
+            }
+            else{
+                popup->addMenu(userMenus[it.key()]);
+            }
+        }
+        qDebug()<<"adding actrions";
+        //add our actions
+        QMapIterator<QString, QStringList> it2(mUserActions);
+        QSignalMapper* mapper = new QSignalMapper(this);
+        while (it2.hasNext()){
+            it2.next();
+            QAction * action = new QAction(it2.key(), this );
+            QStringList actionInfo = it2.value();
+            if (actionInfo[1] != "")
+                userMenus[actionInfo[1]]->addAction(action);
+            else
+                popup->addAction(action);
+//            QMenu * action = new QMenu(this);
+//            qDebug()<<it.key();
+//            qDebug()<<it.value();
+//            QString eventName = it.value();
+            connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
+            mapper->setMapping(action, actionInfo[0]);
+            connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
+        }
+        connect(mapper, SIGNAL(mapped(QString)), this, SLOT(slot_userAction(QString)));
 
-        //go through user actions
 
 
         popup->popup( mapToGlobal( event->pos() ) );

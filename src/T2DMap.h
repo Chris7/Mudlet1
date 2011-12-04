@@ -63,7 +63,8 @@ public:
     int      mRoomSelection;
     bool     mStartSpeedWalk;
     QMap<int, QPoint> mAreaExitList;
-    QMap<QString, QString> mUserActions;
+    QMap<QString, QStringList> mUserActions; //string list: 0 is event name, 1 is menu it is under if it is
+    QMap<QString, QString> mUserMenus; //display name, parent name ("" if null)
     QPoint   mMoveTarget;
     bool     mRoomBeingMoved;
     QPoint   mPHighlightMove;

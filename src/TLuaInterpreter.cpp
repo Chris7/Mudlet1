@@ -789,8 +789,105 @@ int TLuaInterpreter::updateMap(lua_State * L){
     return 0;
 }
 
+int TLuaInterpreter::addMapMenu(lua_State * L){
+    QString displayName, parentName;
+    if( ! lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "addMapEvent: wrong first argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        displayName = lua_tostring( L, 1 );
+    }
+    if( ! lua_isstring( L, 2 ) )
+    {
+        parentName = "";
+    }
+    else
+    {
+        parentName = lua_tostring( L, 2 );
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                pHost->mpMap->mpMapper->mp2dMap->mUserMenus.insert(displayName,parentName);
+            }
+        }
+    }
+    return 0;
+}
+
+int TLuaInterpreter::removeMapMenu(lua_State * L){
+    QString displayName;
+    if( ! lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "addMapEvent: wrong first argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        displayName = lua_tostring( L, 1 );
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(displayName);
+                //remove all entries with this as parent
+                QMapIterator<QString, QString> it(pHost->mpMap->mpMapper->mp2dMap->mUserMenus);
+                QStringList removeList;
+                while (it.hasNext()){
+                    it.next();
+                    if (it.value() == displayName)
+                        removeList.append(it.key());
+                }
+                for(int i=0;i<removeList.size();i++)
+                    pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(removeList[i]);
+                QMapIterator<QString, QStringList> it2(pHost->mpMap->mpMapper->mp2dMap->mUserActions);
+                removeList.clear();
+                while (it2.hasNext()){
+                    it2.next();
+                    QString parent = it2.value()[1];
+                    if (parent == displayName)
+                        removeList.append(it.key());
+                }
+                for(int i=0;i<removeList.size();i++)
+                    pHost->mpMap->mpMapper->mp2dMap->mUserActions.remove(removeList[i]);
+            }
+        }
+    }
+    return 0;
+}
+
+int TLuaInterpreter::getMapMenus(lua_State * L){
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                lua_newtable(L);
+                QMapIterator<QString, QString> it (pHost->mpMap->mpMapper->mp2dMap->mUserMenus);
+                while (it.hasNext()){
+                    it.next();
+                    lua_pushstring( L, it.key().toLatin1().data() );
+                    lua_pushstring( L, it.value().toLatin1().data() );
+                    lua_settable(L, -3);
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+
 int TLuaInterpreter::addMapEvent(lua_State * L){
-    QString displayName, eventName;
+    QString displayName, eventName, parent;
     if( ! lua_isstring( L, 1 ) )
     {
         lua_pushstring( L, "addMapEvent: wrong first argument type" );
@@ -811,12 +908,71 @@ int TLuaInterpreter::addMapEvent(lua_State * L){
     {
         eventName = lua_tostring( L, 2 );
     }
+    if( ! lua_isstring( L, 3 ) )
+    {
+        parent="";
+    }
+    else
+    {
+        parent = lua_tostring( L, 3 );
+    }
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if( pHost->mpMap)
     {
         if (pHost->mpMap->mpMapper){
             if (pHost->mpMap->mpMapper->mp2dMap){
-                pHost->mpMap->mpMapper->mp2dMap->mUserActions.insert(displayName, eventName);
+                QStringList action;
+                action.append(eventName);
+                action.append(parent);
+                pHost->mpMap->mpMapper->mp2dMap->mUserActions.insert(displayName, action);
+            }
+        }
+    }
+    return 0;
+}
+
+int TLuaInterpreter::removeMapEvent(lua_State * L){
+    QString displayName;
+    if( ! lua_isstring( L, 1 ) )
+    {
+        lua_pushstring( L, "removeMapEvent: wrong first argument type" );
+        lua_error( L );
+        return 1;
+    }
+    else
+    {
+        displayName = lua_tostring( L, 1 );
+    }
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                pHost->mpMap->mpMapper->mp2dMap->mUserActions.remove(displayName);
+            }
+        }
+    }
+    return 0;
+}
+
+int TLuaInterpreter::getMapEvents(lua_State * L){
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    if( pHost->mpMap)
+    {
+        if (pHost->mpMap->mpMapper){
+            if (pHost->mpMap->mpMapper->mp2dMap){
+                lua_newtable(L);
+                QMapIterator<QString, QStringList> it (pHost->mpMap->mpMapper->mp2dMap->mUserActions);
+                while (it.hasNext()){
+                    it.next();
+                    QStringList eventInfo = it.value();
+                    lua_pushstring( L, eventInfo[0].toLatin1().data() );
+                    lua_pushstring( L, eventInfo[1].toLatin1().data() );
+                    lua_settable(L, -3);
+                    lua_pushstring(L, it.key().toLatin1().data());
+                    lua_insert(L,-2);
+                    lua_settable(L, -3);
+                }
             }
         }
     }
@@ -9452,6 +9608,11 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "setMapVar", TLuaInterpreter::setMapVar );
     lua_register( pGlobalLua, "updateMap", TLuaInterpreter::updateMap );
     lua_register( pGlobalLua, "addMapEvent", TLuaInterpreter::addMapEvent );
+    lua_register( pGlobalLua, "removeMapEvent", TLuaInterpreter::removeMapEvent );
+    lua_register( pGlobalLua, "getMapEvents", TLuaInterpreter::getMapEvents );
+    lua_register( pGlobalLua, "addMapMenu", TLuaInterpreter::addMapMenu );
+    lua_register( pGlobalLua, "removeMapMenu", TLuaInterpreter::removeMapMenu );
+    lua_register( pGlobalLua, "getMapMenus", TLuaInterpreter::getMapMenus );
 
 
     luaopen_yajl(pGlobalLua);
