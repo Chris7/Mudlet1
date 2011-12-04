@@ -25,7 +25,6 @@
 #include <TMap.h>
 #include <QPixmap>
 
-
 class T2DMap : public QWidget
 {
     Q_OBJECT

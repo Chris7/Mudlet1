@@ -1575,7 +1575,6 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
             QMenu * userMenu = new QMenu(it.key(), this);
             userMenus.insert(it.key(), userMenu);
         }
-        qDebug()<<"menus made";
         it.toFront();
         while (it.hasNext()){//take care of nested menus now since they're all made
             it.next();
@@ -1586,7 +1585,6 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                 popup->addMenu(userMenus[it.key()]);
             }
         }
-        qDebug()<<"adding actrions";
         //add our actions
         QMapIterator<QString, QStringList> it2(mUserActions);
         QSignalMapper* mapper = new QSignalMapper(this);
@@ -1598,12 +1596,8 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                 userMenus[actionInfo[1]]->addAction(action);
             else
                 popup->addAction(action);
-//            QMenu * action = new QMenu(this);
-//            qDebug()<<it.key();
-//            qDebug()<<it.value();
-//            QString eventName = it.value();
-            connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
-            mapper->setMapping(action, actionInfo[0]);
+            //connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
+            mapper->setMapping(action, it2.key());
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
         }
         connect(mapper, SIGNAL(mapped(QString)), this, SLOT(slot_userAction(QString)));
@@ -1663,25 +1657,24 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
     update();
 }
 
-void T2DMap::slot_userAction(QString userEvent){
+void T2DMap::slot_userAction(QString displayName){
     TEvent event;
-    event.mArgumentList.append( userEvent );
+    QStringList userEvent = mUserActions[displayName];
+    event.mArgumentList.append( userEvent[0] );
+    event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+    event.mArgumentList.append(displayName );
     event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
     QList<int> roomList = mMultiSelectionList;
-    qDebug()<<roomList.size();
     if (roomList.size()){
         QList<int> roomList = mMultiSelectionList;
         QList<int>::iterator i;
         for (i = roomList.begin();i != roomList.end(); ++i){
-            qDebug()<<*i;
             event.mArgumentList.append(QString::number(*i));
             event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
         }
         mpHost->raiseEvent( & event );
     }
     else if (mRoomSelection){
-        qDebug()<<"inside here now";
-    qDebug()<<mRoomSelection;
         event.mArgumentList.append(QString::number(mRoomSelection));
         event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
         mpHost->raiseEvent( & event );
