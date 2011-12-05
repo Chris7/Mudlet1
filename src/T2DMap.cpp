@@ -2584,18 +2584,17 @@ void T2DMap::slot_setCustomLine2B(QTreeWidgetItem * special_exit, int column )
 void T2DMap::slot_setPlayerLocation()
 {
     TLuaInterpreter * LuaInt = mpHost->getLuaInterpreter();
-    QString t1 = "mRoomSet";
-    QString room;
-    room.setNum(mRoomSelection);    
     if( mpMap->rooms.contains( mRoomSelection ) )
     {
         mpMap->mRoomId = mRoomSelection;
         mpMap->mNewMove = true;
         update();
-        LuaInt->set_lua_string( t1, room );
-        QString f = "doRoomSet";
-        QString n = "";
-        LuaInt->call(f, n);
+        TEvent event;
+        event.mArgumentList.append( "setPlayerLocation" );
+        event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+        event.mArgumentList.append(QString::number(mRoomSelection));
+        event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
+        mpHost->raiseEvent( & event );
     }
 }
 

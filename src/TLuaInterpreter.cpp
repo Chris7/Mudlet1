@@ -833,6 +833,8 @@ int TLuaInterpreter::removeMapMenu(lua_State * L){
     {
         displayName = lua_tostring( L, 1 );
     }
+    if (displayName == "")
+        return 0;
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if( pHost->mpMap)
     {
@@ -840,25 +842,33 @@ int TLuaInterpreter::removeMapMenu(lua_State * L){
             if (pHost->mpMap->mpMapper->mp2dMap){
                 pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(displayName);
                 //remove all entries with this as parent
-                QMapIterator<QString, QString> it(pHost->mpMap->mpMapper->mp2dMap->mUserMenus);
                 QStringList removeList;
-                while (it.hasNext()){
-                    it.next();
-                    if (it.value() == displayName)
-                        removeList.append(it.key());
+                removeList.append(displayName);
+                bool newElement = true;
+                while (newElement){
+                    newElement = false;
+                    QMapIterator<QString, QString> it(pHost->mpMap->mpMapper->mp2dMap->mUserMenus);
+                    while (it.hasNext()){
+                        it.next();
+                        if (removeList.contains(it.value())){
+                            pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(it.key());
+                            if (it.key() != "" && !removeList.contains(it.key())){
+                                pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(it.key());
+                                removeList.append(it.key());
+                                newElement = true;
+                            }
+                        }
+                    }
                 }
-                for(int i=0;i<removeList.size();i++)
-                    pHost->mpMap->mpMapper->mp2dMap->mUserMenus.remove(removeList[i]);
+                qDebug()<<removeList;
                 QMapIterator<QString, QStringList> it2(pHost->mpMap->mpMapper->mp2dMap->mUserActions);
-                removeList.clear();
                 while (it2.hasNext()){
                     it2.next();
                     QString parent = it2.value()[1];
-                    if (parent == displayName)
-                        removeList.append(it.key());
+                    if (removeList.contains(parent)){
+                        pHost->mpMap->mpMapper->mp2dMap->mUserActions.remove(it2.key());
+                    }
                 }
-                for(int i=0;i<removeList.size();i++)
-                    pHost->mpMap->mpMapper->mp2dMap->mUserActions.remove(removeList[i]);
             }
         }
     }
@@ -880,6 +890,7 @@ int TLuaInterpreter::getMapMenus(lua_State * L){
                     lua_settable(L, -3);
                 }
             }
+            return 1;
         }
     }
     return 0;
@@ -962,9 +973,10 @@ int TLuaInterpreter::getMapEvents(lua_State * L){
         if (pHost->mpMap->mpMapper){
             if (pHost->mpMap->mpMapper->mp2dMap){
                 lua_newtable(L);
-                QMapIterator<QString, QStringList> it (pHost->mpMap->mpMapper->mp2dMap->mUserActions);
+                QMapIterator<QString, QStringList> it(pHost->mpMap->mpMapper->mp2dMap->mUserActions);
                 while (it.hasNext()){
                     it.next();
+                    lua_newtable(L);
                     QStringList eventInfo = it.value();
                     lua_pushstring( L, eventInfo[0].toLatin1().data() );
                     lua_pushstring( L, eventInfo[1].toLatin1().data() );
@@ -974,6 +986,7 @@ int TLuaInterpreter::getMapEvents(lua_State * L){
                     lua_settable(L, -3);
                 }
             }
+            return 1;
         }
     }
     return 0;
