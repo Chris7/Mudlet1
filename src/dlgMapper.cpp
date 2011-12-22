@@ -135,7 +135,7 @@ void dlgMapper::setArea(int areaId){
     if (this){
         int i = showArea->findData(areaId, int(Qt::UserRole)); // value of hidden param is treated as INT
         // set founded item to be current
-        qDebug()<<"AID"<<areaId<<"index"<<i;
+
         showArea->setCurrentIndex(i);
         showArea->update();
     }

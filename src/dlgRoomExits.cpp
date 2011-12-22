@@ -27,6 +27,7 @@ dlgRoomExits::dlgRoomExits( Host * pH, QWidget * pW )
 , QDialog( pW )
 {
     setupUi(this);
+    mpEditItem=0;
     connect( saveButton, SIGNAL(pressed()), this, SLOT(save()));
     connect( addSpecialExit,SIGNAL(pressed()), this, SLOT(slot_addSpecialExit()));
     connect( specialExits,SIGNAL(itemClicked ( QTreeWidgetItem *, int)), this, SLOT(slot_editItem(QTreeWidgetItem*,int)));
@@ -35,11 +36,8 @@ dlgRoomExits::dlgRoomExits( Host * pH, QWidget * pW )
 void dlgRoomExits::slot_editItem(QTreeWidgetItem * pI, int column )
 {
     if( column == 0 || !pI ) return;
-    if( mpEditItem != 0 )
-    {
+    if(mpEditItem)
         specialExits->closePersistentEditor( mpEditItem, mEditColumn );
-        mpEditItem = 0;
-    }
     mpEditItem = pI;
     mEditColumn = column;
     specialExits->openPersistentEditor(pI, column);
