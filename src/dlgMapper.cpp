@@ -31,26 +31,10 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
 , mpHost( pH )
 {
     setupUi(this);
-
     glWidget->mpMap = pM;
     mp2dMap->mpMap = pM;
     mp2dMap->mpHost = pH;
-    QMapIterator<int, QString> it( mpMap->areaNamesMap );
-	//sort them alphabetically (case sensitive)
-	QMap <QString, QString> areaNames;
-    while( it.hasNext() )
-    {
-        it.next();
-        QString name = it.value();
-		areaNames.insert(name.toLower(), name);
-    }
-	//areaNames.sort();
-	QMapIterator<QString, QString> areaIt( areaNames );
-	while( areaIt.hasNext() )
-    {
-        areaIt.next();
-		showArea->addItem( areaIt.value() );
-    }
+    repopulateAreas();
     grid->setChecked( true );
     bubbles->setChecked( mpHost->mBubbleMode );
     d3buttons->setVisible(false);
@@ -121,6 +105,40 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     mpMap->customEnvColors[271] = mpHost->mLightWhite_2;
     mpMap->customEnvColors[272] = mpHost->mLightBlack_2;
     mp2dMap->init();
+}
+
+void dlgMapper::repopulateAreas(){
+    //if (mpMap && mpMap->areaNamesMap && showArea){
+        QMapIterator<int, QString> it( mpMap->areaNamesMap );
+        //sort them alphabetically (case sensitive so we use lower)
+        QMap <QString, QStringList> areaNames;
+        showArea->clear();
+        while( it.hasNext() )
+        {
+            it.next();
+            QStringList info;
+            info.append(it.value());
+            info.append(QString::number(it.key()));
+            areaNames.insert(it.value().toLower(), info);
+        }
+        QMapIterator<QString, QStringList> areaIt( areaNames );
+        while( areaIt.hasNext() )
+        {
+            areaIt.next();
+            QStringList info = areaIt.value();
+            showArea->addItem( info[0], info[1].toInt() );
+        }
+    //}
+}
+
+void dlgMapper::setArea(int areaId){
+    if (this){
+        int i = showArea->findData(areaId, int(Qt::UserRole)); // value of hidden param is treated as INT
+        // set founded item to be current
+        qDebug()<<"AID"<<areaId<<"index"<<i;
+        showArea->setCurrentIndex(i);
+        showArea->update();
+    }
 }
 
 void dlgMapper::slot_toggleShowRoomIDs(int s)

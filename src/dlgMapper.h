@@ -55,6 +55,8 @@ public slots:
         void slot_showGrid();
         void slot_toggleShowRoomIDs(int s);
         void slot_toggleStrongHighlight( int v );
+        void repopulateAreas();
+        void setArea(int);
         void show2dView();
         void slot_togglePanel();
         void setDownloadProgress( qint64, qint64 );

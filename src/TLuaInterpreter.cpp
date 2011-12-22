@@ -1012,16 +1012,16 @@ int TLuaInterpreter::centerview( lua_State * L )
         pHost->mpMap->mRoomId = roomid;
         pHost->mpMap->mNewMove = true;
         pHost->mpMap->mViewArea=0;
-        if( pHost->mpMap->mpM )
-        {
+        if( pHost->mpMap->mpM && pHost->mpMap->mpM->isVisible())
             pHost->mpMap->mpM->update();
-        }
         if( pHost->mpMap->mpMapper)
         {
-            if (pHost->mpMap->mpMapper->mp2dMap)
+            if (pHost->mpMap->mpMapper->mp2dMap && pHost->mpMap->mpMapper->mp2dMap->isVisible())
                 pHost->mpMap->mpMapper->mp2dMap->update();
         }
-
+        int area = pHost->mpMap->rooms[roomid]->area;
+        if (pHost->mpMap->areas.contains(area))
+            pHost->mpMap->mpMapper->setArea(area);
     }
 
     return 0;

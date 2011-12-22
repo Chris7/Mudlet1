@@ -1026,6 +1026,7 @@ bool Host::removeDir( const QString dirName, QString originalPath )
 
 bool Host::uninstallPackage( QString packageName, int module)
 {
+    qDebug()<<"uninstalling" << packageName << "with flag" << module;
     if (module){
         if( ! mInstalledModules.contains( packageName ) ) return false;
     }
@@ -1051,14 +1052,15 @@ bool Host::uninstallPackage( QString packageName, int module)
         mActiveModules.removeAll(packageName);
         return true;
     }
-    else if (module){
+    else if (module==1){
         //if module == 1, we actually uninstall it.
         QStringList entry = mInstalledModules[packageName];
+        qDebug()<<"removing"<<packageName;
         mInstalledModules.remove( packageName );
         //reinstall the package if it shared a module name.  This is a kludge, but it's cleaner than adding extra arguments/etc imo
         if (dualInstallations){
-            //get the pre package list so we don't get duplicates
             mInstalledPackages.removeAll(packageName); //so we don't get denied from installPackage
+            //get the pre package list so we don't get duplicates
             installPackage(entry[0], 0);
         }
     }

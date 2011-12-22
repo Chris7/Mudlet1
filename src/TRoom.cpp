@@ -180,8 +180,10 @@ void TRoom::addSpecialExit( int to, QString cmd )
                 _cmd.prepend("0");
                 _cmd.append( cmd );
             }
-
-            other.replace( to, _cmd );
+            if (it.value() == _cmd)
+                other.replace( to, _cmd );
+            else
+                other.insertMulti( to, _cmd );
             return;
         }
     }
