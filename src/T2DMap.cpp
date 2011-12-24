@@ -539,16 +539,21 @@ void T2DMap::paintEvent( QPaintEvent * e )
             mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
         }
         else{
-            qDebug()<<"in her nowe";
-            ox = mOx;
-            oy = mOy;
-            oz = mOz;
+            if (mpMap->mViewArea){
+                ox = mpMap->rooms[mRID]->x;
+                oy = mpMap->rooms[mRID]->y*-1;
+                oz = mpMap->rooms[mRID]->z;
+            }
+            else{
+                ox = mOx;
+                oy = mOy;
+                oz = mOz;
+            }
         }
     }
     else
     {
         //switch area chooses this part of the if
-        qDebug()<<"in here";
         ox = mOx;
         oy = mOy;
         oz = mOz;
