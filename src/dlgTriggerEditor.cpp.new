@@ -5003,7 +5003,6 @@ void dlgTriggerEditor::fillout_form()
     QStringList sL7;
     sL7 << "Variables";
     mpVarBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL7 );
-    qDebug()<<"our list"<<sL7;
     mpVarBaseItem->setBackground(0,QColor(255,254,215,255));
     //QIcon mainIcon5;
     //mainIcon5.addPixmap(QPixmap(QString::fromUtf8(":/icons/bookmarks.png")), QIcon::Normal, QIcon::Off);
@@ -5011,26 +5010,7 @@ void dlgTriggerEditor::fillout_form()
     treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
     mpVarBaseItem->setExpanded( true );
     luaInterface * lI = new luaInterface(mpHost);
-    QMap<QString, QStringList > variables = lI->getGlobals();
-    qDebug()<<"variables we are adding"<<variables;
-    QMapIterator<QString, QStringList > itm(variables);
-    while (itm.hasNext()){
-        itm.next();
-        //qDebug()<<"added"<<itm.key();
-        QStringList entry = itm.value();
-        QStringList sList;
-        sList << itm.key();
-        QTreeWidgetItem * pItem = new QTreeWidgetItem( mpVarBaseItem, sList);
-        QIcon icon;
-        if( entry[1] != "__ROOT" ){//if we're ROOT, we're at the topmost level, otherwise we are a nested table!
-            icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-  //          expand_child_key( pT, (QTreeWidgetItem*)pItem );
-        }
-        else
-            icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/tag_checkbox_checked.png")), QIcon::Normal, QIcon::Off);
-        pItem->setData( 0, Qt::UserRole, entry );
-        mpVarBaseItem->addChild( pItem );
-    }
+    lI->getVars(mpVarBaseItem);
     mpVarBaseItem->setExpanded( true );
 }
 

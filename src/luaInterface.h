@@ -14,15 +14,36 @@ extern "C"
 class TLuaInterpreter;
 class Host;
 
+class tableObject{
+    public:
+        tableObject(QString);
+        QList<tableObject*> getChildren();
+        tableObject* getParent();
+        QString getName();
+        void addChildTable(tableObject* table);
+        void addVariable(QString name, QString entry);
+        QMap<QString, QString> getVariables();
+        QString getVariable(QString name);
+        void setParent(tableObject* table);
+        void setType(int);
+        int getType();
+    private:
+        QString tableName;
+        QList<tableObject*> children;
+        tableObject* parent;
+        QMap<QString, QString> variables;
+        int tableType;
+};
+
 class luaInterface{
 
     //friend class TLuaInterpreter;
 
 public:
     luaInterface( Host * mpHost);
-    QMap<QString,QStringList> getGlobals();
+    void getVars(QTreeWidgetItem *);
     void saveVar(QString oldName, QString newName, QString newValue);
-    void iterateTable(lua_State* L, QString tableName, QMap<QString, QStringList> &out, int endCondition);
+    void iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList);
 
 private:
     Host * mpHost;
