@@ -54,21 +54,122 @@ luaInterface::luaInterface( Host * pH)
     interpreter = mpHost->getLuaInterpreter();
 }
 
-void luaInterface::saveVar(QString oldName, QString newName, QString newValue){
-    //qDebug()<<"saving variable"<<oldName<<"to"<<newName<<":"<<newValue;
+void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue){
+    if (newName=="")
+        return;
+    if (newValue=="")
+        newValue = "nil";
+    qDebug()<<newName<<":"<<newValue;
     L = interpreter->pGlobalLua;
-    lua_pushnil(L);
-    lua_setglobal(L, oldName.toLatin1().data());
-    if (newValue.toInt()){
-        lua_pushnumber(L,newValue.toInt());
+    int startSize = lua_gettop(L);
+    qDebug()<<"starting stack size"<<startSize;
+    QTreeWidgetItem* pParent = pItem->parent();
+    //check if pItem is a table
+    QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
+    qDebug()<<"info on selected"<<pInfo;
+    if (!pInfo.size() || pInfo.contains(newName))
+        return;
+    if (newName == pItem->text(0) && newValue == pInfo[1])
+        return;
+    QStringList nested;
+    int tabled = 0;
+    if (pParent){
+        for (int i=2;i<pInfo.size();i++)
+            nested<<pInfo[i];
+        qDebug()<<"nested list"<<nested;
+        if (nested.size() && nested[0] != ""){
+            for (int i=0;i<nested.size();i++){
+                tabled++;
+                /*
+                  Sample setup for 2 tables:
+                  iteration 1:
+                  -1 {}
+                  -2 key
+                  iteration 2:
+                  -1 {}
+                  -2 key
+                  -3 {}
+                  -4 key
+                  */
+                QString tableName = nested[i];
+                qDebug()<<"table:"<<tableName;
+                if (tableName == "0" || tableName.toInt())
+                    lua_pushnumber(L, tableName.toInt());
+                else
+                    lua_pushstring(L, tableName.toLatin1().data());
+                qDebug()<<"inter";
+                for (int o=1;o<=lua_gettop(L);o++){
+                    qDebug()<<o*-1<<","<<lua_type(L,o*-1);
+                }
+                if (i>0){
+                    lua_gettable(L,-2);
+                }
+                else
+                    lua_getglobal(L,tableName.toLatin1().data());
+                qDebug()<<"after fetching table";
+                for (int o=1;o<=lua_gettop(L);o++){
+                    qDebug()<<o*-1<<","<<lua_type(L,o*-1);
+                }
+            }
+        }
     }
-    else if (newValue.toFloat()){
-        lua_pushnumber(L, newValue.toFloat());
+    //push the key
+    qDebug()<<"new name:"<<newName;
+    if (newName == "0" || newName.toInt())
+        lua_pushnumber(L, newName.toInt());
+    else
+        lua_pushstring(L, newName.toLatin1().data());
+    qDebug()<<"new value"<<newValue;
+    if (QString(pInfo[0]).toInt() != LUA_TTABLE){
+        if (newValue.toInt()){
+            lua_pushnumber(L,newValue.toInt());
+            pInfo[0] = QString::number(LUA_TNUMBER);
+        }
+        else if (newValue.toFloat()){
+            lua_pushnumber(L, newValue.toFloat());
+            pInfo[0] = QString::number(LUA_TNUMBER);
+        }
+        else{
+            lua_pushstring(L, newValue.toLatin1().data());
+            pInfo[0] = QString::number(LUA_TSTRING);
+        }
     }
-    else{
-        lua_pushstring(L, newValue.toLatin1().data());
+    else if (QString(pInfo[0]).toInt() == LUA_TTABLE){
+        lua_newtable(L);
+        if (pInfo[2] == "")
+            pInfo[2] = newName;
+        else
+            pInfo << newName;
+        for (int o=1;o<=lua_gettop(L);o++){
+            //lua_pushvalue(L,-1*o);
+            qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
+            //lua_pop(L,1);
+        }
     }
-    lua_setglobal(L, newName.toLatin1().data());
+    qDebug()<<"stack size"<<lua_gettop(L);
+    for (int o=1;o<=lua_gettop(L);o++){
+        //lua_pushvalue(L,-1*o);
+        qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
+        //lua_pop(L,1);
+    }
+    while (lua_gettop(L)>startSize+2 && lua_type(L,-3) == LUA_TTABLE){
+        lua_settable(L,-3);//do our table functions if needed
+    }
+    qDebug()<<"after clearing tables";
+    for (int o=1;o<=lua_gettop(L);o++){
+        //lua_pushvalue(L,-1*o);
+        qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
+        //lua_pop(L,1);
+    }
+    lua_pushvalue(L,-2);
+    QString name = lua_tostring(L,-1);
+    lua_pop(L,1);
+    lua_setglobal(L,name.toLatin1().data());
+    lua_settop(L,startSize);
+    pInfo[1] = newValue;
+    qDebug()<<"setting our variable"<<newName<<"to the value of"<<pInfo;
+    pItem->setText(0,newName);
+    pItem->setData(0, Qt::UserRole, pInfo);
 }
 
 void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList){
@@ -97,6 +198,7 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
         else if (vType == LUA_TSTRING || vType == LUA_TNUMBER){
             lua_pushvalue(L,-1);
             valueName = lua_tostring(L,-1);
+            valueName = QString::number(vType)+valueName;
             rootTable->addVariable(keyName, valueName);
             //qDebug()<<"putting "<<keyName<<":"<<valueName<<"under "<<rootTable->getName();
             //qDebug()<<rootTable->getVariables();
@@ -104,6 +206,7 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
         }
         else if (vType == LUA_TBOOLEAN){
             valueName = lua_toboolean(L, -1) == 0 ? "false" : "true";
+            valueName = QString::number(vType)+valueName;
             rootTable->addVariable(keyName, valueName);
             //qDebug()<<"putting "<<keyName<<":"<<valueName<<"under "<<rootTable->getName();
         }
@@ -120,6 +223,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
     //http://cdry.wordpress.com/2010/06/26/how-to-save-global-variables-using-the-lua-c-api/
     //another resource: http://lua-users.org/lists/lua-l/2004-06/msg00329.html
     //This code is hideous but it works and doesn't affect performance.
+    //A pretty recursive function using just the stack was too difficult to work out for all cases.
     L = interpreter->pGlobalLua;
     QList<tableObject*> tables;
     tableObject* rootTable = new tableObject("_G");
@@ -146,9 +250,13 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             sList << keyName;
             QTreeWidgetItem * pI = new QTreeWidgetItem( mpVarBaseItem, sList);
             QIcon icon;
+            QStringList pData;
+            pData << QString::number(vType);
+            pData << valueName;
+            pData << "";
             //we're ROOT, we're at the topmost level
             icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-            pI->setData( 0, Qt::UserRole, valueName );
+            pI->setData( 0, Qt::UserRole, pData );
             mpVarBaseItem->addChild( pI );
             lua_pop(L,1);
         }
@@ -181,9 +289,13 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             sList << nestName;
             pItem = new QTreeWidgetItem( mpVarBaseItem, sList);
             tableOrder.insert(nestName, pItem);
+            QStringList pData;
+            pData << QString::number(LUA_TTABLE);
+            pData << nestName;
+            pData << nestList;
             QIcon icon;
             icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-            pItem->setData( 0, Qt::UserRole, nestList );
+            pItem->setData( 0, Qt::UserRole, pData );
             mpVarBaseItem->insertChild( 0, pItem );
         }
         tableList.pop_front();
@@ -212,9 +324,13 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                 qDebug()<<"adding new table"<<tableName<<"under "<<nestName;
                 pItem = new QTreeWidgetItem( tableOrder[nestName], sList);
                 tableOrder.insert(nestName+tableName, pItem);
+                QStringList pData;
+                pData << QString::number(LUA_TTABLE);
+                pData << tableName;
+                pData << nestList;
                 QIcon icon;
                 icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-                pItem->setData( 0, Qt::UserRole, nestList );
+                pItem->setData( 0, Qt::UserRole, pData );
                 tableOrder[nestName]->insertChild( 0, pItem );
             }
             nestName+=tableName;
@@ -258,9 +374,14 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                 while (it.hasNext()){
                     it.next();
                     QStringList sList;
+                    QString itValue = it.value();
                     sList << it.key();
+                    QStringList pData;
+                    pData << itValue.at(0);
+                    pData << itValue.right(2);
+                    pData << nestList;
                     QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
-                    pI->setData( 0, Qt::UserRole, it.value() );
+                    pI->setData( 0, Qt::UserRole, pData );
                     pItem->insertChild(0,pI);
                 }
             }
@@ -283,9 +404,14 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                     while (it.hasNext()){
                         it.next();
                         QStringList sList;
+                        QStringList pData;
+                        QString itValue = it.value();
+                        pData << itValue.at(0);
+                        pData << itValue.right(2);
+                        pData << nestList;
                         sList << it.key();
                         QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
-                        pI->setData( 0, Qt::UserRole, it.value() );
+                        pI->setData( 0, Qt::UserRole, pData );
                         pItem->insertChild(0,pI);
                     }
                 }
