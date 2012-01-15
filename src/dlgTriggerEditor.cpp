@@ -1753,23 +1753,22 @@ void dlgTriggerEditor::slot_deleteAction()
 
 void dlgTriggerEditor::slot_deleteVar()
 {
-//    QTreeWidgetItem * pItem = treeWidget_actions->currentItem();
-//    if( ! pItem ) return;
-//    QTreeWidgetItem * pParent = pItem->parent();
-//    TAction * pT = mpHost->getActionUnit()->getAction(pItem->data(0, Qt::UserRole).toInt());
-//    if( ! pT ) return;
+    QTreeWidgetItem * pItem = treeWidget_vars->currentItem();
+    if( ! pItem ) return;
+    QTreeWidgetItem * pParent = pItem->parent();
+    luaInterface * lI = new luaInterface(mpHost);
+    QString dName = mpVarsMainArea->lineEdit_var_name->text();
+    lI->deleteVar(pItem,dName);
+    if( pParent )
+    {
+        pParent->removeChild( pItem );
+    }
+    else
+    {
+        qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAction() child to be deleted doesnt have a parent";
+    }
+    mCurrentVar = 0;
 
-//    if( pParent )
-//    {
-//        pParent->removeChild( pItem );
-//    }
-//    else
-//    {
-//        qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAction() child to be deleted doesnt have a parent";
-//    }
-//    delete pT;
-//    mCurrentAction = 0;
-//    mpHost->getActionUnit()->updateToolbar();
 }
 
 void dlgTriggerEditor::slot_deleteScript()
