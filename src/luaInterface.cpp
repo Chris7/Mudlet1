@@ -113,8 +113,6 @@ void luaInterface::deleteVar(QTreeWidgetItem * pItem, QString dName){
 void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue){
     if (newName=="")
         return;
-    if (newValue=="")
-        newValue = "nil";
     qDebug()<<newName<<":"<<newValue;
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
@@ -246,7 +244,7 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
         QString valueName;
         lua_pop(L,1);
         if (vType == LUA_TTABLE){
-            if (!nestList.contains(QString::number(vType)+keyName) && keyName != rootName && keyName != "loaded" && keyName[0] != '_'){
+            if (!nestList.contains(QString::number(kType)+keyName) && keyName != rootName && keyName != "loaded" && keyName[0] != '_'){
                 tableObject* newTable = new tableObject(keyName);
                 newTable->setParent(rootTable);
                 newTable->setType(kType);
@@ -259,7 +257,7 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
             valueName = lua_tostring(L,-1);
             valueName = QString::number(vType)+valueName;
             rootTable->addVariable(QString::number(kType)+keyName, valueName);
-            qDebug()<<"putting "<<keyName<<":"<<valueName<<"under "<<rootTable->getName();
+            //qDebug()<<"putting "<<keyName<<":"<<valueName<<"under "<<rootTable->getName();
             //qDebug()<<rootTable->getVariables();
             lua_pop(L,1);
         }

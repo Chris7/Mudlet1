@@ -5029,7 +5029,7 @@ void dlgTriggerEditor::fillout_form()
         }
     }
     mpKeyBaseItem->setExpanded( true );
-    repopulateVars();
+    //repopulateVars();
 }
 
 void dlgTriggerEditor::repopulateVars(){
@@ -5834,8 +5834,7 @@ void dlgTriggerEditor::slot_show_vars()
         fillout_form();
         mNeedUpdateData = false;
     }
-    else
-        repopulateVars();
+    repopulateVars();
 
     mCurrentView = cmVarsView;
 
