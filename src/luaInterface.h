@@ -45,6 +45,7 @@ public:
     void saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue);
     void iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList);
     void deleteVar(QTreeWidgetItem * pItem, QString dName);
+    QString getValue(QTreeWidgetItem * pItem, QString vName);
 
 private:
     Host * mpHost;

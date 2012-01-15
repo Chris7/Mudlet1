@@ -2418,6 +2418,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         qDebug()<<"in pParent with"<<pData;
         if (!pData.size()){
             //at root
+            pData<<QString::number(LUA_TSTRING); //we can only add string keys
             if (isFolder)
                 pData << QString::number(LUA_TTABLE);
             else
@@ -2425,23 +2426,25 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             pData << "";
             pData << "";
         }
-        int pType = QString(pData[0]).toInt();
+        int pType = QString(pData[1]).toInt();
         //check if we have a table parent, we want to nest this new varaible under this table
         if( pType == LUA_TTABLE){
             pNewItem = new QTreeWidgetItem( pParent, nameL );
+            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
             if (isFolder)
-                pData[0] = QString::number(LUA_TTABLE);
+                pData[1] = QString::number(LUA_TTABLE);
             else
-                pData[0] = QString::number(LUA_TSTRING);
-            pData[1] = "";
+                pData[1] = QString::number(LUA_TSTRING);
+            pData[2] = "";
             pNewItem->setData( 0, Qt::UserRole, pData);
             pParent->insertChild( 0, pNewItem );
         }
         else if (pType == LUA_TSTRING){
             //we selected a variable, so we just add the variable at our current level, which is the same as above
             pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
-            pData[0] = QString::number(LUA_TSTRING);
-            pData[1] = "";
+            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
+            pData[2] = QString::number(LUA_TSTRING);
+            pData[3] = "";
             pNewItem->setData( 0, Qt::UserRole, pData);
             pParent->parent()->insertChild( 0, pNewItem );
         }
@@ -2452,6 +2455,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         //insert a new root item
     ROOT_KEY:
         QStringList pData;
+        pData << QString::number(LUA_TSTRING); //we can only add string keys
         if (isFolder)
             pData << QString::number(LUA_TTABLE);
         else
@@ -3941,6 +3945,8 @@ void dlgTriggerEditor::slot_saveKeyAfterEdit()
 
 void dlgTriggerEditor::saveVar(){
     QTreeWidgetItem * pItem = mCurrentVar;
+    if (!pItem)
+        return;
     luaInterface * lI = new luaInterface(mpHost);
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
@@ -4342,16 +4348,15 @@ void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
     varInfo = pItem->data(0,Qt::UserRole).toStringList();
     if (!varInfo.size())
         return;
-    luaInterface * lI = new luaInterface(mpHost);
-    //varInfo = lI->getInfo(varInfo);
-    //qDebug()<<varInfo;
-    int varType = QString(varInfo[0]).toInt();
+    //luaInterface * lI = new luaInterface(mpHost);
+    //varInfo[1] = lI->getValue(pItem, pItem->text(column));
+    int varType = QString(varInfo[1]).toInt();
     mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
     if (varInfo.size() > 1){
         if (varType == LUA_TTABLE)
             mpVarsMainArea->lineEdit_var_value->setText("Lua Table");
         else
-            mpVarsMainArea->lineEdit_var_value->setText(varInfo[1]);
+            mpVarsMainArea->lineEdit_var_value->setText(varInfo[2]);
     }
     else{
         if (varType == LUA_TTABLE)
@@ -5024,6 +5029,10 @@ void dlgTriggerEditor::fillout_form()
         }
     }
     mpKeyBaseItem->setExpanded( true );
+    repopulateVars();
+}
+
+void dlgTriggerEditor::repopulateVars(){
     QStringList sL7;
     sL7 << "Variables";
     mpVarBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL7 );
@@ -5031,6 +5040,7 @@ void dlgTriggerEditor::fillout_form()
     //QIcon mainIcon5;
     //mainIcon5.addPixmap(QPixmap(QString::fromUtf8(":/icons/bookmarks.png")), QIcon::Normal, QIcon::Off);
     //mpVarBaseItem->setIcon( 0, mainIcon5 );
+    treeWidget_vars->clear();
     treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
     mpVarBaseItem->setExpanded( true );
     luaInterface * lI = new luaInterface(mpHost);
@@ -5810,8 +5820,8 @@ void dlgTriggerEditor::slot_show_keys()
 
 void dlgTriggerEditor::slot_show_vars()
 {
+    mCurrentVar = 0;
     saveOpenChanges();
-
     if( mNeedUpdateData )
     {
         treeWidget->clear();
@@ -5824,6 +5834,8 @@ void dlgTriggerEditor::slot_show_vars()
         fillout_form();
         mNeedUpdateData = false;
     }
+    else
+        repopulateVars();
 
     mCurrentView = cmVarsView;
 
@@ -5870,10 +5882,8 @@ void dlgTriggerEditor::slot_show_vars()
             mpSystemMessageArea->notificationAreaIconLabelInformation->show();
             mpSystemMessageArea->notificationAreaIconLabelError->hide();
             mpSystemMessageArea->notificationAreaIconLabelWarning->hide();
-            QString msg = "To make a new variable click on the 'Add' icon above.";
+            QString msg = "To make a new variable click on the 'Add Item' icon above.\nTo add a table click 'Add Group'.";
             mpSystemMessageArea->notificationAreaMessageBox->setText( msg );
-            /*luaInterface * lI = new luaInterface(mpHost);
-            lI->testIt();*/
         }
     }
 

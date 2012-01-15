@@ -422,6 +422,48 @@
                   </widget>
                  </item>
                  <item>
+                  <widget class="TTreeWidget" name="treeWidget_vars">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="midLineWidth">
+                    <number>4</number>
+                   </property>
+                   <property name="dragDropMode">
+                    <enum>QAbstractItemView::InternalMove</enum>
+                   </property>
+                   <property name="alternatingRowColors">
+                    <bool>false</bool>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>32</width>
+                     <height>32</height>
+                    </size>
+                   </property>
+                   <property name="rootIsDecorated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="allColumnsShowFocus">
+                    <bool>true</bool>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>false</bool>
+                   </property>
+                   <property name="headerHidden">
+                    <bool>false</bool>
+                   </property>
+                   <property name="expandsOnDoubleClick">
+                    <bool>false</bool>
+                   </property>
+                   <column>
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QWidget" name="mpSearchArea" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_6">
                     <property name="spacing">
@@ -653,7 +695,7 @@
                              <string>...</string>
                             </property>
                             <property name="icon">
-                             <iconset>
+                             <iconset resource="../mudlet_alpha.qrc">
                               <normaloff>:/icons/application-exit.png</normaloff>:/icons/application-exit.png</iconset>
                             </property>
                             <property name="autoRaise">
@@ -727,15 +769,6 @@
                       <attribute name="headerMinimumSectionSize">
                        <number>20</number>
                       </attribute>
-                      <attribute name="headerDefaultSectionSize">
-                       <number>80</number>
-                      </attribute>
-                      <attribute name="headerVisible">
-                       <bool>true</bool>
-                      </attribute>
-                      <attribute name="headerMinimumSectionSize">
-                       <number>20</number>
-                      </attribute>
                       <column>
                        <property name="text">
                         <string>1</string>
@@ -757,6 +790,14 @@
                   </widget>
                  </item>
                 </layout>
+                <zorder>treeWidget_timers</zorder>
+                <zorder>treeWidget_keys</zorder>
+                <zorder>treeWidget_alias</zorder>
+                <zorder>treeWidget_actions</zorder>
+                <zorder>treeWidget_scripts</zorder>
+                <zorder>mpSearchArea</zorder>
+                <zorder>treeWidget</zorder>
+                <zorder>treeWidget_vars</zorder>
                </widget>
                <widget class="QFrame" name="right_frame">
                 <property name="sizePolicy">
@@ -1076,6 +1117,8 @@
    <header>TTreeWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../mudlet_alpha.qrc"/>
+ </resources>
  <connections/>
 </ui>

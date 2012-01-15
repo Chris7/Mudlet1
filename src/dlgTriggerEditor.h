@@ -187,6 +187,7 @@ public slots:
     void                        setTBIconSize( int );
     void                        slot_color_trigger_fg();
     void                        slot_color_trigger_bg();
+    void                        repopulateVars();
 
 private:
 

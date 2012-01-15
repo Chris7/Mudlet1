@@ -27,6 +27,7 @@
 #include <QDesktopServices>
 #include "TLuaInterpreter.h"
 #include "TForkedProcess.h"
+#include "luaInterface.h"
 #include "TTrigger.h"
 #include "HostManager.h"
 #include "mudlet.h"

@@ -114,7 +114,9 @@ SOURCES += TConsole.cpp \
     irc/src/ircutil.cpp \
     dlgIRC.cpp \
     T2DMap.cpp \
-    dlgRoomExits.cpp
+    dlgRoomExits.cpp \
+    luaInterface.cpp \
+    dlgVarsMainArea.cpp
 
 
 HEADERS += mudlet.h \
@@ -189,7 +191,9 @@ HEADERS += mudlet.h \
     irc/include/ircutil.h \
     dlgIRC.h \
     T2DMap.h \
-    dlgRoomExits.h
+    dlgRoomExits.h \
+    luaInterface.h \
+    dlgVarsMainArea.h
 
 FORMS += ui/connection_profiles.ui \
     ui/main_window.ui \
@@ -222,7 +226,8 @@ FORMS += ui/connection_profiles.ui \
     ui/package_manager.ui \
     ui/module_manager.ui \
     ui/package_manager_unpack.ui \
-    ui/custom_lines.ui
+    ui/custom_lines.ui \
+    ui/vars_main_area.ui
 
 #win32: {
 #    SOURCES += lua_yajl.c
