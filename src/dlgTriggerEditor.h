@@ -36,12 +36,14 @@
 //#include <Qsci/qscilexerlua.h>
 #include "dlgTriggersMainArea.h"
 #include "dlgTimersMainArea.h"
+#include "dlgVarsMainArea.h"
 #include "dlgSystemMessageArea.h"
 #include "dlgSourceEditorArea.h"
 #include "dlgOptionsAreaTriggers.h"
 #include "dlgSearchArea.h"
 #include "TTreeWidget.h"
 #include "TKey.h"
+#include "luaInterface.h"
 //#include "TConsole.h"
 
 class dlgTimersMainArea;
@@ -58,9 +60,11 @@ class dlgOptionsAreaScripts;
 class dlgOptionsAreaTimers;
 class dlgOptionsAreaAction;
 class dlgKeysMainArea;
+class dlgVarsMainArea;
 class dlgTriggerPatternEdit;
 class TKey;
 class TConsole;
+class luaInterface;
 
 class dlgTriggerEditor : public QMainWindow , private Ui::trigger_editor
 {
@@ -108,18 +112,21 @@ public slots:
     void                        slot_saveAliasAfterEdit();
     void                        slot_saveActionAfterEdit();
     void                        slot_saveKeyAfterEdit();
+    void                        slot_saveVarAfterEdit();
     void                        slot_show_timers();
     void                        slot_show_triggers();
     void                        slot_show_scripts();
     void                        slot_show_aliases();
     void                        slot_show_actions();
     void                        slot_show_keys();
+    void                        slot_show_vars();
     void                        slot_trigger_clicked( QTreeWidgetItem *pItem, int column );
     void                        slot_timer_clicked( QTreeWidgetItem *pItem, int column );
     void                        slot_scripts_clicked( QTreeWidgetItem *pItem, int column );
     void                        slot_alias_clicked( QTreeWidgetItem *pItem, int column );
     void                        slot_action_clicked( QTreeWidgetItem * pItem, int column );
     void                        slot_key_clicked( QTreeWidgetItem *pItem, int column );
+    void                        slot_var_clicked(QTreeWidgetItem *pItem, int column );
     void                        slot_update();
     void                        slot_deleteProfile();
     void                        slot_connection_dlg_finnished();
@@ -143,6 +150,8 @@ public slots:
     void                        slot_addActionGroup();
     void                        slot_addKey();
     void                        slot_addKeyGroup();
+    void                        slot_addVar();
+    void                        slot_addVarGroup();
     void                        slot_toggle_active();
     void                        slot_trigger_toggle_active();
     void                        slot_action_toggle_active();
@@ -160,6 +169,7 @@ public slots:
     void                        slot_deleteScript();
     void                        slot_deleteAction();
     void                        slot_deleteKey();
+    void                        slot_deleteVar();
     void                        slot_save_edit();
     void                        slot_chose_action_icon();
     //void                        slot_trigger_main_area_edit_regex(QListWidgetItem*);
@@ -187,6 +197,7 @@ private:
     void                        saveKey();
     void                        saveScript();
     void                        saveAction();
+    void                        saveVar();
     void                        readSettings();
     void                        writeSettings();
     void                        addScript( bool );
@@ -195,7 +206,7 @@ private:
     void                        addTrigger( bool isFolder );
     void                        addAction( bool isFolder );
     void                        addKey( bool );
-
+    void                        addVar(bool);
     void                        expand_child_triggers( TTrigger * pTriggerParent, QTreeWidgetItem * pItem );
     void                        expand_child_timers( TTimer * pTimerParent, QTreeWidgetItem * pWidgetItemParent );
     void                        expand_child_scripts( TScript * pTriggerParent, QTreeWidgetItem * pWidgetItemParent );
@@ -209,12 +220,14 @@ private:
     void                        exportAction( QFile & );
     void                        exportScript( QFile & );
     void                        exportKey( QFile & );
+    void                        exportVar( QFile &);
     QTreeWidgetItem *           mCurrentAlias;
     QTreeWidgetItem *           mCurrentTrigger;
     QTreeWidgetItem *           mCurrentTimer;
     QTreeWidgetItem *           mCurrentAction;
     QTreeWidgetItem *           mCurrentScript;
     QTreeWidgetItem *           mCurrentKey;
+    QTreeWidgetItem *           mCurrentVar;
 
     QTreeWidgetItem *           mpAliasBaseItem;
     QTreeWidgetItem *           mpTriggerBaseItem;
@@ -222,6 +235,7 @@ private:
     QTreeWidgetItem *           mpTimerBaseItem;
     QTreeWidgetItem *           mpActionBaseItem;
     QTreeWidgetItem *           mpKeyBaseItem;
+    QTreeWidgetItem *           mpVarBaseItem;
 
     QTreeWidgetItem *           mpCurrentActionItem;
     QTreeWidgetItem *           mpCurrentKeyItem;
@@ -229,6 +243,7 @@ private:
     QTreeWidgetItem *           mpCurrentScriptItem;
     QTreeWidgetItem *           mpCurrentTriggerItem;
     QTreeWidgetItem *           mpCurrentAliasItem;
+    QTreeWidgetItem *           mpCurrentVarItem;
     QLineEdit *                 mpCursorPositionIndicator;
     int                         mCurrentView;
     static const int            cmTriggerView;
@@ -237,6 +252,7 @@ private:
     static const int            cmScriptView;
     static const int            cmActionView;
     static const int            cmKeysView;
+    static const int            cmVarsView;
 
     QScrollArea *               mpScrollArea;
     QWidget *                   HpatternList;
@@ -251,6 +267,7 @@ private:
     dlgActionMainArea *         mpActionsMainArea;
     dlgScriptsMainArea *        mpScriptsMainArea;
     dlgKeysMainArea *           mpKeysMainArea;
+    dlgVarsMainArea *           mpVarsMainArea;
     dlgOptionsAreaScripts *     mpOptionsAreaScripts;
     dlgOptionsAreaAction *      mpOptionsAreaActions;
     dlgOptionsAreaAlias *       mpOptionsAreaAlias;

@@ -51,6 +51,7 @@
 #include "dlgTriggerPatternEdit.h"
 #include "THighlighter.h"
 #include "TTextEdit.h"
+#include "luaInterface.h"
 using namespace std;
 
 const int dlgTriggerEditor::cmTriggerView = 1;
@@ -59,6 +60,7 @@ const int dlgTriggerEditor::cmAliasView = 3;
 const int dlgTriggerEditor::cmScriptView = 4;
 const int dlgTriggerEditor::cmActionView = 5;
 const int dlgTriggerEditor::cmKeysView = 6;
+const int dlgTriggerEditor::cmVarsView = 7;
 
 const QString msgInfoAddAlias = "Alias are input triggers. To make a new alias: <b>1.</b> Define an input trigger pattern with a Perl regular expression. " \
                                 "<b>2.</b> Define a command to send to the MUD in clear text <b><u>instead of the alias pattern</b></u>or write a script for more complicated needs. " \
@@ -84,6 +86,8 @@ const QString msgInfoAddKey = "To add a new key binding <b>1.</b> add a new key 
                               "<b>3.</b> Define a command that is executed when the key is hit. <b>4. <u>Activate</b></u> the new key binding." \
                               "Check the manual for <a href='http://mudlet.sourceforge.net/mudlet_documentation.html'>more information</a>";
 
+const QString msgInfoAddVar = "Add a new variable (can be a string or integer).";
+
 dlgTriggerEditor::dlgTriggerEditor( Host * pH )
 : mCurrentAlias( 0 )
 , mCurrentTrigger( 0 )
@@ -91,12 +95,14 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
 , mCurrentAction( 0 )
 , mCurrentScript( 0 )
 , mCurrentKey( 0 )
+, mCurrentVar( 0 )
 , mpCurrentActionItem( 0 )
 , mpCurrentKeyItem( 0 )
 , mpCurrentTimerItem( 0 )
 , mpCurrentScriptItem( 0 )
 , mpCurrentTriggerItem( 0 )
 , mpCurrentAliasItem( 0 )
+, mpCurrentVarItem( 0 )
 , mpHost( pH )
 {
     // init generated dialog
@@ -158,6 +164,9 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     pVB1->addWidget( mpKeysMainArea );
     connect(mpKeysMainArea->pushButton_grabKey, SIGNAL(pressed()), this, SLOT(slot_grab_key()));
 
+    mpVarsMainArea = new dlgVarsMainArea( mainArea );
+    mpVarsMainArea->setSizePolicy( sizePolicy8 );
+    pVB1->addWidget( mpVarsMainArea );
 
     mpScriptsMainArea = new dlgScriptsMainArea( mainArea );
     QSizePolicy sizePolicy9(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -264,6 +273,14 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     treeWidget_timers->setRootIsDecorated( false );
     connect( treeWidget_timers, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(slot_itemClicked(QTreeWidgetItem*,int)) );
 
+    treeWidget_vars->hide();
+    treeWidget_vars->setHost( mpHost );
+    treeWidget_vars->setIsTimerTree();
+    treeWidget_vars->setColumnCount(1);
+    treeWidget_vars->header()->hide();
+    treeWidget_vars->setRootIsDecorated( false );
+    connect( treeWidget_vars, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(slot_itemClicked(QTreeWidgetItem*,int)) );
+
     treeWidget_keys->hide();
     treeWidget_keys->setHost( mpHost );
     treeWidget_keys->setIsKeyTree();
@@ -310,6 +327,11 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     viewKeysAction->setEnabled( true );
     connect( viewKeysAction, SIGNAL(triggered()), this, SLOT( slot_show_keys()));
 
+    QAction * viewVarsAction = new QAction(QIcon(":/icons/preferences-desktop-keyboard.png"), tr("Variables"), this);
+    viewVarsAction->setStatusTip(tr("Variables"));
+    viewVarsAction->setEnabled( true );
+    connect( viewVarsAction, SIGNAL(triggered()), this, SLOT( slot_show_vars()));
+
     QAction * toggleActiveAction = new QAction(QIcon(":/icons/document-encrypt.png"), tr("Activate"), this);
     toggleActiveAction->setStatusTip(tr("Toggle Active or Non-Active Mode for Triggers, Scripts etc."));
     connect( toggleActiveAction, SIGNAL(triggered()), this, SLOT( slot_toggle_active()));
@@ -319,6 +341,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     connect( treeWidget_scripts, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
     connect( treeWidget_actions, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
     connect( treeWidget_keys, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
+    connect( treeWidget_vars, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
 
 
     QAction * addTriggerAction = new QAction(QIcon(":/icons/document-new.png"), tr("Add Item"), this);
@@ -400,6 +423,11 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     addTimersMenuAction->setEnabled( true );
     connect( addTimersMenuAction, SIGNAL(triggered()), this, SLOT( slot_addTimer()));
 
+    QAction * addVarsMenuAction = new QAction(QIcon(":/icons/chronometer.png"), tr("Variables"), this);
+    addVarsMenuAction->setStatusTip(tr("View Variables"));
+    addVarsMenuAction->setEnabled( true );
+    connect( addVarsMenuAction, SIGNAL(triggered()), this, SLOT( slot_addVar()));
+
     QAction * addScriptsMenuAction = new QAction(QIcon(":/icons/document-properties.png"), tr("Scripts"), this);
     addScriptsMenuAction->setStatusTip(tr("Add Script"));
     addScriptsMenuAction->setEnabled( true );
@@ -409,6 +437,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     addKeysMenuAction->setStatusTip(tr("Add Keys"));
     addKeysMenuAction->setEnabled( true );
     connect( addKeysMenuAction, SIGNAL(triggered()), this, SLOT( slot_addKey()));
+
 
     QMenu * addTriggerMenu = new QMenu( this );
     addTriggerMenu->addAction( addTriggerMenuAction );
@@ -483,6 +512,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     toolBar2->addAction( viewScriptsAction );
     toolBar2->addAction( showTimersAction );
     toolBar2->addAction( viewKeysAction );
+    toolBar2->addAction( viewVarsAction );
     toolBar2->addAction( viewActionAction );
     toolBar2->addAction( showSearchAreaAction );
     toolBar2->addAction( viewErrorsAction );
@@ -518,6 +548,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     connect( treeWidget_scripts, SIGNAL( itemClicked( QTreeWidgetItem *, int ) ), this, SLOT( slot_scripts_clicked( QTreeWidgetItem *, int) ) );
     connect( treeWidget_alias, SIGNAL( itemClicked( QTreeWidgetItem *, int ) ), this, SLOT( slot_alias_clicked( QTreeWidgetItem *, int) ) );
     connect( treeWidget_actions, SIGNAL( itemClicked( QTreeWidgetItem *, int ) ), this, SLOT( slot_action_clicked( QTreeWidgetItem *, int) ) );
+    connect( treeWidget_vars, SIGNAL( itemClicked( QTreeWidgetItem *, int ) ), this, SLOT( slot_var_clicked( QTreeWidgetItem *, int) ) );
     connect( this, SIGNAL (accept()), this, SLOT (slot_connection_dlg_finnished()));
     //connect( mpSearchArea, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT( slot_item_clicked_search_list(QTreeWidgetItem*, int)));
     connect( tree_widget_search_results_main, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT( slot_item_clicked_search_list(QTreeWidgetItem*, int)));
@@ -533,7 +564,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     mpAliasMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
-
+    mpVarsMainArea->hide();
     mpSourceEditorArea->hide();
 
     mpSystemMessageArea->hide();
@@ -549,6 +580,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     treeWidget_timers->hide();
     treeWidget_scripts->hide();
     treeWidget_keys->hide();
+    treeWidget_vars->hide();
 
     popupArea->hide();
     frame_4->hide();
@@ -635,6 +667,7 @@ void dlgTriggerEditor::setTBIconSize( int s )
     treeWidget_scripts->setIconSize(QSize(mudlet::self()->mTEFolderIconSize*8,mudlet::self()->mTEFolderIconSize*8));
     treeWidget_keys->setIconSize(QSize(mudlet::self()->mTEFolderIconSize*8,mudlet::self()->mTEFolderIconSize*8));
     treeWidget_actions->setIconSize(QSize(mudlet::self()->mTEFolderIconSize*8,mudlet::self()->mTEFolderIconSize*8));
+    treeWidget_vars->setIconSize(QSize(mudlet::self()->mTEFolderIconSize*8,mudlet::self()->mTEFolderIconSize*8));
 }
 
 void dlgTriggerEditor::slot_choseButtonColor()
@@ -1617,6 +1650,14 @@ void dlgTriggerEditor::slot_addAction()
     addAction(false); //add normal action
 }
 
+void dlgTriggerEditor::slot_addVar()
+{
+    addVar(false); //add normal action
+}
+
+void dlgTriggerEditor::slot_addVarGroup(){
+    addVar(true);
+}
 
 void dlgTriggerEditor::slot_addAliasGroup()
 {
@@ -1708,6 +1749,27 @@ void dlgTriggerEditor::slot_deleteAction()
     delete pT;
     mCurrentAction = 0;
     mpHost->getActionUnit()->updateToolbar();
+}
+
+void dlgTriggerEditor::slot_deleteVar()
+{
+//    QTreeWidgetItem * pItem = treeWidget_actions->currentItem();
+//    if( ! pItem ) return;
+//    QTreeWidgetItem * pParent = pItem->parent();
+//    TAction * pT = mpHost->getActionUnit()->getAction(pItem->data(0, Qt::UserRole).toInt());
+//    if( ! pT ) return;
+
+//    if( pParent )
+//    {
+//        pParent->removeChild( pItem );
+//    }
+//    else
+//    {
+//        qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAction() child to be deleted doesnt have a parent";
+//    }
+//    delete pT;
+//    mCurrentAction = 0;
+//    mpHost->getActionUnit()->updateToolbar();
 }
 
 void dlgTriggerEditor::slot_deleteScript()
@@ -2341,6 +2403,73 @@ void dlgTriggerEditor::addTimer( bool isFolder )
     slot_timer_clicked( treeWidget_timers->currentItem(), 0 );
 }
 
+void dlgTriggerEditor::addVar( bool isFolder ){
+    saveVar();
+    QString name;
+    if (isFolder) name="NewTable";
+    else name = "NewVariable";
+    QStringList nameL;
+    nameL << name;
+    QTreeWidgetItem * pParent = (QTreeWidgetItem*)treeWidget_vars->currentItem();
+    QTreeWidgetItem * pNewItem = 0;
+    if( pParent )
+    {
+        //goto ROOT_KEY;
+        QStringList pData = pParent->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
+        qDebug()<<"in pParent with"<<pData;
+        if (!pData.size()){
+            //at root
+            if (isFolder)
+                pData << QString::number(LUA_TTABLE);
+            else
+                pData << QString::number(LUA_TSTRING);
+            pData << "";
+            pData << "";
+        }
+        int pType = QString(pData[0]).toInt();
+        //check if we have a table parent, we want to nest this new varaible under this table
+        if( pType == LUA_TTABLE){
+            pNewItem = new QTreeWidgetItem( pParent, nameL );
+            if (isFolder)
+                pData[0] = QString::number(LUA_TTABLE);
+            else
+                pData[0] = QString::number(LUA_TSTRING);
+            pData[1] = "";
+            pNewItem->setData( 0, Qt::UserRole, pData);
+            pParent->insertChild( 0, pNewItem );
+        }
+        else if (pType == LUA_TSTRING){
+            //we selected a variable, so we just add the variable at our current level, which is the same as above
+            pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
+            pData[0] = QString::number(LUA_TSTRING);
+            pData[1] = "";
+            pNewItem->setData( 0, Qt::UserRole, pData);
+            pParent->parent()->insertChild( 0, pNewItem );
+        }
+        else
+            goto ROOT_KEY;
+    }
+    else{
+        //insert a new root item
+    ROOT_KEY:
+        QStringList pData;
+        if (isFolder)
+            pData << QString::number(LUA_TTABLE);
+        else
+            pData << QString::number(LUA_TSTRING);
+        pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
+        //pNewItem->
+        pData << "";
+        pData << "";
+        pNewItem->setData(0, Qt::UserRole, pData);
+        treeWidget_vars->insertTopLevelItem( 0, pNewItem );
+    }
+    treeWidget_vars->setCurrentItem( pNewItem );
+    mCurrentVar = pNewItem;
+    showInfo( msgInfoAddVar );
+    slot_var_clicked( treeWidget_vars->currentItem(), 0 );
+}
+
 void dlgTriggerEditor::addKey( bool isFolder )
 {
     saveKey();
@@ -2731,7 +2860,10 @@ void dlgTriggerEditor::addScript( bool isFolder )
     slot_scripts_clicked( treeWidget_scripts->currentItem(), 0 );
 }
 
-
+void dlgTriggerEditor::slot_saveVarAfterEdit()
+{
+    return saveVar();
+}
 
 void dlgTriggerEditor::slot_saveTriggerAfterEdit()
 {
@@ -3808,6 +3940,17 @@ void dlgTriggerEditor::slot_saveKeyAfterEdit()
     }*/
 }
 
+void dlgTriggerEditor::saveVar(){
+    QTreeWidgetItem * pItem = mCurrentVar;
+    luaInterface * lI = new luaInterface(mpHost);
+    QString newName = mpVarsMainArea->lineEdit_var_name->text();
+    QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
+    lI->saveVar(pItem,newName, newValue);
+    //pItem->setText(0,newName);
+    //QStringList pData;
+    //pItem->setData(0, Qt::UserRole, newValue);
+}
+
 void dlgTriggerEditor::saveKey()
 {
     QTreeWidgetItem * pItem = mCurrentKey;
@@ -4186,6 +4329,39 @@ void dlgTriggerEditor::slot_key_clicked( QTreeWidgetItem *pItem, int column )
     }
 }
 
+void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
+    if( ! pItem ) return;
+    mCurrentVar = pItem;
+    mpVarsMainArea->show();
+    if( (pItem == 0) || (column != 0) )
+    {
+        return;
+    }
+    mpCurrentVarItem = pItem; //remember what has been clicked to save it
+    QStringList varInfo;
+    //varInfo << pItem->text(column);
+    varInfo = pItem->data(0,Qt::UserRole).toStringList();
+    if (!varInfo.size())
+        return;
+    luaInterface * lI = new luaInterface(mpHost);
+    //varInfo = lI->getInfo(varInfo);
+    //qDebug()<<varInfo;
+    int varType = QString(varInfo[0]).toInt();
+    mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
+    if (varInfo.size() > 1){
+        if (varType == LUA_TTABLE)
+            mpVarsMainArea->lineEdit_var_value->setText("Lua Table");
+        else
+            mpVarsMainArea->lineEdit_var_value->setText(varInfo[1]);
+    }
+    else{
+        if (varType == LUA_TTABLE)
+            mpVarsMainArea->lineEdit_var_value->setText("Lua Table");
+        else
+            mpVarsMainArea->lineEdit_var_value->setText("");
+    }
+}
+
 void dlgTriggerEditor::slot_action_clicked( QTreeWidgetItem *pItem, int column )
 {
     if( ! pItem ) return;
@@ -4355,7 +4531,6 @@ void dlgTriggerEditor::slot_timer_clicked( QTreeWidgetItem *pItem, int column )
     }
 }
 
-
 void dlgTriggerEditor::fillout_form()
 {
     mCurrentView = 0;
@@ -4365,6 +4540,7 @@ void dlgTriggerEditor::fillout_form()
     mCurrentAction = 0;
     mCurrentScript = 0;
     mCurrentTimer = 0;
+    mCurrentVar = 0;
 
     mNeedUpdateData = false;
     QStringList sL;
@@ -4564,6 +4740,8 @@ void dlgTriggerEditor::fillout_form()
         sList << s;
         QTreeWidgetItem * pItem = new QTreeWidgetItem( mpScriptsBaseItem, sList);
         pItem->setData( 0, Qt::UserRole, QVariant(pT->getID()) );
+        qDebug()<<sList;
+        qDebug()<<pT->getID();
         mpScriptsBaseItem->addChild( pItem );
         QIcon icon;
         if( pT->hasChildren() )
@@ -4777,7 +4955,7 @@ void dlgTriggerEditor::fillout_form()
     mpActionBaseItem->setExpanded( true );
 
     QStringList sL6;
-    sL5 << "Action Key Bindings";
+    sL6 << "Action Key Bindings";
     mpKeyBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL6 );
     mpKeyBaseItem->setBackground(0,QColor(255,254,215,255));
     QIcon mainIcon6;
@@ -4847,6 +5025,18 @@ void dlgTriggerEditor::fillout_form()
         }
     }
     mpKeyBaseItem->setExpanded( true );
+    QStringList sL7;
+    sL7 << "Variables";
+    mpVarBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL7 );
+    mpVarBaseItem->setBackground(0,QColor(255,254,215,255));
+    //QIcon mainIcon5;
+    //mainIcon5.addPixmap(QPixmap(QString::fromUtf8(":/icons/bookmarks.png")), QIcon::Normal, QIcon::Off);
+    //mpVarBaseItem->setIcon( 0, mainIcon5 );
+    treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
+    mpVarBaseItem->setExpanded( true );
+    luaInterface * lI = new luaInterface(mpHost);
+    lI->getVars(mpVarBaseItem);
+    mpVarBaseItem->setExpanded( true );
 }
 
 
@@ -4916,7 +5106,18 @@ void dlgTriggerEditor::expand_child_triggers( TTrigger * pTriggerParent, QTreeWi
     }
 
 }
+/*
+void dlgTriggerEditor::expand_child_var( QMap<QString, QStringList> out, QString parent, QTreeWidgetItem * pWidgetItemParent ){
+    QMapIterator<QString,QStringList> it(out);
+    while (it.hasNext()){
+        it.next();
+        QStringList entry = it.value();
+        if (entry[1] == parent){
 
+        }
+    }
+}
+*/
 void dlgTriggerEditor::expand_child_key( TKey * pTriggerParent, QTreeWidgetItem * pWidgetItemParent )
 {
     list<TKey *> * childrenList = pTriggerParent->getChildrenList();
@@ -5282,6 +5483,7 @@ void dlgTriggerEditor::enterEvent( QEvent *pE )
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5298,6 +5500,7 @@ void dlgTriggerEditor::focusInEvent( QFocusEvent * pE )
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5347,6 +5550,7 @@ void dlgTriggerEditor::slot_show_timers()
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5357,6 +5561,7 @@ void dlgTriggerEditor::slot_show_timers()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
 
@@ -5371,6 +5576,7 @@ void dlgTriggerEditor::slot_show_timers()
     treeWidget->hide();
     treeWidget_alias->hide();
     treeWidget_timers->hide();
+    treeWidget_vars->hide();
     treeWidget_scripts->hide();
     treeWidget_actions->hide();
     treeWidget_keys->hide();
@@ -5411,6 +5617,7 @@ void dlgTriggerEditor::slot_show_triggers()
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5421,6 +5628,7 @@ void dlgTriggerEditor::slot_show_triggers()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
 
@@ -5433,6 +5641,7 @@ void dlgTriggerEditor::slot_show_triggers()
 
     treeWidget->hide();
     treeWidget_alias->hide();
+    treeWidget_vars->hide();
     treeWidget_timers->hide();
     treeWidget_scripts->hide();
     treeWidget_actions->hide();
@@ -5475,6 +5684,7 @@ void dlgTriggerEditor::slot_show_scripts()
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5485,6 +5695,7 @@ void dlgTriggerEditor::slot_show_scripts()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
 
@@ -5498,6 +5709,7 @@ void dlgTriggerEditor::slot_show_scripts()
     treeWidget->hide();
     treeWidget_alias->hide();
     treeWidget_timers->hide();
+    treeWidget_vars->hide();
     treeWidget_scripts->hide();
     treeWidget_actions->hide();
     mpScriptsMainArea->hide();
@@ -5540,6 +5752,7 @@ void dlgTriggerEditor::slot_show_keys()
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5550,6 +5763,7 @@ void dlgTriggerEditor::slot_show_keys()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
 
@@ -5563,6 +5777,7 @@ void dlgTriggerEditor::slot_show_keys()
     treeWidget->hide();
     treeWidget_alias->hide();
     treeWidget_timers->hide();
+    treeWidget_vars->hide();
     treeWidget_scripts->hide();
     treeWidget_actions->hide();
     treeWidget_keys->hide();
@@ -5594,6 +5809,78 @@ void dlgTriggerEditor::slot_show_keys()
 }
 
 
+void dlgTriggerEditor::slot_show_vars()
+{
+    saveOpenChanges();
+
+    if( mNeedUpdateData )
+    {
+        treeWidget->clear();
+        treeWidget_alias->clear();
+        treeWidget_timers->clear();
+        treeWidget_scripts->clear();
+        treeWidget_actions->clear();
+        treeWidget_keys->clear();
+        treeWidget_vars->clear();
+        fillout_form();
+        mNeedUpdateData = false;
+    }
+
+    mCurrentView = cmVarsView;
+
+    mpTriggersMainArea->hide();
+    mpTimersMainArea->hide();
+    mpScriptsMainArea->hide();
+    mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
+    mpActionsMainArea->hide();
+    mpKeysMainArea->hide();
+    mpVarsMainArea->hide();
+
+    mpSystemMessageArea->hide();
+    mpOptionsAreaTriggers->hide();
+    mpOptionsAreaAlias->hide();
+    mpOptionsAreaScripts->hide();
+    mpOptionsAreaTimers->hide();
+    mpOptionsAreaActions->hide();
+
+    treeWidget->hide();
+    treeWidget_alias->hide();
+    treeWidget_timers->hide();
+    treeWidget_vars->hide();
+    treeWidget_scripts->hide();
+    treeWidget_actions->hide();
+    treeWidget_keys->hide();
+    treeWidget_vars->hide();
+
+
+    QTreeWidgetItem * pI = treeWidget_vars->topLevelItem( 0 );
+    if( pI )
+    {
+        if( pI->childCount() > 0 )
+        {
+            mpVarsMainArea->show();
+            mpSourceEditorArea->show();
+            slot_var_clicked( treeWidget_vars->currentItem(), 0 );
+        }
+        else
+        {
+            mpVarsMainArea->hide();
+            mpSourceEditorArea->hide();
+            mpSystemMessageArea->show();
+            mpSystemMessageArea->notificationAreaIconLabelInformation->show();
+            mpSystemMessageArea->notificationAreaIconLabelError->hide();
+            mpSystemMessageArea->notificationAreaIconLabelWarning->hide();
+            QString msg = "To make a new variable click on the 'Add' icon above.";
+            mpSystemMessageArea->notificationAreaMessageBox->setText( msg );
+            /*luaInterface * lI = new luaInterface(mpHost);
+            lI->testIt();*/
+        }
+    }
+
+    treeWidget_vars->show();
+}
+
 void dlgTriggerEditor::slot_show_aliases()
 {
     saveOpenChanges();
@@ -5606,6 +5893,7 @@ void dlgTriggerEditor::slot_show_aliases()
         treeWidget_scripts->clear();
         treeWidget_actions->clear();
         treeWidget_keys->clear();
+        treeWidget_vars->clear();
         fillout_form();
         mNeedUpdateData = false;
     }
@@ -5616,6 +5904,7 @@ void dlgTriggerEditor::slot_show_aliases()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
 
@@ -5631,6 +5920,7 @@ void dlgTriggerEditor::slot_show_aliases()
     treeWidget->hide();
     treeWidget_alias->hide();
     treeWidget_timers->hide();
+    treeWidget_vars->hide();
     treeWidget_scripts->hide();
     treeWidget_actions->hide();
     treeWidget_keys->hide();
@@ -5697,6 +5987,7 @@ void dlgTriggerEditor::slot_show_actions()
     mpTimersMainArea->hide();
     mpScriptsMainArea->hide();
     mpAliasMainArea->hide();
+    mpVarsMainArea->hide();
     mpActionsMainArea->hide();
     mpKeysMainArea->hide();
     mpSourceEditorArea->hide();
@@ -5711,6 +6002,7 @@ void dlgTriggerEditor::slot_show_actions()
     treeWidget->hide();
     treeWidget_alias->hide();
     treeWidget_timers->hide();
+    treeWidget_vars->hide();
     treeWidget_scripts->hide();
     treeWidget_keys->hide();
     QTreeWidgetItem * pI = treeWidget_actions->topLevelItem( 0 );
@@ -5760,6 +6052,9 @@ void dlgTriggerEditor::slot_save_edit()
         case cmKeysView:
             slot_saveKeyAfterEdit();
             break;
+        case cmVarsView:
+            slot_saveVarAfterEdit();
+            break;
 
         default: qWarning()<<"ERROR: dlgTriggerEditor::slot_save_edit() undefined view";
     };
@@ -5789,6 +6084,9 @@ void dlgTriggerEditor::slot_add_new()
     case cmKeysView:
         slot_addKey();
         break;
+    case cmVarsView:
+        slot_addVar();
+        break;
 
     default: qDebug()<<"ERROR: dlgTriggerEditor::slot_save_edit() undefined view";
     };
@@ -5815,6 +6113,9 @@ void dlgTriggerEditor::slot_add_new_folder()
         break;
     case cmKeysView:
         slot_addKeyGroup();
+        break;
+    case cmVarsView:
+        slot_addVarGroup();
         break;
     default: qDebug()<<"ERROR: dlgTriggerEditor::slot_save_edit() undefined view";
     };
@@ -5869,6 +6170,9 @@ void dlgTriggerEditor::slot_delete_item()
     case cmKeysView:
         slot_deleteKey();
         break;
+    case cmVarsView:
+        slot_deleteVar();
+        break;
     default: qDebug()<<"ERROR: dlgTriggerEditor::slot_save_edit() undefined view";
     };
 }
@@ -5896,6 +6200,9 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
         break;
     case cmKeysView:
         saveKey();
+        break;
+    case cmVarsView:
+        saveVar();
         break;
     };
 
@@ -6125,6 +6432,10 @@ void dlgTriggerEditor::exportScript( QFile & file )
 
 }
 
+void dlgTriggerEditor::exportVar( QFile & file ){
+
+}
+
 void dlgTriggerEditor::exportKey( QFile & file )
 {
     QString name;
@@ -6199,6 +6510,9 @@ void dlgTriggerEditor::slot_export()
     case cmKeysView:
         exportKey( file );
         break;
+    case cmVarsView:
+        exportVar( file );
+        break;
     };
 }
 
@@ -6225,6 +6539,9 @@ void dlgTriggerEditor::slot_import()
                 break;
             case cmKeysView:
                 saveKey();
+                break;
+            case cmVarsView:
+                saveVar();
                 break;
         };
     }
@@ -6298,6 +6615,7 @@ void dlgTriggerEditor::slot_import()
     treeWidget->clear();
     treeWidget_alias->clear();
     treeWidget_actions->clear();
+    treeWidget_vars->clear();
     treeWidget_timers->clear();
     treeWidget_keys->clear();
     treeWidget_scripts->clear();
@@ -6347,11 +6665,15 @@ void dlgTriggerEditor::doCleanReset()
             case cmKeysView:
                 saveKey();
                 break;
+            case cmVarsView:
+                saveVar();
+                break;
         };
     }
     treeWidget->clear();
     treeWidget_alias->clear();
     treeWidget_actions->clear();
+    treeWidget_vars->clear();
     treeWidget_timers->clear();
     treeWidget_keys->clear();
     treeWidget_scripts->clear();
