@@ -2443,10 +2443,10 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             //we selected a variable, so we just add the variable at our current level, which is the same as above
             pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
             pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
-            pData[2] = QString::number(LUA_TSTRING);
-            pData[3] = "";
+            pData[1] = QString::number(LUA_TSTRING);
+            pData[2] = "";
             pNewItem->setData( 0, Qt::UserRole, pData);
-            pParent->parent()->insertChild( 0, pNewItem );
+            pParent->insertChild( 0, pNewItem );
         }
         else
             goto ROOT_KEY;

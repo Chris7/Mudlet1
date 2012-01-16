@@ -70,7 +70,8 @@ void luaInterface::deleteVar(QTreeWidgetItem * pItem, QString dName){
     QStringList nested;
     if (pParent){
         for (int i=3;i<pInfo.size();i++)
-            nested<<pInfo[i];
+            if (pInfo[i] != "")
+                nested<<pInfo[i];
         qDebug()<<"nested list"<<nested;
         if (nested.size() && nested[0] != ""){
             for (int i=0;i<nested.size();i++){
@@ -128,9 +129,10 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
     int tabled = 0;
     if (pParent){
         for (int i=3;i<pInfo.size();i++)
-            nested<<pInfo[i];
+            if (pInfo[i] != "")
+                nested<<pInfo[i];
         qDebug()<<"nested list"<<nested;
-        if (nested.size() && nested[0] != ""){
+        if (nested.size()){
             for (int i=0;i<nested.size();i++){
                 tabled++;
                 /*
