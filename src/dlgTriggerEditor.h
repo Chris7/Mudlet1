@@ -188,6 +188,7 @@ public slots:
     void                        slot_color_trigger_fg();
     void                        slot_color_trigger_bg();
     void                        repopulateVars();
+    void                        resetForm();
 
 private:
 
