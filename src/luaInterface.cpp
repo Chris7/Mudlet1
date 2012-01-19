@@ -346,6 +346,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
     QList<tableObject*> tables;
     tableObject* rootTable = new tableObject("_G");
     lua_pushnil(L);
+    QList<QTreeWidgetItem *> itemsToAdd;
     while (lua_next(L, LUA_GLOBALSINDEX)){
         int vType = lua_type(L,-1);
         int kType = lua_type(L,-2);
@@ -377,7 +378,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             //we're ROOT, we're at the topmost level
             icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
             pI->setData( 0, Qt::UserRole, pData );
-            mpVarBaseItem->addChild( pI );
+            itemsToAdd.append(pI);
             lua_pop(L,1);
         }
         else{
@@ -386,6 +387,8 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
         //qDebug()<<keyName<<":"<<valueName;
         lua_pop(L,1);
     }
+    mpVarBaseItem->addChildren( itemsToAdd );
+    itemsToAdd.clear();
     //above we stored all the variables at the global level (one level in), now we go through these and add any nested tables
     QMap<QString, QTreeWidgetItem *> tableOrder;
     QList<tableObject*> tables2 = tables;
@@ -418,7 +421,11 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             QIcon icon;
             icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
             pItem->setData( 0, Qt::UserRole, pData );
-            mpVarBaseItem->insertChild( 0, pItem );
+            itemsToAdd.append(pItem );
+        }
+        if (itemsToAdd.size()){
+            mpVarBaseItem->addChildren(itemsToAdd);
+            itemsToAdd.clear();
         }
         tableList.pop_front();
         //now we go into the nested orders
@@ -454,7 +461,11 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                 QIcon icon;
                 icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
                 pItem->setData( 0, Qt::UserRole, pData );
-                tableOrder[nestName]->insertChild( 0, pItem );
+                itemsToAdd.append(pItem );
+            }
+            if (itemsToAdd.size()){
+                tableOrder[nestName]->addChildren(itemsToAdd);
+                itemsToAdd.clear();
             }
             nestName+=tableName;
             lua_gettable(L,-2);
@@ -511,7 +522,11 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                     sList << itName;
                     QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
                     pI->setData( 0, Qt::UserRole, pData );
-                    pItem->insertChild(0,pI);
+                    itemsToAdd.append(pItem );
+                }
+                if (itemsToAdd.size()){
+                    pItem->addChildren(itemsToAdd);
+                    itemsToAdd.clear();
                 }
             }
             varsLoaded.append(nestName);
@@ -547,7 +562,11 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                         sList << itName;
                         QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
                         pI->setData( 0, Qt::UserRole, pData );
-                        pItem->insertChild(0,pI);
+                        itemsToAdd.append(pItem );
+                    }
+                    if (itemsToAdd.size()){
+                        pItem->addChildren(itemsToAdd);
+                        itemsToAdd.clear();
                     }
                 }
                 varsLoaded.append(nestName);
