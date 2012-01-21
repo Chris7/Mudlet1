@@ -3,6 +3,7 @@
 
 #include "TLuaInterpreter.h"
 #include "Host.h"
+#include <QSet>
 
 extern "C"
 {
@@ -41,16 +42,17 @@ class luaInterface{
 
 public:
     luaInterface( Host * mpHost);
-    void getVars(QTreeWidgetItem *);
+    void getVars(QTreeWidgetItem *, int hide);
     void saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue);
     void iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList);
     void deleteVar(QTreeWidgetItem * pItem, QString dName);
-    QString getValue(QTreeWidgetItem * pItem, QString vName);
+    QString getValue(QTreeWidgetItem * pItem);
 
 private:
     Host * mpHost;
     int mHostID;
     TLuaInterpreter *interpreter;
     lua_State* L;
+    QMap<Host *, QSet<QString> > hiddenVars;
 };
 #endif // LUAINTERFACE_H

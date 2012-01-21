@@ -1,6 +1,7 @@
 #include "luaInterface.h"
 #include <QDebug>
 #include <QTime>
+#include <QSet>
 
 using namespace std;
 
@@ -279,71 +280,63 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
     }
 }
 
-QString luaInterface::getValue(QTreeWidgetItem * pItem, QString vName){
+QString luaInterface::getValue(QTreeWidgetItem * pItem){
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
-    //qDebug()<<"starting stack size"<<startSize;
     QTreeWidgetItem* pParent = pItem->parent();
-    //check if pItem is a table
     QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
-    int vType = QString(pInfo[0]).toInt();
-    //qDebug()<<"info on"<<vName<<":"<<pInfo;
-    if (!pInfo.size() || vType == LUA_TTABLE)
+    if (!pInfo.size())
         return "";
     QStringList nested;
     if (pParent){
         for (int i=3;i<pInfo.size();i++)
-            nested<<pInfo[i];
-        //qDebug()<<"nested list"<<nested;
-        if (nested.size() && nested[0] != ""){
+            if (pInfo[i] != "")
+                nested<<pInfo[i];
+        if (nested.size()){
             for (int i=0;i<nested.size();i++){
                 QString tableName = nested[i];
-                int tableType = QString(tableName.at(1)).toInt();
+                int tableType = QString(tableName.at(0)).toInt();
                 tableName.remove(0,1);
-                //qDebug()<<"table:"<<tableName<<","<<tableType;
-                if (tableType == LUA_TNUMBER)
+                if (tableType  == LUA_TNUMBER)
                     lua_pushnumber(L, tableName.toInt());
                 else
                     lua_pushstring(L, tableName.toLatin1().data());
-                //qDebug()<<"inter";
-                for (int o=1;o<=lua_gettop(L);o++){
-                    //qDebug()<<o*-1<<","<<lua_type(L,o*-1);
-                }
                 if (i>0){
                     lua_gettable(L,-2);
                 }
                 else
                     lua_getglobal(L,tableName.toLatin1().data());
-                //qDebug()<<"after fetching table";
-                for (int o=1;o<=lua_gettop(L);o++){
-                    //qDebug()<<o*-1<<","<<lua_type(L,o*-1);
-                }
             }
         }
     }
-    if (vType == LUA_TNUMBER)
-        lua_rawgeti(L,-1, vName.toInt());
-    else
-        lua_getfield(L,-1, vName.toLatin1().data());
-    if (lua_istable(L,-1))
-        return "Lua Table";
-    lua_pushvalue(L,-1);
-    QString newValue = lua_tostring(L,-1);
-    lua_pop(L,1);
+    int kType = pInfo[0].toInt();
+    QString kName = pItem->text(0);
+    if (nested.size()){
+        if (kType == LUA_TNUMBER){
+            lua_pushnumber(L, kName.toInt());
+        }
+        else{
+            lua_pushstring(L, kName.toLatin1().data());
+        }
+        lua_gettable(L,-2);
+    }
+    else{
+        lua_getglobal(L, kName.toLatin1().data());
+    }
+    QString curValue = lua_tostring(L,-1);
     lua_settop(L,startSize);
-    pInfo[1] = newValue;
-    //qDebug()<<"setting our variable"<<vName<<"to the value of"<<pInfo;
-    pItem->setText(0,vName);
+    pInfo[2] = curValue;
     pItem->setData(0, Qt::UserRole, pInfo);
-    return newValue;
+    return curValue;
 }
 
-void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
+void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
     //Help from:
     //http://cdry.wordpress.com/2010/06/26/how-to-save-global-variables-using-the-lua-c-api/
     //another resource: http://lua-users.org/lists/lua-l/2004-06/msg00329.html
     //This code is hideous but it works and doesn't affect performance.
     //A pretty recursive function using just the stack was too difficult to work out for all cases.
+    //if hide = 1, then all variables discovered here will be marked as hidden and not shown
     QTime myTimer;
     myTimer.start();
     L = interpreter->pGlobalLua;
@@ -370,19 +363,25 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             lua_pushvalue(L,-1);
             valueName = lua_tostring(L,-1);
             //rootTable->addVariable(keyName, valueName);
-            QStringList sList;
-            sList << keyName;
-            QTreeWidgetItem * pI = new QTreeWidgetItem( mpVarBaseItem, sList);
-            QIcon icon;
-            QStringList pData;
-            pData << QString::number(kType);
-            pData << QString::number(vType);
-            pData << valueName;
-            pData << "";
-            //we're ROOT, we're at the topmost level
-            icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-            pI->setData( 0, Qt::UserRole, pData );
-            itemsToAdd.append(pI);
+            if (hide)
+                hiddenVars[mpHost].insert(keyName);
+            else{
+                QStringList sList;
+                sList << keyName;
+                QTreeWidgetItem * pI = new QTreeWidgetItem( mpVarBaseItem, sList);
+                pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+                pI->setCheckState(0, Qt::Unchecked);
+                QIcon icon;
+                QStringList pData;
+                pData << QString::number(kType);
+                pData << QString::number(vType);
+                pData << valueName;
+                pData << "";
+                //we're ROOT, we're at the topmost level
+                icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
+                pI->setData( 0, Qt::UserRole, pData );
+                itemsToAdd.append(pI);
+            }
             lua_pop(L,1);
         }
         else{
@@ -414,20 +413,28 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
         nestList.append(QString::number(tableList.first()->getType())+nestName);
         lua_getglobal(L, nestName.toLatin1().data());//get our first table
         if (!tableOrder.contains(nestName)){
-            QStringList sList;
-            QTreeWidgetItem * pItem;
-            sList << nestName;
-            pItem = new QTreeWidgetItem( mpVarBaseItem, sList);
-            tableOrder.insert(nestName, pItem);
-            QStringList pData;
-            pData << QString::number(tableList.first()->getType());
-            pData << QString::number(LUA_TTABLE);
-            pData << nestName;
-            pData << nestList;
-            QIcon icon;
-            icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-            pItem->setData( 0, Qt::UserRole, pData );
-            itemsToAdd.append(pItem );
+            if (hide){
+                tableOrder.insert(nestName, mpVarBaseItem);
+                hiddenVars[mpHost].insert(nestList.join(""));
+            }
+            else{
+                QStringList sList;
+                QTreeWidgetItem * pItem;
+                sList << nestName;
+                pItem = new QTreeWidgetItem( mpVarBaseItem, sList);
+                pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+                pItem->setCheckState(0, Qt::Unchecked);
+                tableOrder.insert(nestName, pItem);
+                QStringList pData;
+                pData << QString::number(tableList.first()->getType());
+                pData << QString::number(LUA_TTABLE);
+                pData << nestName;
+                pData << nestList;
+                QIcon icon;
+                icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
+                pItem->setData( 0, Qt::UserRole, pData );
+                itemsToAdd.append(pItem );
+            }
         }
         if (itemsToAdd.size()){
             mpVarBaseItem->addChildren(itemsToAdd);
@@ -453,21 +460,29 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
             QString tableName = tableInfo->getName();
             nestList.append(QString::number(tableType)+tableName);
             if (!tableOrder.contains(nestName+tableName)){
-                QStringList sList;
-                QTreeWidgetItem * pItem;
-                sList << tableName;
-                ////qDebug()<<"adding new table"<<tableName<<"under "<<nestName;
-                pItem = new QTreeWidgetItem( tableOrder[nestName], sList);
-                tableOrder.insert(nestName+tableName, pItem);
-                QStringList pData;
-                pData << QString::number(tableInfo->getType());
-                pData << QString::number(LUA_TTABLE);
-                pData << tableName;
-                pData << nestList;
-                QIcon icon;
-                icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
-                pItem->setData( 0, Qt::UserRole, pData );
-                itemsToAdd.append(pItem );
+                if (hide){
+                    tableOrder.insert(nestName+tableName, mpVarBaseItem);
+                    hiddenVars[mpHost].insert(nestList.join(""));
+                }
+                else{
+                    QStringList sList;
+                    QTreeWidgetItem * pItem;
+                    sList << tableName;
+                    ////qDebug()<<"adding new table"<<tableName<<"under "<<nestName;
+                    pItem = new QTreeWidgetItem( tableOrder[nestName], sList);
+                    pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+                    pItem->setCheckState(0, Qt::Unchecked);
+                    tableOrder.insert(nestName+tableName, pItem);
+                    QStringList pData;
+                    pData << QString::number(tableInfo->getType());
+                    pData << QString::number(LUA_TTABLE);
+                    pData << tableName;
+                    pData << nestList;
+                    QIcon icon;
+                    icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
+                    pItem->setData( 0, Qt::UserRole, pData );
+                    itemsToAdd.append(pItem );
+                }
             }
             if (itemsToAdd.size()){
                 tableOrder[nestName]->addChildren(itemsToAdd);
@@ -515,22 +530,29 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                 QTreeWidgetItem * pItem = tableOrder[nestName];
                 while (it.hasNext()){
                     it.next();
-                    QStringList sList;
-                    QString itValue = it.value();
-                    QString itName = it.key();
-                    QStringList pData;
-                    //qDebug()<<itName<<":"<<itValue;
-                    pData << itName.at(0);
-                    pData << itValue.at(0);
-                    itName.remove(0,1);
-                    itValue.remove(0,1);
-                    pData << itValue;
-                    pData << nestList;
-                    //qDebug()<<pData;
-                    sList << itName;
-                    QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
-                    pI->setData( 0, Qt::UserRole, pData );
-                    itemsToAdd.append(pItem );
+                    if (hide){
+                        hiddenVars[mpHost].insert(nestName+it.key());
+                    }
+                    else{
+                        QStringList sList;
+                        QString itValue = it.value();
+                        QString itName = it.key();
+                        QStringList pData;
+                        //qDebug()<<itName<<":"<<itValue;
+                        pData << itName.at(0);
+                        pData << itValue.at(0);
+                        itName.remove(0,1);
+                        itValue.remove(0,1);
+                        pData << itValue;
+                        pData << nestList;
+                        //qDebug()<<pData;
+                        sList << itName;
+                        QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
+                        pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+                        pI->setCheckState(0, Qt::Unchecked);
+                        pI->setData( 0, Qt::UserRole, pData );
+                        itemsToAdd.append(pItem );
+                    }
                 }
                 if (itemsToAdd.size()){
                     pItem->addChildren(itemsToAdd);
@@ -555,22 +577,29 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
                     QMapIterator<QString, QString> it(vars);
                     while (it.hasNext()){
                         it.next();
-                        QStringList sList;
-                        QString itValue = it.value();
-                        QString itName = it.key();
-                        QStringList pData;
-                        //qDebug()<<itName<<":"<<itValue;
-                        pData << itName.at(0);
-                        pData << itValue.at(0);
-                        itName.remove(0,1);
-                        itValue.remove(0,1);
-                        pData << itValue;
-                        pData << nestList;
-                        //qDebug()<<pData;
-                        sList << itName;
-                        QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
-                        pI->setData( 0, Qt::UserRole, pData );
-                        itemsToAdd.append(pItem );
+                        if (hide){
+                            hiddenVars[mpHost].insert(nestName+it.key());
+                        }
+                        else{
+                            QStringList sList;
+                            QString itValue = it.value();
+                            QString itName = it.key();
+                            QStringList pData;
+                            //qDebug()<<itName<<":"<<itValue;
+                            pData << itName.at(0);
+                            pData << itValue.at(0);
+                            itName.remove(0,1);
+                            itValue.remove(0,1);
+                            pData << itValue;
+                            pData << nestList;
+                            //qDebug()<<pData;
+                            sList << itName;
+                            QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
+                            pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+                            pI->setCheckState(0, Qt::Unchecked);
+                            pI->setData( 0, Qt::UserRole, pData );
+                            itemsToAdd.append(pItem );
+                        }
                     }
                     if (itemsToAdd.size()){
                         pItem->addChildren(itemsToAdd);
@@ -585,4 +614,6 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem){
     }
     qDebug()<<myTimer.elapsed()<<"to take care of tables2";
     myTimer.restart();
+    qDebug()<<"hide status"<<hide;
+    qDebug()<<hiddenVars;
 }

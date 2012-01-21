@@ -304,6 +304,7 @@ public:
     QColor             mCommandLineBgColor;
     bool               mMapperUseAntiAlias;
     bool               mFORCE_MXP_NEGOTIATION_OFF;
+    QStringList        savedVariables;
 
 private:
     Host();

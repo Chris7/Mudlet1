@@ -341,7 +341,8 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     connect( treeWidget_scripts, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
     connect( treeWidget_actions, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
     connect( treeWidget_keys, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
-    connect( treeWidget_vars, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
+    //double clicking may serve a future role with variables, none now
+    //connect( treeWidget_vars, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT( slot_toggle_active()));
 
 
     QAction * addTriggerAction = new QAction(QIcon(":/icons/document-new.png"), tr("Add Item"), this);
@@ -4348,21 +4349,20 @@ void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
     varInfo = pItem->data(0,Qt::UserRole).toStringList();
     if (!varInfo.size())
         return;
-    //luaInterface * lI = new luaInterface(mpHost);
-    //varInfo[1] = lI->getValue(pItem, pItem->text(column));
     int varType = QString(varInfo[1]).toInt();
-    mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
-    if (varInfo.size() > 1){
-        if (varType == LUA_TTABLE)
-            mpVarsMainArea->lineEdit_var_value->setText("Lua Table");
-        else
-            mpVarsMainArea->lineEdit_var_value->setText(varInfo[2]);
+    if (varType == LUA_TTABLE){
+        varInfo[2] == "Lua Table";
     }
     else{
-        if (varType == LUA_TTABLE)
-            mpVarsMainArea->lineEdit_var_value->setText("Lua Table");
-        else
-            mpVarsMainArea->lineEdit_var_value->setText("");
+        luaInterface * lI = new luaInterface(mpHost);
+        varInfo[2] = lI->getValue(pItem);
+    }
+    mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
+    if (varInfo.size() > 1){
+        mpVarsMainArea->lineEdit_var_value->setText(varInfo[2]);
+    }
+    else{
+        mpVarsMainArea->lineEdit_var_value->setText("");
     }
 }
 
@@ -5033,6 +5033,7 @@ void dlgTriggerEditor::fillout_form()
 }
 
 void dlgTriggerEditor::repopulateVars(){
+    treeWidget_vars->setUpdatesEnabled(false);
     QStringList sL7;
     sL7 << "Variables";
     mpVarBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL7 );
@@ -5044,8 +5045,10 @@ void dlgTriggerEditor::repopulateVars(){
     treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
     mpVarBaseItem->setExpanded( true );
     luaInterface * lI = new luaInterface(mpHost);
-    lI->getVars(mpVarBaseItem);
+    lI->getVars(mpVarBaseItem, 0);
     mpVarBaseItem->setExpanded( true );
+    treeWidget_vars->sortItems(0, Qt::AscendingOrder);
+    treeWidget_vars->setUpdatesEnabled(true);
 }
 
 
@@ -5992,6 +5995,21 @@ void dlgTriggerEditor::slot_delete_item()
     };
 }
 
+void recurseVarTree(QTreeWidgetItem * pItem, QStringList &varList){
+    QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
+    QString varName;
+    int itemType = itemInfo[1].toInt();
+    for (int i=3;i<itemInfo.size();i++){
+        varName+=itemInfo[i];
+    }
+    if (itemType != LUA_TTABLE){
+        varName+=itemInfo[0]+pItem->text(0);
+    }
+    varList << varName;
+    for(int i=0;i<pItem->childCount();++i)
+        recurseVarTree(pItem->child(i), varList);
+}
+
 void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
 {
     if( ! pItem ) return;
@@ -6016,11 +6034,37 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
     case cmKeysView:
         saveKey();
         break;
-    case cmVarsView:
+    case cmVarsView:{
         saveVar();
+        QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
+        QString varName;
+        QStringList varsToChange;
+        int itemType = itemInfo[1].toInt();
+        for (int i=3;i<itemInfo.size();i++){
+            varName+=itemInfo[i];
+        }
+        if (itemType != LUA_TTABLE){
+            varName+=itemInfo[0]+pItem->text(0);
+        }
+        int checked = pItem->checkState(0);
+        if ((checked && !mpHost->savedVariables.contains(varName)) || (!checked && mpHost->savedVariables.contains(varName))){
+            recurseVarTree(pItem, varsToChange);
+            if (checked){
+                for (int i=0;i<varsToChange.size();i++){
+                    if (!mpHost->savedVariables.contains(varsToChange[i]))
+                        mpHost->savedVariables.append(varsToChange[i]);
+                }
+            }
+            else if (!checked){
+                for (int i=0;i<varsToChange.size();i++){
+                    if (mpHost->savedVariables.contains(varsToChange[i]))
+                        mpHost->savedVariables.removeAll(varsToChange[i]);
+                }
+            }
+        }
         break;
-    };
-
+    }
+    }
 }
 
 void dlgTriggerEditor::slot_script_main_area_edit_handler(QListWidgetItem*)
