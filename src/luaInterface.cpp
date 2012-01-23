@@ -114,6 +114,74 @@ void luaInterface::deleteVar(QTreeWidgetItem * pItem, QString dName){
     //qDebug()<<"variable"<<dName<<"set to nil";
 }
 
+void luaInterface::restoreVar(QStringList pInfo){
+    L = interpreter->pGlobalLua;
+    int startSize = lua_gettop(L);
+    QStringList nested;
+    QString newName = pInfo[0];
+    pInfo.pop_front();
+    int vType = pInfo[1].toInt();
+    QString newValue = pInfo[2];
+    if (vType == LUA_TTABLE)
+        pInfo.pop_back();//for this instance, we want to remove the self-reference
+    for (int i=3;i<pInfo.size();i++)
+        if (pInfo[i] != "")
+            nested<<pInfo[i];
+    if (nested.size()){
+        for (int i=0;i<nested.size();i++){
+            QString tableName = nested[i];
+            int tableType = QString(tableName.at(0)).toInt();
+            tableName.remove(0,1);
+            if (tableType  == LUA_TNUMBER)
+                lua_pushnumber(L, tableName.toInt());
+            else
+                lua_pushstring(L, tableName.toLatin1().data());
+            if (i>0){
+                lua_gettable(L,-2);
+            }
+            else
+                lua_getglobal(L,tableName.toLatin1().data());
+            if (lua_type(L,-1) == LUA_TNIL){
+                lua_pop(L,1);
+                if (tableType  == LUA_TNUMBER)
+                    lua_pushnumber(L, tableName.toInt());
+                else
+                    lua_pushstring(L, tableName.toLatin1().data());
+                lua_newtable(L);
+                if (i>0)
+                    lua_settable(L,-3);
+                else{
+                    lua_setglobal(L,tableName.toLatin1().data());
+                    lua_pop(L,1);
+                }
+                i--; //reiterate after making the table to get it on the stack
+                continue;
+            }
+        }
+    }
+    if (pInfo[0].toInt() == LUA_TNUMBER){
+        lua_pushnumber(L, newName.toInt());
+    }
+    else{
+        lua_pushstring(L, newName.toLatin1().data());
+    }
+    if (vType == LUA_TNUMBER){
+        lua_pushnumber(L,newValue.toInt());
+    }
+    else if (vType == LUA_TTABLE){
+        lua_newtable(L);
+    }
+    else{
+        lua_pushstring(L, newValue.toLatin1().data());
+    }
+    if (lua_type(L,-3) == LUA_TTABLE){
+        lua_settable(L,-3);
+    }
+    else
+        lua_setglobal(L,newName.toLatin1().data());
+    lua_settop(L,startSize);
+}
+
 void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue){
     if (newName=="")
         return;
@@ -202,26 +270,9 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
     else if (QString(pInfo[1]).toInt() == LUA_TTABLE){
         lua_newtable(L);
         pInfo << pInfo[0]+newName;
-        for (int o=1;o<=lua_gettop(L);o++){
-            //lua_pushvalue(L,-1*o);
-            //qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
-            //lua_pop(L,1);
-        }
-    }
-    //qDebug()<<"stack size"<<lua_gettop(L);
-    for (int o=1;o<=lua_gettop(L);o++){
-        //lua_pushvalue(L,-1*o);
-        //qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
-        //lua_pop(L,1);
     }
     while (lua_gettop(L)>startSize+2 && lua_type(L,-3) == LUA_TTABLE){
         lua_settable(L,-3);//do our table functions if needed
-    }
-    //qDebug()<<"after clearing tables";
-    for (int o=1;o<=lua_gettop(L);o++){
-        //lua_pushvalue(L,-1*o);
-        //qDebug()<<o*-1<<","<<lua_type(L,o*-1);//<<":"<<lua_tostring(L,-1);
-        //lua_pop(L,1);
     }
     lua_pushvalue(L,-2);
     QString name = lua_tostring(L,-1);
@@ -229,7 +280,6 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
     lua_setglobal(L,name.toLatin1().data());
     lua_settop(L,startSize);
     pInfo[2] = newValue;
-    //qDebug()<<"setting our variable"<<newName<<"to the value of"<<pInfo;
     pItem->setText(0,newName);
     pItem->setData(0, Qt::UserRole, pInfo);
 }
@@ -362,7 +412,6 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
         else if (vType == LUA_TSTRING || vType == LUA_TNUMBER){
             lua_pushvalue(L,-1);
             valueName = lua_tostring(L,-1);
-            //rootTable->addVariable(keyName, valueName);
             if (hide)
                 hiddenVars[mpHost].insert(keyName);
             else{
@@ -370,13 +419,19 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                 sList << keyName;
                 QTreeWidgetItem * pI = new QTreeWidgetItem( mpVarBaseItem, sList);
                 pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-                pI->setCheckState(0, Qt::Unchecked);
                 QIcon icon;
                 QStringList pData;
                 pData << QString::number(kType);
                 pData << QString::number(vType);
                 pData << valueName;
                 pData << "";
+                QString nestListConcat = pData[0]+keyName;
+                if (mpHost->savedVariables.contains(nestListConcat)){
+                    mpHost->savedVariables[nestListConcat] = pI;
+                    pI->setCheckState(0, Qt::Checked);
+                }
+                else
+                    pI->setCheckState(0, Qt::Unchecked);
                 //we're ROOT, we're at the topmost level
                 icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
                 pI->setData( 0, Qt::UserRole, pData );
@@ -384,10 +439,6 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
             }
             lua_pop(L,1);
         }
-        else{
-         //   //qDebug()<<vType;
-        }
-        ////qDebug()<<keyName<<":"<<valueName;
         lua_pop(L,1);
     }
     qDebug()<<myTimer.elapsed()<<"to take care to main loop";
@@ -403,11 +454,9 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
         tableList.append(table);
         tableObject* parentTable = table->getParent();
         while (parentTable->getName() != "_G"){
-            ////qDebug()<<parentTable->getType();
             tableList.insert(0,parentTable);
             parentTable = parentTable->getParent();
         }
-        ////qDebug()<<tableList.first();
         QString nestName = tableList.first()->getName();
         QStringList nestList;
         nestList.append(QString::number(tableList.first()->getType())+nestName);
@@ -423,13 +472,19 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                 sList << nestName;
                 pItem = new QTreeWidgetItem( mpVarBaseItem, sList);
                 pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-                pItem->setCheckState(0, Qt::Unchecked);
                 tableOrder.insert(nestName, pItem);
                 QStringList pData;
                 pData << QString::number(tableList.first()->getType());
                 pData << QString::number(LUA_TTABLE);
                 pData << nestName;
                 pData << nestList;
+                QString nestListConcat = nestList.join("");
+                if (mpHost->savedVariables.contains(nestListConcat)){
+                    mpHost->savedVariables[nestListConcat] = pItem;
+                    pItem->setCheckState(0, Qt::Checked);
+                }
+                else
+                    pItem->setCheckState(0, Qt::Unchecked);
                 QIcon icon;
                 icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
                 pItem->setData( 0, Qt::UserRole, pData );
@@ -471,13 +526,20 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                     ////qDebug()<<"adding new table"<<tableName<<"under "<<nestName;
                     pItem = new QTreeWidgetItem( tableOrder[nestName], sList);
                     pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-                    pItem->setCheckState(0, Qt::Unchecked);
+                    //pItem->setCheckState(0, Qt::Unchecked);
                     tableOrder.insert(nestName+tableName, pItem);
                     QStringList pData;
                     pData << QString::number(tableInfo->getType());
                     pData << QString::number(LUA_TTABLE);
                     pData << tableName;
                     pData << nestList;
+                    QString nestListConcat = nestList.join("");
+                    if (mpHost->savedVariables.contains(nestListConcat)){
+                        mpHost->savedVariables[nestListConcat] = pItem;
+                        pItem->setCheckState(0, Qt::Checked);
+                    }
+                    else
+                        pItem->setCheckState(0, Qt::Unchecked);
                     QIcon icon;
                     icon.addPixmap(QPixmap(QString::fromUtf8(":/icons/folder-brown.png")), QIcon::Normal, QIcon::Off);
                     pItem->setData( 0, Qt::UserRole, pData );
@@ -549,8 +611,15 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                         sList << itName;
                         QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
                         pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-                        pI->setCheckState(0, Qt::Unchecked);
+                        //pI->setCheckState(0, Qt::Unchecked);
                         pI->setData( 0, Qt::UserRole, pData );
+                        QString nestListConcat = nestList.join("")+pData[0]+itName;
+                        if (mpHost->savedVariables.contains(nestListConcat)){
+                            mpHost->savedVariables[nestListConcat] = pI;
+                            pI->setCheckState(0, Qt::Checked);
+                        }
+                        else
+                            pI->setCheckState(0, Qt::Unchecked);
                         itemsToAdd.append(pItem );
                     }
                 }
@@ -596,8 +665,15 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                             sList << itName;
                             QTreeWidgetItem * pI = new QTreeWidgetItem( pItem, sList);
                             pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-                            pI->setCheckState(0, Qt::Unchecked);
+                            //pI->setCheckState(0, Qt::Unchecked);
                             pI->setData( 0, Qt::UserRole, pData );
+                            QString nestListConcat = nestList.join("")+pData[0]+itName;
+                            if (mpHost->savedVariables.contains(nestListConcat)){
+                                mpHost->savedVariables[nestListConcat] = pI;
+                                pI->setCheckState(0, Qt::Checked);
+                            }
+                            else
+                                pI->setCheckState(0, Qt::Unchecked);
                             itemsToAdd.append(pItem );
                         }
                     }

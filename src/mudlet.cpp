@@ -41,6 +41,7 @@
 #include "EAction.h"
 #include "TTextEdit.h"
 #include "dlgNotepad.h"
+#include "luaInterface.h"
 
 //#ifdef Q_CC_GNU
     #include "dlgIRC.h"
@@ -1907,6 +1908,11 @@ void mudlet::doAutoLogin( QString & profile_name )
     QStringList entries = dir.entryList( QDir::Files, QDir::Time );
     //for( int i=0;i<entries.size(); i++ )
     //    qDebug()<<i<<"#"<<entries[i];
+    luaInterface * lI = new luaInterface(pHost);
+    QStringList test;
+    test << "test";
+    QTreeWidgetItem * fake = new QTreeWidgetItem( test);
+    lI->getVars(fake, 1);
     if( entries.size() > 0 )
     {
         QFile file(folder+"/"+entries[0]);

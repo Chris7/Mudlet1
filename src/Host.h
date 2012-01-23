@@ -50,7 +50,8 @@ class TLuaInterpreter;
 #include "TArea.h"
 #include "TRoom.h"
 #include "TMap.h"
-#include <QListWidget>;
+#include <QListWidget>
+#include <QTreeWidgetItem>
 
 class dlgTriggerEditor;
 class TConsole;
@@ -304,7 +305,7 @@ public:
     QColor             mCommandLineBgColor;
     bool               mMapperUseAntiAlias;
     bool               mFORCE_MXP_NEGOTIATION_OFF;
-    QStringList        savedVariables;
+    QMap<QString, QTreeWidgetItem *>   savedVariables;
 
 private:
     Host();

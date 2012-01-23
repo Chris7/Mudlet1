@@ -28,6 +28,7 @@
 #include "XMLimport.h"
 #include <QFileDialog>
 #include <QPainter>
+#include "luaInterface.h"
 
 #define _DEBUG_
 
@@ -1127,6 +1128,11 @@ void dlgConnectionProfiles::slot_connectToServer()
     dir.setSorting(QDir::Time);
     QStringList entries = dir.entryList( QDir::Files, QDir::Time );
     bool needsGenericPackagesInstall = false;
+    luaInterface * lI = new luaInterface(pHost);
+    QStringList test;
+    test << "test";
+    QTreeWidgetItem * fake = new QTreeWidgetItem( test);
+    lI->getVars(fake, 1);
     if( entries.size() > 0 )
     {
         QFile file(folder+"/"+profile_history->itemData(profile_history->currentIndex()).toString());   //entries[0]);

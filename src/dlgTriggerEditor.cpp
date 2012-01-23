@@ -3952,9 +3952,6 @@ void dlgTriggerEditor::saveVar(){
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
     lI->saveVar(pItem,newName, newValue);
-    //pItem->setText(0,newName);
-    //QStringList pData;
-    //pItem->setData(0, Qt::UserRole, newValue);
 }
 
 void dlgTriggerEditor::saveKey()
@@ -5995,7 +5992,7 @@ void dlgTriggerEditor::slot_delete_item()
     };
 }
 
-void recurseVarTree(QTreeWidgetItem * pItem, QStringList &varList){
+void recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
     QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
     QString varName;
     int itemType = itemInfo[1].toInt();
@@ -6005,7 +6002,7 @@ void recurseVarTree(QTreeWidgetItem * pItem, QStringList &varList){
     if (itemType != LUA_TTABLE){
         varName+=itemInfo[0]+pItem->text(0);
     }
-    varList << varName;
+    varList.insert(varName, pItem);
     for(int i=0;i<pItem->childCount();++i)
         recurseVarTree(pItem->child(i), varList);
 }
@@ -6036,9 +6033,10 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
         break;
     case cmVarsView:{
         saveVar();
+        QMap<QString, QTreeWidgetItem *> varsToChange;
+        int checked = pItem->checkState(0);
         QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
         QString varName;
-        QStringList varsToChange;
         int itemType = itemInfo[1].toInt();
         for (int i=3;i<itemInfo.size();i++){
             varName+=itemInfo[i];
@@ -6046,22 +6044,26 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
         if (itemType != LUA_TTABLE){
             varName+=itemInfo[0]+pItem->text(0);
         }
-        int checked = pItem->checkState(0);
         if ((checked && !mpHost->savedVariables.contains(varName)) || (!checked && mpHost->savedVariables.contains(varName))){
             recurseVarTree(pItem, varsToChange);
             if (checked){
-                for (int i=0;i<varsToChange.size();i++){
-                    if (!mpHost->savedVariables.contains(varsToChange[i]))
-                        mpHost->savedVariables.append(varsToChange[i]);
+                QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
+                while (it.hasNext()){
+                    it.next();
+                    if (!mpHost->savedVariables.contains(it.key()))
+                        mpHost->savedVariables.insert(it.key(), it.value());
                 }
             }
             else if (!checked){
-                for (int i=0;i<varsToChange.size();i++){
-                    if (mpHost->savedVariables.contains(varsToChange[i]))
-                        mpHost->savedVariables.removeAll(varsToChange[i]);
+                QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
+                while (it.hasNext()){
+                    it.next();
+                    if (mpHost->savedVariables.contains(it.key()))
+                        mpHost->savedVariables.remove(it.key());
                 }
             }
         }
+        qDebug()<<mpHost->savedVariables;
         break;
     }
     }

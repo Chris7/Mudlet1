@@ -395,7 +395,28 @@ bool XMLexport::writeHost( Host * pT )
         ret = writeKey( pChildKey );
     }
     writeEndElement();
-
+    writeStartElement("Variables");
+    QMap<QString, QTreeWidgetItem *> savedVariables = mpHost->savedVariables;
+    QMapIterator<QString, QTreeWidgetItem *> it(savedVariables);
+    luaInterface * lI = new luaInterface(mpHost);
+    while (it.hasNext()){
+        it.next();
+        writeStartElement("variable");
+        QString value = lI->getValue(it.value());
+        QStringList info = it.value()->data(0, Qt::UserRole).toStringList();
+        writeTextElement( "name", it.value()->text(0) );
+        writeTextElement( "nameType", info[0] );
+        writeTextElement( "valueType", info[1] );
+        writeTextElement( "value", value );
+        QString parentOrder = "";
+        for (int i=3;i<info.size();i++){
+            if (info[i] != "")
+                parentOrder+=info[i]+"|";
+        }
+        writeTextElement( "parentOrder", parentOrder );
+        writeEndElement();
+    }
+    writeEndElement();
     return ret;
 }
 
@@ -628,6 +649,7 @@ bool XMLexport::writeAlias( TAlias * pT )
 
     return true;
 }
+
 
 bool XMLexport::exportAction( QIODevice * device )
 {

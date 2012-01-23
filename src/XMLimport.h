@@ -63,6 +63,7 @@ private:
     void      readEnvColors();
     void      readAreaNames();
     void      readAreas();
+    void      readVariables();
 
     void      readUnknownHostElement();
     void      readUnknownRoomElement();

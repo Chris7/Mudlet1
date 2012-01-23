@@ -19,7 +19,7 @@
 
 
 #include "XMLimport.h"
-
+#include "luaInterface.h"
 #include <QStringList>
 #include <QDebug>
 
@@ -436,6 +436,10 @@ void XMLimport::readPackage()
                 readKeyPackage();
                 continue;
             }
+            else if( name() == "Variables"){
+                readVariables();
+                continue;
+            }
             else
             {
                 readUnknownPackage();
@@ -627,6 +631,58 @@ void XMLimport::readTriggerPackage()
             else
             {
                 readUnknownTriggerElement();
+            }
+        }
+    }
+}
+
+void XMLimport::readVariables()
+{
+    QStringList varInfo;
+    QTreeWidgetItem * fake;
+    luaInterface * lI = new luaInterface(mpHost);
+    while( ! atEnd() )
+    {
+        readNext();
+        if( isEndElement() && name() != "variable")
+        {
+            break;
+        }
+        //qDebug()<<name();
+        if( isStartElement() )
+        {
+            if( name() == "name" )
+            {
+                varInfo.clear();
+                varInfo << readElementText();
+                continue;
+            }
+            else if( name() == "nameType" )
+            {
+                varInfo << readElementText();
+                continue;
+            }
+            else if( name() == "valueType" )
+            {
+                varInfo << readElementText();
+                continue;
+            }
+            else if( name() == "value" )
+            {
+                varInfo << readElementText();
+                continue;
+            }
+            else if( name() == "parentOrder" )
+            {
+                QStringList parents = readElementText().split("|");
+                parents.pop_back();
+                varInfo << parents;
+                lI->restoreVar(varInfo);
+                if (varInfo[2].toInt() == LUA_TTABLE)
+                    mpHost->savedVariables.insert(parents.join(""),fake);
+                else
+                    mpHost->savedVariables.insert(parents.join("")+varInfo[1]+varInfo[0],fake);
+                continue;
             }
         }
     }
