@@ -679,10 +679,10 @@ void XMLimport::readVariables()
                 varInfo << parents;
                 lI->restoreVar(varInfo);
                 for (int i=0;i<parents.size();i++){
-                    QString pName;
+                    QString pName = "";
                     for (int j=0;j==i;j++)
                         pName+=parents[j];
-                    if (pName && !mpHost->savedVariables.contains(pName))
+                    if (pName != "" && !mpHost->savedVariables.contains(pName))
                         mpHost->savedVariables.insert(pName,fake);
                 }
                 if (varInfo[2].toInt() == LUA_TTABLE)
