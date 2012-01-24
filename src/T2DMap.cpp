@@ -405,7 +405,7 @@ void T2DMap::switchArea(QString name)
         QString _n = it.value();
         if( name == _n )
         {
-            mAID = areaID;
+            //mAID = areaID;
             mShiftMode = true;
             mpMap->mViewArea = areaID;
             mOx = 0;
@@ -447,16 +447,16 @@ void T2DMap::drawMapInfo(bool gridMode, QTime __time, QPainter * p){
         (*p).drawText( 10, 4*mFontHeight, text );
     }
     else{
-        qDebug() << "Drawing Map Info";
+        //qDebug() << "Drawing Map Info";
         (*p).fillRect( 0,0,width(), 5*mFontHeight, QColor(150,150,150,80) );
         QString text;
         int __rid = mRID;
-        qDebug() << __rid;
+        //qDebug() << __rid;
         if( mRoomSelection > 0 && mpMap->rooms.contains( mRoomSelection ) )
         {
             __rid = mRoomSelection;
         }
-        qDebug() << mRoomSelection;
+//        qDebug() << mRoomSelection;
         if( mpMap->areaNamesMap.contains(__rid))
         {
             text = QString("Area: %1 ID:%2 x:%3-%4 y:%5-%6").arg(mpMap->areaNamesMap[mpMap->rooms[__rid]->area]).arg(mpMap->rooms[__rid]->area).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_x).arg(mpMap->areas[mpMap->rooms[__rid]->area]->min_y).arg(mpMap->areas[mpMap->rooms[__rid]->area]->max_y);
@@ -466,7 +466,7 @@ void T2DMap::drawMapInfo(bool gridMode, QTime __time, QPainter * p){
         (*p).drawText( 10, 2*mFontHeight, text );
         text = QString("Room ID: %1 Position on Map: (%2/%3/%4)").arg(QString::number(__rid)).arg(QString::number(mpMap->rooms[__rid]->x)).arg(QString::number(mpMap->rooms[__rid]->y)).arg(QString::number(mpMap->rooms[__rid]->z));
         (*p).drawText( 10, 3*mFontHeight, text );
-        qDebug() << "finished drawing";
+//        qDebug() << "finished drawing";
     }
 }
 
@@ -518,37 +518,41 @@ void T2DMap::paintEvent( QPaintEvent * e )
     if( (! __Pick && ! mShiftMode ) || mpMap->mNewMove || mpMap->mViewArea)
     {
         mShiftMode = true;
+        int recenter = 0;
         if( mpMap->rooms.contains(mpMap->mRoomId) )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
+        qDebug()<<"view area"<<mpMap->mViewArea;
+        qDebug()<<"area"<<mAID;
         if (mpMap->mViewArea){
-            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 ){
+            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() && mAID != mpMap->mViewArea){
                 oldId = mRID;
                 mRID = mpMap->areas[mpMap->mViewArea]->rooms.at(0);
+                recenter = 1;
+                mAID = mpMap->mViewArea;
             }
         }
-        else
+        else{
             mRID = mpMap->mRoomId;
-        mAID = mpMap->rooms[mRID]->area;
-        if (mpMap->mNewMove){//centerview will trigger this
+            mAID = mpMap->rooms[mRID]->area;
+        }
+        qDebug()<<"view area"<<mpMap->mViewArea;
+        qDebug()<<"area"<<mAID;
+        qDebug()<<mpMap->mNewMove;
+        qDebug()<<recenter;
+        if (mpMap->mNewMove || recenter){//centerview will trigger this
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
             mOx = ox;
             mOy = oy;
             mOz = mpMap->rooms[mRID]->z;
+            oz = mOz;
             mpMap->mNewMove = false; // das ist nur hier von Interesse, weil es nur hier einen map editor gibt -> map wird unter Umstaenden nicht geupdated, deshalb force ich mit mNewRoom ein map update bei centerview()
         }
         else{
-            if (mpMap->mViewArea){
-                ox = mpMap->rooms[mRID]->x;
-                oy = mpMap->rooms[mRID]->y*-1;
-                oz = mpMap->rooms[mRID]->z;
-            }
-            else{
-                ox = mOx;
-                oy = mOy;
-                oz = mOz;
-            }
+            ox = mOx;
+            oy = mOy;
+            oz = mOz;
         }
     }
     else

@@ -262,12 +262,8 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
             lua_pushnumber(L, newValue.toFloat());
             pInfo[1] = QString::number(LUA_TNUMBER);
         }
-        else if (newValue.toLower() == "true"){
-            lua_pushboolean(L, 1);
-            pInfo[1] = QString::number(LUA_TBOOLEAN);
-        }
-        else if (newValue.toLower() == "false"){
-            lua_pushboolean(L, 0);
+        else if (newValue.toLower() == "true" || newValue.toLower() == "false"){
+            lua_pushboolean(L, newValue.toLower()=="true"?1:0);
             pInfo[1] = QString::number(LUA_TBOOLEAN);
         }
         else{
