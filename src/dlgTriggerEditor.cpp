@@ -2431,6 +2431,8 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         //check if we have a table parent, we want to nest this new varaible under this table
         if( pType == LUA_TTABLE){
             pNewItem = new QTreeWidgetItem( pParent, nameL );
+            pNewItem->setCheckState(0, Qt::Unchecked);
+            pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
             pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
             if (isFolder)
                 pData[1] = QString::number(LUA_TTABLE);
@@ -2443,6 +2445,8 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         else if (pType == LUA_TSTRING){
             //we selected a variable, so we just add the variable at our current level, which is the same as above
             pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
+            pNewItem->setCheckState(0, Qt::Unchecked);
+            pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
             pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
             pData[1] = QString::number(LUA_TSTRING);
             pData[2] = "";
@@ -2462,6 +2466,8 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         else
             pData << QString::number(LUA_TSTRING);
         pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
+        pNewItem->setCheckState(0, Qt::Unchecked);
+        pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
         //pNewItem->
         pData << "";
         pData << "";
@@ -6037,6 +6043,8 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
         int checked = pItem->checkState(0);
         QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
         QString varName;
+        if (!itemInfo.size())
+            return;
         int itemType = itemInfo[1].toInt();
         for (int i=3;i<itemInfo.size();i++){
             varName+=itemInfo[i];

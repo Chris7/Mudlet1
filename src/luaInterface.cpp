@@ -262,6 +262,14 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
             lua_pushnumber(L, newValue.toFloat());
             pInfo[1] = QString::number(LUA_TNUMBER);
         }
+        else if (newValue.toLower() == "true"){
+            lua_pushboolean(L, 1);
+            pInfo[1] = QString::number(LUA_TBOOLEAN);
+        }
+        else if (newValue.toLower() == "false"){
+            lua_pushboolean(L, 0);
+            pInfo[1] = QString::number(LUA_TBOOLEAN);
+        }
         else{
             lua_pushstring(L, newValue.toLatin1().data());
             pInfo[1] = QString::number(LUA_TSTRING);
@@ -373,7 +381,11 @@ QString luaInterface::getValue(QTreeWidgetItem * pItem){
     else{
         lua_getglobal(L, kName.toLatin1().data());
     }
-    QString curValue = lua_tostring(L,-1);
+    QString curValue;
+    if (pInfo[1].toInt() == LUA_TBOOLEAN)
+        curValue = lua_toboolean(L, -1) == 0 ? "false" : "true";
+    else
+        curValue = lua_tostring(L,-1);
     lua_settop(L,startSize);
     pInfo[2] = curValue;
     pItem->setData(0, Qt::UserRole, pInfo);
@@ -409,9 +421,12 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide){
                 tables.append(newTable);
             }
         }
-        else if (vType == LUA_TSTRING || vType == LUA_TNUMBER){
+        else if (vType == LUA_TSTRING || vType == LUA_TNUMBER || vType == LUA_TBOOLEAN){
             lua_pushvalue(L,-1);
-            valueName = lua_tostring(L,-1);
+            if (vType == LUA_TBOOLEAN)
+                valueName = lua_toboolean(L, -1) == 0 ? "false" : "true";
+            else
+                valueName = lua_tostring(L,-1);
             if (hide)
                 hiddenVars[mpHost].insert(keyName);
             else{
