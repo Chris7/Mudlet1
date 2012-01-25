@@ -128,6 +128,7 @@ public:
     float m2DPanXStart;
     float m2DPanYStart;
     int mViewArea;
+    int mOldId;
     QMap<QString, mVarTypes> mVars;
     int mTargetID;
     QList<int> mPathList;

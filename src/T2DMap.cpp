@@ -408,9 +408,10 @@ void T2DMap::switchArea(QString name)
             //mAID = areaID;
             mShiftMode = true;
             mpMap->mViewArea = areaID;
-            mOx = 0;
+            mpMap->mOldId=0;
+            /*mOx = 0;
             mOy = 0;
-            mOz = 0;
+            mOz = 0;*/
             update();
             break;
         }
@@ -419,7 +420,7 @@ void T2DMap::switchArea(QString name)
 
 void T2DMap::drawPlayerLocation(QPointF _center, float _radius, QPainter * p){
     QRadialGradient _gradient(_center,_radius);
-    qDebug()<<_center;
+    //qDebug()<<_center;
     _gradient.setColorAt(0.95, QColor(255,0,0,150));
     _gradient.setColorAt(0.80, QColor(150,100,100,150));
     _gradient.setColorAt(0.799,QColor(150,100,100,100));
@@ -522,24 +523,19 @@ void T2DMap::paintEvent( QPaintEvent * e )
         if( mpMap->rooms.contains(mpMap->mRoomId) )
             if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
                 return;
-        qDebug()<<"view area"<<mpMap->mViewArea;
-        qDebug()<<"area"<<mAID;
         if (mpMap->mViewArea){
-            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() && mAID != mpMap->mViewArea){
-                oldId = mRID;
+            if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size()){
                 mRID = mpMap->areas[mpMap->mViewArea]->rooms.at(0);
-                recenter = 1;
-                mAID = mpMap->mViewArea;
+                if (mpMap->mOldId != mRID){
+                    mpMap->mOldId = mRID;
+                    recenter = 1;
+                }
             }
         }
         else{
             mRID = mpMap->mRoomId;
-            mAID = mpMap->rooms[mRID]->area;
         }
-        qDebug()<<"view area"<<mpMap->mViewArea;
-        qDebug()<<"area"<<mAID;
-        qDebug()<<mpMap->mNewMove;
-        qDebug()<<recenter;
+        mAID = mpMap->rooms[mRID]->area;
         if (mpMap->mNewMove || recenter){//centerview will trigger this
             ox = mpMap->rooms[mRID]->x;
             oy = mpMap->rooms[mRID]->y*-1;
@@ -1382,7 +1378,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     if( mShowInfo )
         drawMapInfo(pArea->gridMode, __time, &p);
     if( mMapInfoRect == QRect(0,0,0,0) ) mMapInfoRect = QRect(0,0,width(),height()/10);
-    qDebug()<<"px/py are :"<<px<<","<<py;
+    //qDebug()<<"px/py are :"<<px<<","<<py;
     if( ! mShiftMode )
     {
         if( mpHost->mMapStrongHighlight )
@@ -1441,7 +1437,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
     }
     if (mpMap->mViewArea){
         if( mpMap->areas.contains( mpMap->mViewArea ) && mpMap->areas[mpMap->mViewArea]->rooms.size() > 0 ){
-        mRID = oldId;//mpMap->mViewArea;
+        mRID = mpMap->mOldId;//mpMap->mViewArea;
         //mpMap->mViewArea=0;
         }
     }

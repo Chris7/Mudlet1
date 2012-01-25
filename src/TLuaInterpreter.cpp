@@ -1013,6 +1013,7 @@ int TLuaInterpreter::centerview( lua_State * L )
         pHost->mpMap->mRoomId = roomid;
         pHost->mpMap->mNewMove = true;
         pHost->mpMap->mViewArea=0;
+        pHost->mpMap->mOldId=0;
         if( pHost->mpMap->mpM && pHost->mpMap->mpM->isVisible())
             pHost->mpMap->mpM->update();
         if( pHost->mpMap->mpMapper)
