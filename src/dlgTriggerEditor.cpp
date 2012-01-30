@@ -1760,6 +1760,25 @@ void dlgTriggerEditor::slot_deleteVar()
     luaInterface * lI = new luaInterface(mpHost);
     QString dName = mpVarsMainArea->lineEdit_var_name->text();
     lI->deleteVar(pItem,dName);
+    QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
+    QString varName;
+    QMap<QString, QTreeWidgetItem *> varsToChange;
+    int itemType = itemInfo[1].toInt();
+    for (int i=3;i<itemInfo.size();i++){
+        varName+=itemInfo[i];
+    }
+    if (itemType != LUA_TTABLE){
+        varName+=itemInfo[0]+pItem->text(0);
+    }
+    if (mpHost->savedVariables.contains(varName)){
+        recurseVarTree(pItem, varsToChange);
+        QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
+        while (it.hasNext()){
+            it.next();
+            if (mpHost->savedVariables.contains(it.key()))
+                mpHost->savedVariables.remove(it.key());
+        }
+    }
     if( pParent )
     {
         pParent->removeChild( pItem );
@@ -5998,7 +6017,7 @@ void dlgTriggerEditor::slot_delete_item()
     };
 }
 
-void recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
+void dlgTriggerEditor::recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
     QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
     QString varName;
     int itemType = itemInfo[1].toInt();

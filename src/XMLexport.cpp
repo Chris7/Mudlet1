@@ -395,7 +395,7 @@ bool XMLexport::writeHost( Host * pT )
         ret = writeKey( pChildKey );
     }
     writeEndElement();
-    writeStartElement("Variables");
+    writeStartElement("VariablePackage");
     QMap<QString, QTreeWidgetItem *> savedVariables = mpHost->savedVariables;
     QMapIterator<QString, QTreeWidgetItem *> it(savedVariables);
     luaInterface * lI = new luaInterface(mpHost);

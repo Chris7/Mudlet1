@@ -189,6 +189,7 @@ public slots:
     void                        slot_color_trigger_bg();
     void                        repopulateVars();
     void                        resetForm();
+    void                        recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList);
 
 private:
 

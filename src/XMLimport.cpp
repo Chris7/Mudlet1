@@ -436,7 +436,7 @@ void XMLimport::readPackage()
                 readKeyPackage();
                 continue;
             }
-            else if( name() == "Variables"){
+            else if( name() == "VariablePackage"){
                 readVariables();
                 continue;
             }
@@ -655,6 +655,7 @@ void XMLimport::readVariables()
             {
                 varInfo.clear();
                 varInfo << readElementText();
+                qDebug()<<"reading in variable"<<varInfo;
                 continue;
             }
             else if( name() == "nameType" )

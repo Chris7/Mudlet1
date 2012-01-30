@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <QtGui>
-#include <QtOpenGL/qgl.h>
 //#include <QtOpenGL/qgl.h> //problem with git
 #include <math.h>
 #include <QDebug>
