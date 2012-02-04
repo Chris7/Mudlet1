@@ -25,6 +25,7 @@
 #include "Host.h"
 #include "HostManager.h"
 #include "TDebug.h"
+#include "luaInterface.h"
 
 TTreeWidget::TTreeWidget( QWidget * pW ) : QTreeWidget( pW )
 {
@@ -45,6 +46,18 @@ TTreeWidget::TTreeWidget( QWidget * pW ) : QTreeWidget( pW )
     mIsAliasTree = false;
     mIsActionTree = false;
     mIsKeyTree = false;
+    mIsVarTree = false;
+}
+
+void TTreeWidget::setIsVarTree()
+{
+    mIsAliasTree = false;
+    mIsTriggerTree = false;
+    mIsScriptTree = false;
+    mIsTimerTree = false;
+    mIsActionTree = false;
+    mIsKeyTree = false;
+    mIsVarTree = true;
 }
 
 void TTreeWidget::setIsAliasTree()
@@ -55,6 +68,7 @@ void TTreeWidget::setIsAliasTree()
     mIsTimerTree = false;
     mIsActionTree = false;
     mIsKeyTree = false;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setIsTriggerTree()
@@ -65,6 +79,7 @@ void TTreeWidget::setIsTriggerTree()
     mIsTimerTree = false;
     mIsActionTree = false;
     mIsKeyTree = false;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setIsActionTree()
@@ -75,6 +90,7 @@ void TTreeWidget::setIsActionTree()
     mIsTimerTree = false;
     mIsKeyTree = false;
     mIsActionTree = true;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setIsKeyTree()
@@ -85,6 +101,7 @@ void TTreeWidget::setIsKeyTree()
     mIsTimerTree = false;
     mIsActionTree = false;
     mIsKeyTree = true;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setIsTimerTree()
@@ -95,6 +112,7 @@ void TTreeWidget::setIsTimerTree()
     mIsAliasTree = false;
     mIsActionTree = false;
     mIsKeyTree = false;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setIsScriptTree()
@@ -105,6 +123,7 @@ void TTreeWidget::setIsScriptTree()
     mIsTimerTree = false;
     mIsActionTree = false;
     mIsKeyTree = false;
+    mIsVarTree = false;
 }
 
 void TTreeWidget::setHost( Host * pH )
@@ -114,6 +133,7 @@ void TTreeWidget::setHost( Host * pH )
 
 void TTreeWidget::rowsAboutToBeRemoved( const QModelIndex & parent, int start, int end )
 {
+    oldModel = parent;
     if( parent.isValid() )
     {
         mOldParentID = parent.data( Qt::UserRole ).toInt();
@@ -147,6 +167,21 @@ void TTreeWidget::rowsAboutToBeRemoved( const QModelIndex & parent, int start, i
     //QTreeWidget::rowsAboutToBeRemoved( parent, start, end );
 }
 
+void recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
+    QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
+    QString varName;
+    int itemType = itemInfo[1].toInt();
+    for (int i=3;i<itemInfo.size();i++){
+        varName+=itemInfo[i];
+    }
+    if (itemType != LUA_TTABLE){
+        varName+=itemInfo[0]+pItem->text(0);
+    }
+    varList.insert(varName, pItem);
+    for(int i=0;i<pItem->childCount();++i)
+        recurseVarTree(pItem->child(i), varList);
+}
+
 
 void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
 {
@@ -164,6 +199,83 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
             mChildID = parent.model()->index( start, 0 ).data( Qt::UserRole ).toInt();
         }
         int newParentID = parent.data( Qt::UserRole ).toInt();
+        if (mIsVarTree){
+            //mpHost->reParentTrigger( mChildID, mOldParentID, newParentID, parentPosition, childPosition );
+            QTreeWidgetItem * newpItem = itemFromIndex(parent);
+            QTreeWidgetItem * cItem = itemFromIndex(child);
+            QTreeWidgetItem * oldpItem = itemFromIndex(oldModel);
+            //qDebug()<<newpItem->data(0, Qt::UserRole).toStringList();
+            //qDebug()<<cItem->data(0, Qt::UserRole).toStringList();
+            if (!oldpItem)
+                return;
+            //qDebug()<<oldpItem->data(0, Qt::UserRole).toStringList();
+            QStringList oldInfo = oldpItem->data(0, Qt::UserRole).toStringList();
+            QStringList oldRoot;
+            for (int i=3;i<oldInfo.size();i++){
+                if (oldInfo[i] != "")
+                    oldRoot << oldInfo[i];
+            }
+            QStringList newInfo = newpItem->data(0, Qt::UserRole).toStringList();
+            QStringList newRoot;
+            for (int i=3;i<newInfo.size();i++){
+                if (newInfo[i] != "")
+                    newRoot << newInfo[i];
+            }
+            //delete everything from cItem
+            luaInterface * lI = new luaInterface(mpHost);
+            QString dName = cItem->text(0);
+            QStringList itemInfo = cItem->data(0, Qt::UserRole).toStringList();
+            QString varName;
+            QMap<QString, QTreeWidgetItem *> varsToChange;
+            int itemType = itemInfo[1].toInt();
+            for (int i=3;i<itemInfo.size();i++){
+                varName+=itemInfo[i];
+            }
+            if (itemType != LUA_TTABLE){
+                varName+=itemInfo[0]+cItem->text(0);
+            }
+            recurseVarTree(cItem, varsToChange);
+            qDebug()<<varsToChange;
+            lI->deleteVar(cItem,dName);
+            QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
+            while (it.hasNext()){
+                it.next();
+                qDebug()<<it.key();
+                QTreeWidgetItem * pI = it.value();
+                //lI->deleteVar(pI,pI->text(0));
+                QStringList itemInfo = pI->data(0, Qt::UserRole).toStringList();
+                QStringList newItemInfo;
+                newItemInfo = itemInfo;
+                for (int i=0;i<oldRoot.size();i++){
+                    newItemInfo.removeAt(3+i);
+                }
+                for (int i=0;i<newRoot.size();i++){
+                    newItemInfo.insert(3+i,newRoot[i]);
+                }
+               // if (newItemInfo[1].toInt() == LUA_TTABLE)
+                 //   newItemInfo.removeLast();
+                //qDebug()<<itemInfo;
+                //qDebug()<<newItemInfo;
+                qDebug()<<pI->text(0);
+                pI->setData(0, Qt::UserRole, newItemInfo);
+                newItemInfo.prepend(pI->text(0));
+                //lI->saveVar(pI, pI->text(0), newItemInfo[2],1);
+                lI->restoreVar(newItemInfo);
+                if (mpHost->savedVariables.contains(it.key())){
+                    mpHost->savedVariables.remove(it.key());
+                    varName = "";
+                    int itemType = newItemInfo[1].toInt();
+                    for (int i=3;i<newItemInfo.size();i++){
+                        varName+=newItemInfo[i];
+                    }
+                    if (itemType != LUA_TTABLE){
+                        varName+=newItemInfo[0]+pI->text(0);
+                    }
+                    mpHost->savedVariables.insert(varName, pI);
+                }
+            }
+            qDebug()<<"OLD TEST"<<oldpItem->text(0);
+        }
         if( mIsTriggerTree )
             mpHost->getTriggerUnit()->reParentTrigger( mChildID, mOldParentID, newParentID, parentPosition, childPosition );
         if( mIsAliasTree )

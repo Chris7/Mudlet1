@@ -86,7 +86,7 @@ const QString msgInfoAddKey = "To add a new key binding <b>1.</b> add a new key 
                               "<b>3.</b> Define a command that is executed when the key is hit. <b>4. <u>Activate</b></u> the new key binding." \
                               "Check the manual for <a href='http://mudlet.sourceforge.net/mudlet_documentation.html'>more information</a>";
 
-const QString msgInfoAddVar = "Add a new variable (can be a string or integer).";
+const QString msgInfoAddVar = "Add a new variable (can be a string, integer, boolean -- delete a variable to set it to nil).";
 
 dlgTriggerEditor::dlgTriggerEditor( Host * pH )
 : mCurrentAlias( 0 )
@@ -150,7 +150,6 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     QSizePolicy sizePolicy8(QSizePolicy::Expanding, QSizePolicy::Fixed);
     mpAliasMainArea->setSizePolicy( sizePolicy8 );
     pVB1->addWidget( mpAliasMainArea );
-
     mpActionsMainArea = new dlgActionMainArea( mainArea );
     //QSizePolicy sizePolicy8(QSizePolicy::Expanding, QSizePolicy::Fixed);
     mpActionsMainArea->setSizePolicy( sizePolicy8 );
@@ -275,7 +274,7 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
 
     treeWidget_vars->hide();
     treeWidget_vars->setHost( mpHost );
-    treeWidget_vars->setIsTimerTree();
+    treeWidget_vars->setIsVarTree();
     treeWidget_vars->setColumnCount(1);
     treeWidget_vars->header()->hide();
     treeWidget_vars->setRootIsDecorated( false );
@@ -2450,6 +2449,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         //check if we have a table parent, we want to nest this new varaible under this table
         if( pType == LUA_TTABLE){
             pNewItem = new QTreeWidgetItem( pParent, nameL );
+            pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
             pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
             pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
@@ -2464,6 +2464,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         else if (pType == LUA_TSTRING){
             //we selected a variable, so we just add the variable at our current level, which is the same as above
             pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
+            pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
             pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
             pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
@@ -2485,6 +2486,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         else
             pData << QString::number(LUA_TSTRING);
         pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
+        pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
         pNewItem->setCheckState(0, Qt::Unchecked);
         pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
         //pNewItem->
@@ -3976,7 +3978,7 @@ void dlgTriggerEditor::saveVar(){
     luaInterface * lI = new luaInterface(mpHost);
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
-    lI->saveVar(pItem,newName, newValue);
+    lI->saveVar(pItem,newName, newValue, 0);
 }
 
 void dlgTriggerEditor::saveKey()

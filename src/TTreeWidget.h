@@ -41,6 +41,7 @@ public:
     void rowsAboutToBeRemoved ( const QModelIndex & parent, int start, int end );   
     void rowsInserted( const QModelIndex & parent, int start, int end );
     void setHost( Host * pH );
+    void setIsVarTree();
     void setIsScriptTree();
     void setIsTimerTree();
     void setIsTriggerTree();
@@ -61,6 +62,8 @@ private:
     bool mIsTimerTree;
     bool mIsKeyTree;
     bool mIsActionTree;
+    bool mIsVarTree;
+    QModelIndex oldModel;
     
     
 signals:
