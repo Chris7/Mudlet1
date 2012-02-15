@@ -396,14 +396,18 @@ bool XMLexport::writeHost( Host * pT )
     }
     writeEndElement();
     writeStartElement("VariablePackage");
+    //we need to do this because the treewidget items need to be setup else we seg fault if the user never opens the variable menu
+    mpHost->mpEditorDialog->repopulateVars();
     QMap<QString, QTreeWidgetItem *> savedVariables = mpHost->savedVariables;
     QMapIterator<QString, QTreeWidgetItem *> it(savedVariables);
     luaInterface * lI = new luaInterface(mpHost);
     while (it.hasNext()){
         it.next();
-        writeStartElement("variable");
-        QString value = lI->getValue(it.value());
         QStringList info = it.value()->data(0, Qt::UserRole).toStringList();
+        QString value = "";
+        if (QString(info[1]).toInt() != LUA_TTABLE)
+             value = lI->getValue(it.value());
+        writeStartElement("variable");
         writeTextElement( "name", it.value()->text(0) );
         writeTextElement( "nameType", info[0] );
         writeTextElement( "valueType", info[1] );

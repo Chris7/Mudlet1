@@ -167,7 +167,7 @@ void TTreeWidget::rowsAboutToBeRemoved( const QModelIndex & parent, int start, i
     //QTreeWidget::rowsAboutToBeRemoved( parent, start, end );
 }
 
-void recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
+void TTreeWidget::recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList){
     QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
     QString varName;
     int itemType = itemInfo[1].toInt();

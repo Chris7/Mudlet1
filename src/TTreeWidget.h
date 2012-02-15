@@ -49,6 +49,7 @@ public:
     void setIsActionTree();
     void setIsKeyTree();
     void beginInsertRows ( const QModelIndex & parent, int first, int last );
+    void recurseVarTree(QTreeWidgetItem * pItem, QMap<QString, QTreeWidgetItem *> &varList);
     
 private:
     

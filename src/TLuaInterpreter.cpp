@@ -6682,9 +6682,33 @@ int TLuaInterpreter::highlightRoom( lua_State * L )
             pHost->mpMap->mpMapper->mp2dMap->update();
     return 0;
 }
+/*
+   Function: createMapLabel
 
+   Adds a new label to the map
 
-// labelID = createMapLabel( area, text, posx, posy, fgRed, fgGreen, fgBlue, bgRed, bgGreen, bgBlue )
+   Parameters:
+
+      area - Area ID
+      text - Label text
+      posx - X Coordinate for Label
+      posy - Y Coordinate for Label
+      posz - Z Coordinate for Label
+      fgRed - Foreground Intensity of Red Channel (0-255)
+      fgGreen - Foreground Intensity of Green Channel (0-255)
+      fgBlue - Foreground Intensity of Blue Channel (0-255)
+      bgRed - Background Intensity of Red Channel (0-255)
+      bgGreen - Background Intensity of Green Channel (0-255)
+      bgBlue - Background Intensity of Blue Channel (0-255)
+
+   Returns:
+
+      Nothing
+
+   See Also:
+
+      <deleteMapLabel>
+*/
 int TLuaInterpreter::createMapLabel( lua_State * L )
 {
     int area, fgr, fgg, fgb, bgr, bgg, bgb;
@@ -6818,7 +6842,25 @@ int TLuaInterpreter::createMapLabel( lua_State * L )
     lua_pushinteger( L, pHost->mpMap->createMapLabel( area, _text, posx, posy, posz, fg, bg ) );
     return 1;
 }
+/*
+   Function: deleteMapLabel
 
+   Removes a map label
+
+   Parameters:
+
+      area - Area ID
+      labelID - Label ID
+
+
+   Returns:
+
+      Nothing
+
+   See Also:
+
+      <createMapLabel>
+*/
 int TLuaInterpreter::deleteMapLabel( lua_State * L )
 {
     int area, labelID;

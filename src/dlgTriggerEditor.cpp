@@ -2428,12 +2428,15 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     else name = "NewVariable";
     QStringList nameL;
     nameL << name;
-    QTreeWidgetItem * pParent = (QTreeWidgetItem*)treeWidget_vars->currentItem();
+    QTreeWidgetItem * cItem = (QTreeWidgetItem*)treeWidget_vars->currentItem();
+    QTreeWidgetItem * pParent = cItem->parent();
+    QStringList pData = pParent->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
+    if (!pData.size())
+        pParent = 0;
     QTreeWidgetItem * pNewItem = 0;
     if( pParent )
     {
         //goto ROOT_KEY;
-        QStringList pData = pParent->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
         qDebug()<<"in pParent with"<<pData;
         if (!pData.size()){
             //at root
@@ -2476,10 +2479,41 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         else
             goto ROOT_KEY;
     }
+    else if (cItem){
+        pData = cItem->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
+        if (!pData.size()){
+            //at root
+            pData<<QString::number(LUA_TSTRING); //we can only add string keys
+            if (isFolder)
+                pData << QString::number(LUA_TTABLE);
+            else
+                pData << QString::number(LUA_TSTRING);
+            pData << "";
+            pData << "";
+        }
+        int pType = QString(pData[1]).toInt();
+        //check if we have a table parent, we want to nest this new varaible under this table
+        if( pType == LUA_TTABLE){
+            pNewItem = new QTreeWidgetItem( cItem, nameL );
+            pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
+            pNewItem->setCheckState(0, Qt::Unchecked);
+            pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
+            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
+            if (isFolder)
+                pData[1] = QString::number(LUA_TTABLE);
+            else
+                pData[1] = QString::number(LUA_TSTRING);
+            pData[2] = "";
+            pNewItem->setData( 0, Qt::UserRole, pData);
+            cItem->insertChild( 0, pNewItem );
+        }
+        else
+            goto ROOT_KEY;
+    }
     else{
         //insert a new root item
     ROOT_KEY:
-        QStringList pData;
+        pData.clear();
         pData << QString::number(LUA_TSTRING); //we can only add string keys
         if (isFolder)
             pData << QString::number(LUA_TTABLE);
@@ -5066,6 +5100,7 @@ void dlgTriggerEditor::repopulateVars(){
     //mainIcon5.addPixmap(QPixmap(QString::fromUtf8(":/icons/bookmarks.png")), QIcon::Normal, QIcon::Off);
     //mpVarBaseItem->setIcon( 0, mainIcon5 );
     treeWidget_vars->clear();
+    mCurrentVar = 0;
     treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
     mpVarBaseItem->setExpanded( true );
     luaInterface * lI = new luaInterface(mpHost);

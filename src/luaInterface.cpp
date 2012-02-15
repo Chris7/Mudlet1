@@ -188,6 +188,8 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
     QTreeWidgetItem* pParent = pItem->parent();
+    if (pItem == NULL || !(pItem->columnCount()))
+        return;
     QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
     if (!pParent)
         return;
@@ -329,6 +331,8 @@ void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList
 }
 
 QString luaInterface::getValue(QTreeWidgetItem * pItem){
+    if (pItem == NULL)
+        return "";
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
     QTreeWidgetItem* pParent = pItem->parent();
