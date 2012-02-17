@@ -1460,7 +1460,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
     if (mpMap->mLeftDown){
         mpMap->mLeftDown = false;
         mpMap->m2DPanMode=false;
-        if( event->buttons() && event->modifiers().testFlag(Qt::ControlModifier))
+        if(event->modifiers().testFlag(Qt::ControlModifier))
         {
             if( mCustomLinesRoomFrom > 0 )
             {
@@ -1481,7 +1481,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                     float mx = event->pos().x()/mTX + mOx;
                     float my = event->pos().y()/mTY + mOy;
                     mx = mx - xspan/2;
-                    my = yspan/2 - my;;
+                    my = yspan/2 - my;
                     mpMap->rooms[mCustomLinesRoomFrom]->customLines[mCustomLinesRoomExit].push_back( QPointF( mx, my ) );
                 }
                 repaint();
