@@ -2430,7 +2430,9 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     nameL << name;
     QTreeWidgetItem * cItem = (QTreeWidgetItem*)treeWidget_vars->currentItem();
     QTreeWidgetItem * pParent = cItem->parent();
-    QStringList pData = pParent->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
+    QStringList pData;
+    if (pParent)
+        pData = pParent->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
     if (!pData.size())
         pParent = 0;
     QTreeWidgetItem * pNewItem = 0;
@@ -2438,6 +2440,11 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     {
         //goto ROOT_KEY;
         qDebug()<<"in pParent with"<<pData;
+        QStringList cData = cItem->data(0, Qt::UserRole).toStringList();
+        if (cData.size() && (QString(cData[1]).toInt()==LUA_TTABLE)){
+            pParent=cItem;
+            pData=cData;
+        }
         if (!pData.size()){
             //at root
             pData<<QString::number(LUA_TSTRING); //we can only add string keys
