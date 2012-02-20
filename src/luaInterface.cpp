@@ -630,8 +630,8 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                         }
                         else
                             pI->setCheckState(0, Qt::Unchecked);
-                        if (showHidden || !mpHost->isHiddenVariable(pItem))
-                            itemsToAdd.append(pItem );
+                        if (showHidden || !mpHost->isHiddenVariable(pI))
+                            itemsToAdd.append(pI );
                     }
                 }
                 if (itemsToAdd.size()){
@@ -685,8 +685,8 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                             }
                             else
                                 pI->setCheckState(0, Qt::Unchecked);
-                            if (showHidden || !mpHost->isHiddenVariable(pItem))
-                                itemsToAdd.append(pItem );
+                            if (showHidden || !mpHost->isHiddenVariable(pI))
+                                itemsToAdd.append(pI );
                         }
                     }
                     if (itemsToAdd.size()){

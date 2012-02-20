@@ -325,8 +325,6 @@ void Host::setHiddenVariable(QTreeWidgetItem * pItem, int status){
     QString pValue;
     for (int i=3;i<pData.size();i++)
         pValue += pData[i];
-    qDebug()<<pData;
-    qDebug()<<pValue;
     if (QString(pData[1]).toInt() != LUA_TTABLE)
         pValue += pData[0]+pItem->text(0);
     if (status)
