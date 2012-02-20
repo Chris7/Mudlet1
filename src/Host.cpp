@@ -300,6 +300,42 @@ Host::~Host()
     mErrorLogFile.close();
 }
 
+void Host::addHiddenVars(QSet<QString> vars){
+    QSetIterator<QString> it = QSetIterator<QString>(vars);
+    while (it.hasNext())
+        hiddenVariables.insert(it.next());
+}
+
+int Host::isHiddenVariable(QTreeWidgetItem * pItem){
+    QStringList pData = pItem->data(0, Qt::UserRole).toStringList();
+    if (!pData.size())
+        return 0;
+    QString pValue;
+    for (int i=3;i<pData.size();i++)
+        pValue += pData[i];
+    if (QString(pData[1]).toInt() != LUA_TTABLE)
+        pValue += pData[0]+pItem->text(0);
+    return hiddenVariables.contains(pValue);
+}
+
+void Host::setHiddenVariable(QTreeWidgetItem * pItem, int status){
+    QStringList pData = pItem->data(0, Qt::UserRole).toStringList();
+    if (!pData.size())
+        return;
+    QString pValue;
+    for (int i=3;i<pData.size();i++)
+        pValue += pData[i];
+    qDebug()<<pData;
+    qDebug()<<pValue;
+    if (QString(pData[1]).toInt() != LUA_TTABLE)
+        pValue += pData[0]+pItem->text(0);
+    if (status)
+        hiddenVariables.insert(pValue);
+    else
+        hiddenVariables.remove(pValue);
+
+}
+
 void Host::saveModules(int sync){
     if (mModuleSaveBlock){
         qDebug()<<"MODULES SAVING DISABLED UNTIL RELOAD";

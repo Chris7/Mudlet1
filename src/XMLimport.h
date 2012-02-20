@@ -64,6 +64,7 @@ private:
     void      readAreaNames();
     void      readAreas();
     void      readVariables();
+    void      readHiddenVariables();
 
     void      readUnknownHostElement();
     void      readUnknownRoomElement();

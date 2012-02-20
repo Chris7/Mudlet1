@@ -94,6 +94,7 @@ signals:
     void                        update();
 
 public slots:
+    void                        toggleHiddenVars();
     void                        slot_viewErrorsAction();
     void                        slot_cursorPositionChanged();
     void                        slot_set_pattern_type_color( int );
@@ -283,6 +284,7 @@ private:
     //QsciDocument                mDocument;
     Host *                      mpHost;
     QList<dlgTriggerPatternEdit *> mTriggerPatternEdit;
+    bool                        showHiddenVars;
 };
 
 #endif

@@ -440,6 +440,10 @@ void XMLimport::readPackage()
                 readVariables();
                 continue;
             }
+            else if( name() == "HiddenVariablePackage"){
+                readHiddenVariables();
+                continue;
+            }
             else
             {
                 readUnknownPackage();
@@ -690,6 +694,28 @@ void XMLimport::readVariables()
                     mpHost->savedVariables.insert(parents.join(""),fake);
                 else
                     mpHost->savedVariables.insert(parents.join("")+varInfo[1]+varInfo[0],fake);
+                continue;
+            }
+        }
+    }
+}
+
+void XMLimport::readHiddenVariables()
+{
+    QString varInfo;
+    while( ! atEnd() )
+    {
+        readNext();
+        if( isEndElement() && name() != "variable")
+        {
+            break;
+        }
+        if( isStartElement() )
+        {
+            if( name() == "name" )
+            {
+                varInfo = readElementText();
+                mpHost->hiddenVariables.insert(varInfo);
                 continue;
             }
         }

@@ -52,6 +52,7 @@ class TLuaInterpreter;
 #include "TMap.h"
 #include <QListWidget>
 #include <QTreeWidgetItem>
+#include "luaInterface.h"
 
 class dlgTriggerEditor;
 class TConsole;
@@ -141,6 +142,9 @@ public:
     void               set_USE_IRE_DRIVER_BUGFIX( bool b ){ mUSE_IRE_DRIVER_BUGFIX = b; mTelnet.set_USE_IRE_DRIVER_BUGFIX( b ); }
     void               set_LF_ON_GA( bool b ){ mLF_ON_GA = b; mTelnet.set_LF_ON_GA( b ); }
     void               adjustNAWS();
+    void               addHiddenVars(QSet<QString>);
+    int                isHiddenVariable(QTreeWidgetItem *);
+    void               setHiddenVariable(QTreeWidgetItem *, int);
     class              Exception_NoLogin{};
     class              Exception_NoConnectionAvailable{};
 
@@ -306,6 +310,7 @@ public:
     bool               mMapperUseAntiAlias;
     bool               mFORCE_MXP_NEGOTIATION_OFF;
     QMap<QString, QTreeWidgetItem *>   savedVariables;
+    QSet<QString>      hiddenVariables;
 
 private:
     Host();

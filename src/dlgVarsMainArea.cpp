@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <QWidget>
+#include <QMenu>
 
 
 #include "dlgVarsMainArea.h"
@@ -27,5 +28,19 @@ dlgVarsMainArea::dlgVarsMainArea(QWidget * pF) : QWidget(pF)
 {
     // init generated dialog
     setupUi(this);
+    var_type->setText("Variable Name Type");
+    var_type->setPopupMode(QToolButton::InstantPopup);
+    QMenu * varTypeMenu = new QMenu(var_type);
+    varTypeMenu->addAction("String(default)");
+    varTypeMenu->addAction("Integer");
+    var_type->setMenu(varTypeMenu);
+    value_type->setText("Variable Value Type");
+    value_type->setPopupMode(QToolButton::InstantPopup);
+    QMenu * valueTypeMenu = new QMenu(value_type);
+    valueTypeMenu->addAction("String(default)");
+    valueTypeMenu->addAction("Integer");
+    valueTypeMenu->addAction("Boolean");
+    value_type->setMenu(valueTypeMenu);
+    hideVariable->setText("Hidden Variable");
 }
 

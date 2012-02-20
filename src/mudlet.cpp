@@ -1912,7 +1912,7 @@ void mudlet::doAutoLogin( QString & profile_name )
     QStringList test;
     test << "test";
     QTreeWidgetItem * fake = new QTreeWidgetItem( test);
-    lI->getVars(fake, 1);
+    lI->getVars(fake, 1, false);
     if( entries.size() > 0 )
     {
         QFile file(folder+"/"+entries[0]);

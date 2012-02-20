@@ -423,6 +423,17 @@ bool XMLexport::writeHost( Host * pT )
         }
     }
     writeEndElement();
+    writeStartElement("HiddenVariablePackage");
+    if (mpHost->mpEditorDialog){
+        QSet<QString> hiddenVariables = mpHost->hiddenVariables;
+        QSetIterator<QString> it(hiddenVariables);
+        while (it.hasNext()){
+            writeStartElement("variable");
+            writeTextElement( "name", it.next() );
+            writeEndElement();
+        }
+    }
+    writeEndElement();
     return ret;
 }
 
