@@ -354,11 +354,11 @@ void Host::saveModules(int sync){
         //move the old file, use the key (module name) as the file
         savePath.rename(filename_xml,dirName+it.key()+time);
         QFile file_xml( filename_xml );
-        qDebug()<<"writing module xml for:"<<entry[0];
+        //qDebug()<<"writing module xml for:"<<entry[0];
         if ( file_xml.open( QIODevice::WriteOnly ) )
         {
             XMLexport writer(this);
-            qDebug()<<"successfully wrote module xml for:"<<entry[0];
+          //  qDebug()<<"successfully wrote module xml for:"<<entry[0];
             writer.writeModuleXML( & file_xml, it.key());
             file_xml.close();
             if (entry[1].toInt())
@@ -395,12 +395,12 @@ void Host::saveModules(int sync){
             QMapIterator<int, QStringList> it4(moduleOrder);
             while(it4.hasNext()){
                 it4.next();
-                qDebug()<<"On priority "<<it4.key();
+                //qDebug()<<"On priority "<<it4.key();
                 QStringList moduleList = it4.value();
                 for(int i=0;i<moduleList.size();i++){
                     QString moduleName = moduleList[i];
                     if (modulesToSync.contains(moduleName)){
-                        qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
+                        //qDebug()<<"synchronizing module:"<<moduleName<<" in profile:"<<host->mHostName;
                         host->reloadModule(moduleName);
                     }
                 }

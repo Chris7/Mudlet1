@@ -1798,7 +1798,6 @@ void dlgTriggerEditor::slot_deleteVar()
         qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAction() child to be deleted doesnt have a parent";
     }
     mCurrentVar = 0;
-
 }
 
 void dlgTriggerEditor::slot_deleteScript()
@@ -2435,8 +2434,14 @@ void dlgTriggerEditor::addTimer( bool isFolder )
 void dlgTriggerEditor::addVar( bool isFolder ){
     saveVar();
     QString name;
-    if (isFolder) name="NewTable";
-    else name = "NewVariable";
+    if (isFolder){
+        mpVarsMainArea->lineEdit_var_value->setReadOnly(true);
+        name="NewTable";
+    }
+    else{
+        mpVarsMainArea->lineEdit_var_value->setReadOnly(false);
+        name = "NewVariable";
+    }
     QStringList nameL;
     nameL << name;
     QTreeWidgetItem * cItem = (QTreeWidgetItem*)treeWidget_vars->currentItem();
@@ -2450,7 +2455,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     if( pParent )
     {
         //goto ROOT_KEY;
-        qDebug()<<"in pParent with"<<pData;
+        //qDebug()<<"in pParent with"<<pData;
         QStringList cData = cItem->data(0, Qt::UserRole).toStringList();
         if (cData.size() && (QString(cData[1]).toInt()==LUA_TTABLE)){
             pParent=cItem;
@@ -2478,7 +2483,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
                 pData[1] = QString::number(LUA_TTABLE);
             else
                 pData[1] = QString::number(LUA_TSTRING);
-            pData[2] = "";
+            pData[2] = "NewTable";
             pNewItem->setData( 0, Qt::UserRole, pData);
             pParent->insertChild( 0, pNewItem );
         }
@@ -2521,7 +2526,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
                 pData[1] = QString::number(LUA_TTABLE);
             else
                 pData[1] = QString::number(LUA_TSTRING);
-            pData[2] = "";
+            pData[2] = "NewTable";
             pNewItem->setData( 0, Qt::UserRole, pData);
             cItem->insertChild( 0, pNewItem );
         }
@@ -2533,16 +2538,19 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     ROOT_KEY:
         pData.clear();
         pData << QString::number(LUA_TSTRING); //we can only add string keys
-        if (isFolder)
+        if (isFolder){
             pData << QString::number(LUA_TTABLE);
-        else
+            pData << "NewTable";
+        }
+        else{
             pData << QString::number(LUA_TSTRING);
+            pData << "";
+        }
         pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
         pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
         pNewItem->setCheckState(0, Qt::Unchecked);
         pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
         //pNewItem->
-        pData << "";
         pData << "";
         pNewItem->setData(0, Qt::UserRole, pData);
         treeWidget_vars->insertTopLevelItem( 0, pNewItem );
@@ -4828,8 +4836,6 @@ void dlgTriggerEditor::fillout_form()
         sList << s;
         QTreeWidgetItem * pItem = new QTreeWidgetItem( mpScriptsBaseItem, sList);
         pItem->setData( 0, Qt::UserRole, QVariant(pT->getID()) );
-        qDebug()<<sList;
-        qDebug()<<pT->getID();
         mpScriptsBaseItem->addChild( pItem );
         QIcon icon;
         if( pT->hasChildren() )
@@ -5130,7 +5136,7 @@ void dlgTriggerEditor::repopulateVars(){
     treeWidget_vars->insertTopLevelItem( 0, mpVarBaseItem );
     mpVarBaseItem->setExpanded( true );
     luaInterface * lI = new luaInterface(mpHost);
-    qDebug()<<showHiddenVars;
+    //qDebug()<<showHiddenVars;
     lI->getVars(mpVarBaseItem, 0, showHiddenVars);
     mpVarBaseItem->setExpanded( true );
     treeWidget_vars->sortItems(0, Qt::AscendingOrder);
@@ -6152,7 +6158,7 @@ void dlgTriggerEditor::slot_itemClicked( QTreeWidgetItem * pItem, int column )
                 }
             }
         }
-        qDebug()<<mpHost->savedVariables;
+        //qDebug()<<mpHost->savedVariables;
         break;
     }
     }
@@ -6653,7 +6659,7 @@ void dlgTriggerEditor::slot_profileSaveAction()
         XMLexport writer( mpHost );
         writer.exportHost( & file_xml );
         file_xml.close();
-        qDebug()<<"saving modules";
+        //qDebug()<<"saving modules";
         mpHost->saveModules(1);
     }
     else

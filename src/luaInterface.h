@@ -42,6 +42,12 @@ class luaInterface{
 
 public:
     luaInterface( Host * mpHost);
+    int pushVariable(lua_State* L, int varType, QString varName);
+    int pushVariable(lua_State* L, QTreeWidgetItem * pItem);
+    int getVariable(lua_State* L, QStringList varInfo);
+    int getVariable(lua_State* L, QTreeWidgetItem * pItem);
+    void deleteVar(lua_State* L, QTreeWidgetItem * pItem);
+    void renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString newName);
     void getVars(QTreeWidgetItem *, int hide, bool showHidden);
     void saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue, int force);
     void iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList);

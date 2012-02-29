@@ -260,6 +260,7 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
                 pI->setData(0, Qt::UserRole, newItemInfo);
                 newItemInfo.prepend(pI->text(0));
                 //lI->saveVar(pI, pI->text(0), newItemInfo[2],1);
+                qDebug()<<"restoring"<<newItemInfo;
                 lI->restoreVar(newItemInfo);
                 if (mpHost->savedVariables.contains(it.key())){
                     mpHost->savedVariables.remove(it.key());
