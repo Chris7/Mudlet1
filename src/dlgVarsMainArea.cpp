@@ -28,7 +28,7 @@ dlgVarsMainArea::dlgVarsMainArea(QWidget * pF) : QWidget(pF)
 {
     // init generated dialog
     setupUi(this);
-    var_type->setText("Variable Name Type");
+    /*var_type->setText("Variable Name Type");
     var_type->setPopupMode(QToolButton::InstantPopup);
     QMenu * varTypeMenu = new QMenu(var_type);
     varTypeMenu->addAction("String(default)");
@@ -41,6 +41,6 @@ dlgVarsMainArea::dlgVarsMainArea(QWidget * pF) : QWidget(pF)
     valueTypeMenu->addAction("Integer");
     valueTypeMenu->addAction("Boolean");
     value_type->setMenu(valueTypeMenu);
-    hideVariable->setText("Hidden Variable");
+    hideVariable->setText("Hidden Variable");*/
 }
 

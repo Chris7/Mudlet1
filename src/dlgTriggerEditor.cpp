@@ -4038,7 +4038,7 @@ void dlgTriggerEditor::saveVar(){
     luaInterface * lI = new luaInterface(mpHost);
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
-    mpHost->setHiddenVariable(pItem, mpVarsMainArea->hideVariable->checkState());
+    mpHost->setHiddenVariable(pItem, mpVarsMainArea->hideVariable->isChecked());
     lI->saveVar(pItem,newName, newValue, 0);
 }
 

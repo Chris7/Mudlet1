@@ -144,7 +144,7 @@ public:
     void               adjustNAWS();
     void               addHiddenVars(QSet<QString>);
     int                isHiddenVariable(QTreeWidgetItem *);
-    void               setHiddenVariable(QTreeWidgetItem *, int);
+    void               setHiddenVariable(QTreeWidgetItem *, bool);
     class              Exception_NoLogin{};
     class              Exception_NoConnectionAvailable{};
 
