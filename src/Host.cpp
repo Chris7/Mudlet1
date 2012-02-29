@@ -315,8 +315,6 @@ int Host::isHiddenVariable(QTreeWidgetItem * pItem){
         pValue += pData[i];
     if (QString(pData[1]).toInt() != LUA_TTABLE)
         pValue += pData[0]+pItem->text(0);
-    qDebug()<<"hidden var check"<<pValue;
-    qDebug()<<"hidden var list"<<hiddenVariables;
     return hiddenVariables.contains(pValue);
 }
 
