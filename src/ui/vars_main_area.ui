@@ -296,17 +296,8 @@ or, alternatively, use this not to mess them by up accident</string>
       <property name="bottomMargin">
        <number>1</number>
       </property>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="var_type_box">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="key_type_box">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -318,15 +309,10 @@ or, alternatively, use this not to mess them by up accident</string>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Type of value the variable data (in the big box below) should be.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;string&lt;/span&gt; - it's text (can contain numbers)&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;number&lt;/span&gt; - it's numbers only&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;boolean&lt;/span&gt; - true/false value only&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;table&lt;/span&gt; - this is a table (group), and can have other values in it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If this variable is a key of a table, then you can select it to either be an &lt;span style=&quot; font-style:italic;&quot;&gt;indexed key&lt;/span&gt; or a &lt;span style=&quot; font-style:italic;&quot;&gt;key&lt;/span&gt; type.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="title">
-         <string>value type</string>
+         <string>key type</string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -334,7 +320,7 @@ p, li { white-space: pre-wrap; }
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout_7">
+        <layout class="QGridLayout" name="gridLayout_8">
          <property name="leftMargin">
           <number>5</number>
          </property>
@@ -348,25 +334,33 @@ p, li { white-space: pre-wrap; }
           <number>1</number>
          </property>
          <item row="0" column="0">
-          <widget class="QComboBox" name="var_type">
+          <widget class="QComboBox" name="key_type">
+           <property name="toolTip">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tables can store values either in a list, and/or a hashmap. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In a &lt;span style=&quot; font-weight:600;&quot;&gt;list&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;indexed keys&lt;/span&gt; represent values - so you can have values at &lt;span style=&quot; font-style:italic;&quot;&gt;1, 2, 3...&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In a &lt;span style=&quot; font-weight:600;&quot;&gt;map&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;keys&lt;/span&gt; represent values - so you can have values under any name you'd like.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This selects whenever you'd like your key to be an indexed or a non-indexed type.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <item>
             <property name="text">
-             <string>string</string>
+             <string>Auto-Type</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>number</string>
+             <string>key (string)</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>boolean</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>table</string>
+             <string>index (integer)</string>
             </property>
            </item>
           </widget>
@@ -469,7 +463,16 @@ p, li { white-space: pre-wrap; }
        <number>1</number>
       </property>
       <item>
-       <widget class="QGroupBox" name="key_type_box">
+       <widget class="QGroupBox" name="var_type_box">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -481,10 +484,15 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If this variable is a key of a table, then you can select it to either be an &lt;span style=&quot; font-style:italic;&quot;&gt;indexed key&lt;/span&gt; or a &lt;span style=&quot; font-style:italic;&quot;&gt;key&lt;/span&gt; type.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Type of value the variable data (in the big box below) should be.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;string&lt;/span&gt; - it's text (can contain numbers)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;number&lt;/span&gt; - it's numbers only&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;boolean&lt;/span&gt; - true/false value only&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;table&lt;/span&gt; - this is a table (group), and can have other values in it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="title">
-         <string>key type</string>
+         <string>value type</string>
         </property>
         <property name="checkable">
          <bool>false</bool>
@@ -492,7 +500,7 @@ p, li { white-space: pre-wrap; }
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QGridLayout" name="gridLayout_8">
+        <layout class="QGridLayout" name="gridLayout_7">
          <property name="leftMargin">
           <number>5</number>
          </property>
@@ -506,28 +514,30 @@ p, li { white-space: pre-wrap; }
           <number>1</number>
          </property>
          <item row="0" column="0">
-          <widget class="QComboBox" name="key_type">
-           <property name="toolTip">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tables can store values either in a list, and/or a hashmap. &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In a &lt;span style=&quot; font-weight:600;&quot;&gt;list&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;indexed keys&lt;/span&gt; represent values - so you can have values at &lt;span style=&quot; font-style:italic;&quot;&gt;1, 2, 3...&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In a &lt;span style=&quot; font-weight:600;&quot;&gt;map&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;keys&lt;/span&gt; represent values - so you can have values under any name you'd like.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This selects whenever you'd like your key to be an indexed or a non-indexed type.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
+          <widget class="QComboBox" name="var_type">
            <item>
             <property name="text">
-             <string>key (mailbox)</string>
+             <string>Auto-Type</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>index key (list)</string>
+             <string>string</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>number</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>boolean</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>table</string>
             </property>
            </item>
           </widget>

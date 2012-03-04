@@ -28,6 +28,14 @@ dlgVarsMainArea::dlgVarsMainArea(QWidget * pF) : QWidget(pF)
 {
     // init generated dialog
     setupUi(this);
+    key_type->setItemData(0, -1, Qt::UserRole);
+    key_type->setItemData(1, 4, Qt::UserRole);
+    key_type->setItemData(2, 3, Qt::UserRole);
+    var_type->setItemData(0, -1, Qt::UserRole);
+    var_type->setItemData(1, 4, Qt::UserRole);
+    var_type->setItemData(2, 3, Qt::UserRole);
+    var_type->setItemData(3, 1, Qt::UserRole);
+    var_type->setItemData(4, 5, Qt::UserRole);
     /*var_type->setText("Variable Name Type");
     var_type->setPopupMode(QToolButton::InstantPopup);
     QMenu * varTypeMenu = new QMenu(var_type);

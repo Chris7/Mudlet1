@@ -1574,20 +1574,24 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         popup->addAction( action15 );
         popup->addAction( action16 );
         QMap<QString, QMenu *> userMenus;
-        QMapIterator<QString, QString> it(mUserMenus);
+        QMapIterator<QString, QStringList> it(mUserMenus);
         while (it.hasNext()){
             it.next();
-            QMenu * userMenu = new QMenu(it.key(), this);
+            QStringList menuInfo = it.value();
+            QString displayName = menuInfo[1];
+            QMenu * userMenu = new QMenu(displayName, this);
             userMenus.insert(it.key(), userMenu);
         }
         it.toFront();
         while (it.hasNext()){//take care of nested menus now since they're all made
             it.next();
-            if (it.value() != ""){
-                userMenus[it.value()]->addMenu(userMenus[it.key()]);
-            }
-            else{
+            QStringList menuInfo = it.value();
+            QString menuParent = menuInfo[0];
+            if (menuParent == ""){//parentless
                 popup->addMenu(userMenus[it.key()]);
+            }
+            else{//has a parent
+                userMenus[menuParent]->addMenu(userMenus[it.key()]);
             }
         }
         //add our actions
@@ -1595,20 +1599,19 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
         QSignalMapper* mapper = new QSignalMapper(this);
         while (it2.hasNext()){
             it2.next();
-            QAction * action = new QAction(it2.key(), this );
             QStringList actionInfo = it2.value();
-            if (actionInfo[1] != "")
+            QAction * action = new QAction(actionInfo[2], this );
+            if (actionInfo[1] == "")//no parent
+                popup->addAction(action);
+            else if (userMenus.contains(actionInfo[1]))
                 userMenus[actionInfo[1]]->addAction(action);
             else
-                popup->addAction(action);
+                continue;
             //connect( action, SIGNAL(triggered()), this, SLOT(slot_userAction()));
             mapper->setMapping(action, it2.key());
             connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
         }
         connect(mapper, SIGNAL(mapped(QString)), this, SLOT(slot_userAction(QString)));
-
-
-
         popup->popup( mapToGlobal( event->pos() ) );
         mLastMouseClick = event->posF();
     }
@@ -1662,12 +1665,12 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
     update();
 }
 
-void T2DMap::slot_userAction(QString displayName){
+void T2DMap::slot_userAction(QString uniqueName){
     TEvent event;
-    QStringList userEvent = mUserActions[displayName];
+    QStringList userEvent = mUserActions[uniqueName];
     event.mArgumentList.append( userEvent[0] );
     event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
-    event.mArgumentList.append(displayName );
+    event.mArgumentList.append(uniqueName );
     event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
     QList<int> roomList = mMultiSelectionList;
     if (roomList.size()){
@@ -1682,6 +1685,15 @@ void T2DMap::slot_userAction(QString displayName){
     else if (mRoomSelection){
         event.mArgumentList.append(QString::number(mRoomSelection));
         event.mArgumentTypeList.append(ARGUMENT_TYPE_NUMBER);
+        mpHost->raiseEvent( & event );
+    }
+    else{
+        event.mArgumentList.append(uniqueName);
+        event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+        for (int i=0;i<userEvent.size();i++){
+            event.mArgumentList.append(userEvent[i]);
+            event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
+        }
         mpHost->raiseEvent( & event );
     }
 }

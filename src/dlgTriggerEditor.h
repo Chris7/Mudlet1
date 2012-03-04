@@ -82,6 +82,7 @@ public:
     void                        focusOutEvent( QFocusEvent * );
     void                        enterEvent( QEvent * pE );
     void                        doCleanReset();
+    int                         canRecast(QTreeWidgetItem *, int, int);
     QToolBar *                  toolBar;
     QToolBar *                  toolBar2;
     bool                        mNeedUpdateData;

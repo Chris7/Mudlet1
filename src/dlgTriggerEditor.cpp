@@ -4031,6 +4031,25 @@ void dlgTriggerEditor::slot_saveKeyAfterEdit()
     }*/
 }
 
+int dlgTriggerEditor::canRecast(QTreeWidgetItem * pItem, int nameType, int valueType){
+    //basic checks, return 1 if we can recast, 2 if no need to recast, 0 if we can't recast
+    QStringList pInfo = pItem->data(0, Qt::UserRole).toStringList();
+    int cNameType = QString(pInfo[0]).toInt();
+    int cValueType = QString(pInfo[1]).toInt();
+    QString cName = mpVarsMainArea->lineEdit_var_name->text();
+    QString cValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
+    if ((nameType == LUA_TNONE || (cNameType == nameType)) &&
+            (valueType == LUA_TNONE || (cValueType == LUA_TTABLE) || (cValueType == valueType)))
+        return 2;
+    if (nameType == LUA_TSTRING && !cName.toInt()) //can we cast the key to an int?
+        return 0;
+    if (valueType == LUA_TSTRING && !cValue.toInt()) //can we cast the value to an int?
+        return 0;
+    else if (valueType == LUA_TBOOLEAN && (cValue.toLower() == "true" || cValue.toLower() == "false")) //can we cast to bool?
+        return 0;
+    return 1;
+}
+
 void dlgTriggerEditor::saveVar(){
     QTreeWidgetItem * pItem = mCurrentVar;
     if (!pItem)
@@ -4038,6 +4057,19 @@ void dlgTriggerEditor::saveVar(){
     luaInterface * lI = new luaInterface(mpHost);
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
+    int nameType = mpVarsMainArea->key_type->itemData(mpVarsMainArea->key_type->currentIndex(), Qt::UserRole).toInt();
+    int valueType = mpVarsMainArea->var_type->itemData(mpVarsMainArea->var_type->currentIndex(), Qt::UserRole).toInt();
+    //check variable recasting
+    int varRecast = canRecast(pItem,nameType,valueType);
+    if (varRecast == 2){
+        qDebug()<<"it works out";
+    }
+    else if (varRecast == 1){
+        qDebug()<<"rcast it";
+    }
+    else{
+        return;
+    }
     mpHost->setHiddenVariable(pItem, mpVarsMainArea->hideVariable->isChecked());
     lI->saveVar(pItem,newName, newValue, 0);
 }
@@ -4441,13 +4473,25 @@ void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
         mpVarsMainArea->hideVariable->setChecked(false);
     }
     int varType = QString(varInfo[1]).toInt();
+    int keyType = QString(varInfo[0]).toInt();
+    if (keyType == 4)
+        mpVarsMainArea->key_type->setCurrentIndex(0);
+    else if (keyType == 3)
+        mpVarsMainArea->key_type->setCurrentIndex(1);
     if (varType == LUA_TTABLE){
         varInfo[2] == "Lua Table";
         mpVarsMainArea->lineEdit_var_value->setReadOnly(true);
+        mpVarsMainArea->var_type->setDisabled(true);
+        mpVarsMainArea->var_type->setCurrentIndex(3);
     }
     else{
         varInfo[2] = lI->getValue(pItem);
         mpVarsMainArea->lineEdit_var_value->setReadOnly(false);
+        mpVarsMainArea->var_type->setEnabled(true);
+        if (varType == 4)
+            mpVarsMainArea->var_type->setCurrentIndex(0);
+        else if (varType == 3)
+            mpVarsMainArea->var_type->setCurrentIndex(1);
     }
     mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
     if (varInfo.size() > 1){

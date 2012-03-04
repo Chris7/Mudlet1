@@ -63,7 +63,7 @@ public:
     bool     mStartSpeedWalk;
     QMap<int, QPoint> mAreaExitList;
     QMap<QString, QStringList> mUserActions; //string list: 0 is event name, 1 is menu it is under if it is
-    QMap<QString, QString> mUserMenus; //display name, parent name ("" if null)
+    QMap<QString, QStringList> mUserMenus; //unique name, List:parent name ("" if null), display name
     QPoint   mMoveTarget;
     bool     mRoomBeingMoved;
     QPoint   mPHighlightMove;
