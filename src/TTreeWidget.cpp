@@ -236,7 +236,7 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
             }
             recurseVarTree(cItem, varsToChange);
             qDebug()<<varsToChange;
-            lI->deleteVar(cItem,dName);
+            lI->deleteVar(cItem);
             QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
             while (it.hasNext()){
                 it.next();

@@ -51,7 +51,7 @@ public:
     void getVars(QTreeWidgetItem *, int hide, bool showHidden);
     void saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue, int force);
     void iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList);
-    void deleteVar(QTreeWidgetItem * pItem, QString dName);
+    void deleteVar(QTreeWidgetItem * pItem);
     void restoreVar(QStringList pInfo);
     QString getValue(QTreeWidgetItem * pItem);
 

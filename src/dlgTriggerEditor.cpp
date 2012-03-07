@@ -1663,11 +1663,17 @@ void dlgTriggerEditor::slot_addAction()
 
 void dlgTriggerEditor::slot_addVar()
 {
-    addVar(false); //add normal action
+    if (mCurrentVar)
+        addVar(false); //add normal action
+    else
+        qDebug()<<"here";
 }
 
 void dlgTriggerEditor::slot_addVarGroup(){
-    addVar(true);
+    if (mCurrentVar)
+        addVar(true);
+    else
+        qDebug()<<"here";
 }
 
 void dlgTriggerEditor::slot_addAliasGroup()
@@ -1768,8 +1774,8 @@ void dlgTriggerEditor::slot_deleteVar()
     if( ! pItem ) return;
     QTreeWidgetItem * pParent = pItem->parent();
     luaInterface * lI = new luaInterface(mpHost);
-    QString dName = mpVarsMainArea->lineEdit_var_name->text();
-    lI->deleteVar(pItem,dName);
+    //QString dName = mpVarsMainArea->lineEdit_var_name->text();
+    lI->deleteVar(pItem);
     QStringList itemInfo = pItem->data(0, Qt::UserRole).toStringList();
     QString varName;
     QMap<QString, QTreeWidgetItem *> varsToChange;
@@ -2434,12 +2440,15 @@ void dlgTriggerEditor::addTimer( bool isFolder )
 void dlgTriggerEditor::addVar( bool isFolder ){
     saveVar();
     QString name;
+    mpVarsMainArea->key_type->setCurrentIndex(0);
     if (isFolder){
         mpVarsMainArea->lineEdit_var_value->setReadOnly(true);
+        mpVarsMainArea->var_type->setCurrentIndex(4);
         name="NewTable";
     }
     else{
         mpVarsMainArea->lineEdit_var_value->setReadOnly(false);
+        mpVarsMainArea->var_type->setCurrentIndex(0);
         name = "NewVariable";
     }
     QStringList nameL;
@@ -2463,11 +2472,11 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         }
         if (!pData.size()){
             //at root
-            pData<<QString::number(LUA_TSTRING); //we can only add string keys
+            pData<<QString::number(LUA_TNONE);
             if (isFolder)
                 pData << QString::number(LUA_TTABLE);
             else
-                pData << QString::number(LUA_TSTRING);
+                pData << QString::number(LUA_TNONE);
             pData << "";
             pData << "";
         }
@@ -2478,23 +2487,23 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
             pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
-            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
+            pData[0] = QString::number(LUA_TNONE); //we can only add string keys
             if (isFolder)
                 pData[1] = QString::number(LUA_TTABLE);
             else
-                pData[1] = QString::number(LUA_TSTRING);
+                pData[1] = QString::number(LUA_TNONE);
             pData[2] = "NewTable";
             pNewItem->setData( 0, Qt::UserRole, pData);
             pParent->insertChild( 0, pNewItem );
         }
-        else if (pType == LUA_TSTRING){
+        else if (pType){
             //we selected a variable, so we just add the variable at our current level, which is the same as above
             pNewItem = new QTreeWidgetItem( pParent->parent(), nameL );
             pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
             pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
-            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
-            pData[1] = QString::number(LUA_TSTRING);
+            pData[0] = QString::number(LUA_TNONE); //we can only add string keys
+            pData[1] = QString::number(LUA_TNONE);
             pData[2] = "";
             pNewItem->setData( 0, Qt::UserRole, pData);
             pParent->insertChild( 0, pNewItem );
@@ -2510,7 +2519,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             if (isFolder)
                 pData << QString::number(LUA_TTABLE);
             else
-                pData << QString::number(LUA_TSTRING);
+                pData << QString::number(LUA_TNONE);
             pData << "";
             pData << "";
         }
@@ -2521,11 +2530,11 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
             pNewItem->setToolTip(0, "Checked variables will be saved and loaded with your profile.");
-            pData[0] = QString::number(LUA_TSTRING); //we can only add string keys
+            pData[0] = QString::number(LUA_TNONE); //we can only add string keys
             if (isFolder)
                 pData[1] = QString::number(LUA_TTABLE);
             else
-                pData[1] = QString::number(LUA_TSTRING);
+                pData[1] = QString::number(LUA_TNONE);
             pData[2] = "NewTable";
             pNewItem->setData( 0, Qt::UserRole, pData);
             cItem->insertChild( 0, pNewItem );
@@ -2537,13 +2546,13 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         //insert a new root item
     ROOT_KEY:
         pData.clear();
-        pData << QString::number(LUA_TSTRING); //we can only add string keys
+        pData << QString::number(LUA_TNONE); //we can only add string keys
         if (isFolder){
             pData << QString::number(LUA_TTABLE);
             pData << "NewTable";
         }
         else{
-            pData << QString::number(LUA_TSTRING);
+            pData << QString::number(LUA_TNONE);
             pData << "";
         }
         pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
@@ -4034,23 +4043,27 @@ void dlgTriggerEditor::slot_saveKeyAfterEdit()
 int dlgTriggerEditor::canRecast(QTreeWidgetItem * pItem, int nameType, int valueType){
     //basic checks, return 1 if we can recast, 2 if no need to recast, 0 if we can't recast
     QStringList pInfo = pItem->data(0, Qt::UserRole).toStringList();
+    if (!pInfo.size())
+        return 0;
     int cNameType = QString(pInfo[0]).toInt();
     int cValueType = QString(pInfo[1]).toInt();
     QString cName = mpVarsMainArea->lineEdit_var_name->text();
     QString cValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
-    if ((nameType == LUA_TNONE || (cNameType == nameType)) &&
-            (valueType == LUA_TNONE || (cValueType == LUA_TTABLE) || (cValueType == valueType)))
+    qDebug()<<"attempting to recast variable"<<cName<<":"<<cValue<<"to "<<nameType<<","<<valueType<<"from"<<cNameType<<","<<cValueType;
+    if ((cNameType == nameType) && ((cValueType == LUA_TTABLE) || (cValueType == valueType)))
         return 2;
-    if (nameType == LUA_TSTRING && !cName.toInt()) //can we cast the key to an int?
+    if (nameType != cNameType && (nameType == LUA_TNUMBER && !cName.toInt())) //can we cast the key to an int, we dont care about str->int?
         return 0;
-    if (valueType == LUA_TSTRING && !cValue.toInt()) //can we cast the value to an int?
+    if (valueType != cValueType && (valueType == LUA_TNUMBER && !cValue.toInt())) //can we cast the value to an int, we dont' care about str->xx?
         return 0;
-    else if (valueType == LUA_TBOOLEAN && (cValue.toLower() == "true" || cValue.toLower() == "false")) //can we cast to bool?
+    else if (valueType == LUA_TBOOLEAN && (cValue.toLower() != "true" && cValue.toLower() != "false")) //can we cast to bool?
         return 0;
     return 1;
 }
 
 void dlgTriggerEditor::saveVar(){
+    if (!mCurrentVar)
+        return;
     QTreeWidgetItem * pItem = mCurrentVar;
     if (!pItem)
         return;
@@ -4061,17 +4074,37 @@ void dlgTriggerEditor::saveVar(){
     int valueType = mpVarsMainArea->var_type->itemData(mpVarsMainArea->var_type->currentIndex(), Qt::UserRole).toInt();
     //check variable recasting
     int varRecast = canRecast(pItem,nameType,valueType);
+    qDebug()<<"var recast status"<<varRecast<<nameType<<valueType;
+    int forceSave = 0;
     if (varRecast == 2){
-        qDebug()<<"it works out";
+        //qDebug()<<"it works out";
     }
     else if (varRecast == 1){
-        qDebug()<<"rcast it";
-    }
-    else{
-        return;
+        //qDebug()<<"rcast it";
+        QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
+        if (valueType != LUA_TTABLE){
+            lI->deleteVar(pItem);
+            if (!pInfo.size()){
+                pInfo<<QString::number(nameType);
+                pInfo<<QString::number(valueType);
+                pInfo<<newValue;
+                pInfo<<"";
+            }
+            else{
+                pInfo[0]=QString::number(nameType);
+                pInfo[1]=QString::number(valueType);
+            }
+            forceSave = 1;
+        }
+        else{
+            pInfo[0]=QString::number(nameType);
+            forceSave=2;
+        }
+        pItem->setData(0, Qt::UserRole,pInfo);
     }
     mpHost->setHiddenVariable(pItem, mpVarsMainArea->hideVariable->isChecked());
-    lI->saveVar(pItem,newName, newValue, 0);
+    lI->saveVar(pItem,newName, newValue, forceSave);
+    slot_var_clicked(pItem,0);
 }
 
 void dlgTriggerEditor::saveKey()
@@ -4475,23 +4508,25 @@ void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
     int varType = QString(varInfo[1]).toInt();
     int keyType = QString(varInfo[0]).toInt();
     if (keyType == 4)
-        mpVarsMainArea->key_type->setCurrentIndex(0);
-    else if (keyType == 3)
         mpVarsMainArea->key_type->setCurrentIndex(1);
+    else if (keyType == 3)
+        mpVarsMainArea->key_type->setCurrentIndex(2);
     if (varType == LUA_TTABLE){
-        varInfo[2] == "Lua Table";
+        varInfo[2] == "Table";
         mpVarsMainArea->lineEdit_var_value->setReadOnly(true);
         mpVarsMainArea->var_type->setDisabled(true);
-        mpVarsMainArea->var_type->setCurrentIndex(3);
+        mpVarsMainArea->var_type->setCurrentIndex(4);
     }
     else{
         varInfo[2] = lI->getValue(pItem);
         mpVarsMainArea->lineEdit_var_value->setReadOnly(false);
         mpVarsMainArea->var_type->setEnabled(true);
         if (varType == 4)
-            mpVarsMainArea->var_type->setCurrentIndex(0);
-        else if (varType == 3)
             mpVarsMainArea->var_type->setCurrentIndex(1);
+        else if (varType == 3)
+            mpVarsMainArea->var_type->setCurrentIndex(2);
+        else if (varType == 1)
+            mpVarsMainArea->var_type->setCurrentIndex(3);
     }
     mpVarsMainArea->lineEdit_var_name->setText(pItem->text(column));
     if (varInfo.size() > 1){
