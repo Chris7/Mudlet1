@@ -354,11 +354,9 @@ void Host::saveModules(int sync){
         //move the old file, use the key (module name) as the file
         savePath.rename(filename_xml,dirName+it.key()+time);
         QFile file_xml( filename_xml );
-        //qDebug()<<"writing module xml for:"<<entry[0];
         if ( file_xml.open( QIODevice::WriteOnly ) )
         {
             XMLexport writer(this);
-          //  qDebug()<<"successfully wrote module xml for:"<<entry[0];
             writer.writeModuleXML( & file_xml, it.key());
             file_xml.close();
             if (entry[1].toInt())

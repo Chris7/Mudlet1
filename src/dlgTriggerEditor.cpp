@@ -1665,15 +1665,11 @@ void dlgTriggerEditor::slot_addVar()
 {
     if (mCurrentVar)
         addVar(false); //add normal action
-    else
-        qDebug()<<"here";
 }
 
 void dlgTriggerEditor::slot_addVarGroup(){
     if (mCurrentVar)
         addVar(true);
-    else
-        qDebug()<<"here";
 }
 
 void dlgTriggerEditor::slot_addAliasGroup()
