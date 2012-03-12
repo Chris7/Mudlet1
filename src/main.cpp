@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
     t.start();
     while( t.elapsed() < 1500 );
     splash.finish( mudlet::self() );
-    mudlet::debugMode = false;
+    mudlet::debugMode = true;
     HostManager::self();
     FontManager fm;
     fm.addFonts();

@@ -1131,7 +1131,7 @@ void dlgConnectionProfiles::slot_connectToServer()
     luaInterface * lI = new luaInterface(pHost);
     QStringList test;
     test << "test";
-    QTreeWidgetItem * fake = new QTreeWidgetItem( test);
+    QTreeWidgetItem * fake = new QTreeWidgetItem(test);
     lI->getVars(fake, 1, false);
     if( entries.size() > 0 )
     {

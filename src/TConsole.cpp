@@ -678,7 +678,7 @@ void TConsole::closeEvent( QCloseEvent *event )
         {
             hide();
             mudlet::mpDebugArea->setVisible(false);
-            mudlet::debugMode = false;
+            mudlet::debugMode = true;
             event->ignore();
             return;
         }

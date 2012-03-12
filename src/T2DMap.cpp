@@ -2077,19 +2077,23 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
         int x = event->x();
         int y = height()-event->y();//opengl ursprungspunkt liegt unten links
         if ((mpMap->m2DPanXStart-x) > 1){
-            shiftRight();
+            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                shiftRight();
             mpMap->m2DPanXStart = x;
         }
         else if ((mpMap->m2DPanXStart-x) < -1){
-            shiftLeft();
+            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                shiftLeft();
             mpMap->m2DPanXStart = x;
         }
         if ((mpMap->m2DPanYStart-y) > 1){
-            shiftDown();
+            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                shiftDown();
             mpMap->m2DPanYStart = y;
         }
         else if ((mpMap->m2DPanYStart-y) < -1){
-            shiftUp();
+            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                shiftUp();
             mpMap->m2DPanYStart = y;
         }
     }
@@ -2423,6 +2427,12 @@ void T2DMap::setExitSize( double f )
 {
     eSize = f;
     if( mpHost ) mpHost->mLineSize = f;
+}
+
+void T2DMap::setPanSpeed( double f )
+{
+    //pSpeed = f;
+    if( mpHost ) mpHost->mPanSpeed = f;
 }
 
 #include <QTreeWidget>

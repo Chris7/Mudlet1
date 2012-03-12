@@ -42,6 +42,7 @@
 #include "TTextEdit.h"
 #include "dlgNotepad.h"
 #include "luaInterface.h"
+#include <QtWebKit/QWebView>
 
 //#ifdef Q_CC_GNU
     #include "dlgIRC.h"
@@ -57,7 +58,7 @@ bool TConsoleMonitor::eventFilter(QObject *obj, QEvent *event)
 {
     if( event->type() == QEvent::Close )
     {
-        mudlet::debugMode = false;
+        mudlet::debugMode = true;
         return QObject::eventFilter(obj,event);
     }
     else
@@ -68,7 +69,7 @@ bool TConsoleMonitor::eventFilter(QObject *obj, QEvent *event)
 
 TConsole *  mudlet::mpDebugConsole = 0;
 QMainWindow * mudlet::mpDebugArea = 0;
-bool mudlet::debugMode = false;
+bool mudlet::debugMode = true;
 
 mudlet * mudlet::_self = 0;
 
@@ -110,7 +111,7 @@ mudlet::mudlet()
     setupUi(this);
     setUnifiedTitleAndToolBarOnMac( true );
     setContentsMargins(0,0,0,0);
-    mudlet::debugMode = false;
+    mudlet::debugMode = true;
     setAttribute( Qt::WA_DeleteOnClose );
     QSizePolicy sizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
     setWindowTitle(version);
@@ -457,16 +458,46 @@ void mudlet::slot_module_manager(){
     moduleTable = d->findChild<QTableWidget *>("moduleTable");
     moduleUninstallButton = d->findChild<QPushButton *>("uninstallButton");
     moduleInstallButton = d->findChild<QPushButton *>("installButton");
+    moduleHelpButton = d->findChild<QPushButton *>("helpButton");
     QDialogButtonBox * moduleButtonBox = d->findChild<QDialogButtonBox *>("buttonBox");
-    if( ! moduleTable || ! moduleUninstallButton ) return;
+    if( !moduleTable || !moduleUninstallButton || !moduleHelpButton) return;
     layoutModules();
     connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
     connect(moduleInstallButton, SIGNAL(clicked()), this, SLOT(slot_install_module()));
+    connect(moduleHelpButton, SIGNAL(clicked()), this, SLOT(slot_help_module()));
     connect(moduleButtonBox, SIGNAL(accepted()), this, SLOT(slot_ok_module()));
     d->setWindowTitle("Module Manager");
     d->show();
     d->raise();
 
+}
+
+void mudlet::slot_help_module(){
+    QWebView *view = new QWebView(this);
+    //view->load(QUrl(""))
+    Host * pH = getActiveHost();
+    if (!pH)
+        return;
+    int cRow = moduleTable->currentRow();
+    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
+    QString url, htmlContent;
+    if (pH->moduleHelp[pI->text()].contains("helpURL"))
+        url = pH->moduleHelp[pI->text()]["helpURL"];
+    if (pH->moduleHelp[pI->text()].contains("helpHTML"))
+        htmlContent = pH->moduleHelp[pI->text()]["helpHTML"];
+    if (url != ""){
+        view->setUrl(QUrl(url));
+    }
+    else if (htmlContent != ""){
+        view->setHtml(htmlContent);
+    }
+    else
+        return;
+    view->setFixedHeight(600);
+    view->setFixedWidth(600);
+    view->setWindowFlags(Qt::Window);
+    view->move(QPoint(50,50));
+    view->show();
 }
 
 void mudlet::slot_ok_module(){

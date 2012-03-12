@@ -199,6 +199,7 @@ public slots:
    void                          slot_module_manager();
    void                          slot_ok_module();
    void                          layoutModules();
+   void                          slot_help_module();
 
 protected:
 
@@ -252,6 +253,7 @@ private:
    QTableWidget *                 moduleTable;
    QPushButton *                 moduleUninstallButton;
    QPushButton *                 moduleInstallButton;
+   QPushButton *                 moduleHelpButton;
 
 };
 

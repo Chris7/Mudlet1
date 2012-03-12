@@ -217,6 +217,7 @@ void luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString
             lua_setglobal(L,newName.toLatin1().data());
             deleteVar(L, pItem);
             pItem->setText(0,newName);
+            pItem->setText(1,newName.toLower());
         }
         else if (tabled>0){
             //we're renaming a table, so first we save the value
@@ -233,6 +234,7 @@ void luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString
             pInfo.pop_back();
             pInfo << pInfo[0]+newName;
             pItem->setText(0,newName);
+            pItem->setText(1,newName.toLower());
             pItem->setData(0, Qt::UserRole, pInfo);
             return;
         }
@@ -309,7 +311,7 @@ void luaInterface::restoreVar(QStringList pInfo){
 void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue, int force){
     if (newName=="")
         return;
-    QTreeWidgetItem* pParent = pItem->parent();
+    QTreeWidgetItem* pParent = (QTreeWidgetItem*)pItem->parent();
     if (pItem == NULL || !(pItem->columnCount()))
         return;
     QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
@@ -402,6 +404,7 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
     }*/
     pInfo[2] = newValue;
     pItem->setText(0,newName);
+    pItem->setText(1,newName.toLower());
     pItem->setData(0, Qt::UserRole, pInfo);
     if (tabled && lua_type(L,-3) == LUA_TTABLE && lua_gettop(L)>startSize+2){
         lua_settable(L,-3);
@@ -537,6 +540,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
             else{
                 QStringList sList;
                 sList << keyName;
+                sList << keyName.toLower();
                 QTreeWidgetItem * pI = new QTreeWidgetItem(sList);
                 pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled);
                 QIcon icon;
@@ -593,6 +597,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                 QStringList sList;
                 QTreeWidgetItem * pItem;
                 sList << nestName;
+                sList << nestName.toLower();
                 pItem = new QTreeWidgetItem(sList);
                 pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
                 tableOrder.insert(nestName, pItem);
@@ -647,6 +652,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                     QStringList sList;
                     QTreeWidgetItem * pItem;
                     sList << tableName;
+                    sList << tableName.toLower();
                     ////qDebug()<<"adding new table"<<tableName<<"under "<<nestName;
                     pItem = new QTreeWidgetItem(sList);
                     pItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
@@ -732,6 +738,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                         pData << nestList;
                         //qDebug()<<pData;
                         sList << itName;
+                        sList << itName.toLower();
                         QTreeWidgetItem * pI = new QTreeWidgetItem( sList);
                         pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
                         //pI->setCheckState(0, Qt::Unchecked);
@@ -787,6 +794,7 @@ void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showH
                             pData << nestList;
                             //qDebug()<<pData;
                             sList << itName;
+                            sList << itName.toLower();
                             QTreeWidgetItem * pI = new QTreeWidgetItem(sList);
                             pI->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
                             //pI->setCheckState(0, Qt::Unchecked);

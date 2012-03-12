@@ -140,9 +140,8 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             }
         }
     }
-    if( ! packName.isEmpty())
-    {
-       if( ! gotTrigger )
+    if( ! packName.isEmpty()){
+       if( ! gotTrigger ){
             mpHost->getTriggerUnit()->unregisterTrigger( mpTrigger );
        if( ! gotTimer )
             mpHost->getTimerUnit()->unregisterTimer( mpTimer );
@@ -154,8 +153,9 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpHost->getKeyUnit()->unregisterKey( mpKey );
        if( ! gotScript )
             mpHost->getScriptUnit()->unregisterScript( mpScript );
-    }
+        }
     return ! error();
+    }
 }
 
 void XMLimport::readMap()
@@ -444,12 +444,43 @@ void XMLimport::readPackage()
                 readHiddenVariables();
                 continue;
             }
+            else if(name() == "HelpPackage"){
+                readHelpPackage();
+                continue;
+            }
             else
             {
                 readUnknownPackage();
             }
         }
     }
+}
+
+void XMLimport::readHelpPackage(){
+    while( ! atEnd() )
+    {
+        readNext();
+        if(isEndElement())
+        {
+            break;
+        }
+        if( isStartElement() )
+        {
+            if( name() == "helpURL" )
+            {
+                QString contents = readElementText();
+                mpHost->moduleHelp[mPackageName].insert("helpURL", contents);
+                continue;
+            }
+            else if( name() == "helpHTML" )
+            {
+                QString contents = readElementText();
+                mpHost->moduleHelp[mPackageName].insert("helpHTML", contents);
+                continue;
+            }
+        }
+    }
+    qDebug()<<"module help:"<<mpHost->moduleHelp;
 }
 
 void XMLimport::readUnknownPackage()

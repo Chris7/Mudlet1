@@ -398,4 +398,7 @@ bool TTreeWidget::dropMimeData ( QTreeWidgetItem * parent, int index, const QMim
     return QTreeWidget::dropMimeData( parent, index, data, action );
 }
 
-
+/*bool TTreeSortedWidget::operator<(const QTreeWidgetItem * rhs) {
+    qDebug()<<text(0);
+    return text(0).toLower() < rhs->text(0).toLower();
+}*/

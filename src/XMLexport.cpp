@@ -407,7 +407,7 @@ bool XMLexport::writeHost( Host * pT )
             QStringList info = it.value()->data(0, Qt::UserRole).toStringList();
             QString value = "";
             if (QString(info[1]).toInt() != LUA_TTABLE)
-                 value = lI->getValue(it.value());
+                 value = lI->getValue((QTreeWidgetItem*)it.value());
             writeStartElement("variable");
             writeTextElement( "name", it.value()->text(0) );
             writeTextElement( "nameType", info[0] );

@@ -47,6 +47,7 @@ public:
     int      getTopLeftSelection();
     void     setRoomSize( double );
     void     setExitSize( double );
+    void     setPanSpeed( double );
 
 
     TMap *   mpMap;

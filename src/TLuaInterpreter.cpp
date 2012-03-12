@@ -9296,7 +9296,7 @@ bool TLuaInterpreter::callEventHandler( QString & function, TEvent * pE )
            e += lua_tostring( L, 1 );
        }
        emit signalEchoMessage( mHostID, QString( e.c_str() ) );
-       qDebug()<< "LUA_ERROR:"<<e.c_str();
+       qDebug()<< "LUA_ERROR:"<<e.c_str()<<"on function"<<function;
        return false;
     }
     for( int i=0; i<pE->mArgumentList.size(); i++ )
@@ -9419,7 +9419,7 @@ void TLuaInterpreter::threadLuaInterpreterExec( string code )
             e += lua_tostring( L, 1 );
         }
         emit signalEchoMessage( mHostID, QString( e.c_str() ) );
-        qDebug()<< "LUA_ERROR:"<<e.c_str();
+        qDebug()<< "LUA_ERROR:"<<e.c_str()<<"on"<<code.c_str();
      }
 
      cout << "cRunningScript::threadLuaInterpreterExec() done" << endl;

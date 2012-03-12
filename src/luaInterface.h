@@ -2,6 +2,7 @@
 #define LUAINTERFACE_H
 
 #include "TLuaInterpreter.h"
+#include "TTreeWidget.h"
 #include "Host.h"
 #include <QSet>
 
@@ -11,7 +12,6 @@ extern "C"
     #include "lualib.h"
     #include "lauxlib.h"
 }
-
 class TLuaInterpreter;
 class Host;
 

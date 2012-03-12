@@ -275,7 +275,9 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     treeWidget_vars->hide();
     treeWidget_vars->setHost( mpHost );
     treeWidget_vars->setIsVarTree();
-    treeWidget_vars->setColumnCount(1);
+    treeWidget_vars->setColumnCount(2);
+    treeWidget_vars->hideColumn(1);
+    //treeWidget_vars->setSou
     treeWidget_vars->header()->hide();
     treeWidget_vars->setRootIsDecorated( false );
     connect( treeWidget_vars, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(slot_itemClicked(QTreeWidgetItem*,int)) );
@@ -1766,9 +1768,9 @@ void dlgTriggerEditor::slot_deleteAction()
 
 void dlgTriggerEditor::slot_deleteVar()
 {
-    QTreeWidgetItem * pItem = treeWidget_vars->currentItem();
+    QTreeWidgetItem * pItem = (QTreeWidgetItem *)treeWidget_vars->currentItem();
     if( ! pItem ) return;
-    QTreeWidgetItem * pParent = pItem->parent();
+    QTreeWidgetItem * pParent = (QTreeWidgetItem *)pItem->parent();
     luaInterface * lI = new luaInterface(mpHost);
     //QString dName = mpVarsMainArea->lineEdit_var_name->text();
     lI->deleteVar(pItem);
@@ -2561,9 +2563,9 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         treeWidget_vars->insertTopLevelItem( 0, pNewItem );
     }
     treeWidget_vars->setCurrentItem( pNewItem );
-    mCurrentVar = pNewItem;
+    mCurrentVar = (QTreeWidgetItem*)pNewItem;
     showInfo( msgInfoAddVar );
-    slot_var_clicked( treeWidget_vars->currentItem(), 0 );
+    slot_var_clicked( (QTreeWidgetItem*)treeWidget_vars->currentItem(), 0 );
 }
 
 void dlgTriggerEditor::addKey( bool isFolder )
@@ -4060,7 +4062,7 @@ int dlgTriggerEditor::canRecast(QTreeWidgetItem * pItem, int nameType, int value
 void dlgTriggerEditor::saveVar(){
     if (!mCurrentVar)
         return;
-    QTreeWidgetItem * pItem = mCurrentVar;
+    QTreeWidgetItem * pItem = (QTreeWidgetItem*)mCurrentVar;
     if (!pItem)
         return;
     luaInterface * lI = new luaInterface(mpHost);
@@ -4122,6 +4124,7 @@ void dlgTriggerEditor::saveKey()
         if( pT )
         {
             pItem->setText(0,name );
+            pItem->setText(1, name.toLower());
             pT->setName( name );
             pT->setCommand( command );
             pT->setScript( script );
@@ -5201,7 +5204,7 @@ void dlgTriggerEditor::repopulateVars(){
     treeWidget_vars->setUpdatesEnabled(false);
     QStringList sL7;
     sL7 << "Variables";
-    mpVarBaseItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, sL7 );
+    mpVarBaseItem = new QTreeWidgetItem( sL7 );
     mpVarBaseItem->setBackground(0,QColor(255,254,215,255));
     //QIcon mainIcon5;
     //mainIcon5.addPixmap(QPixmap(QString::fromUtf8(":/icons/bookmarks.png")), QIcon::Normal, QIcon::Off);
@@ -5214,7 +5217,8 @@ void dlgTriggerEditor::repopulateVars(){
     //qDebug()<<showHiddenVars;
     lI->getVars(mpVarBaseItem, 0, showHiddenVars);
     mpVarBaseItem->setExpanded( true );
-    treeWidget_vars->sortItems(0, Qt::AscendingOrder);
+    treeWidget_vars->sortItems(1,Qt::AscendingOrder);
+    //mpVarBaseItem->sortChildren(1, Qt::AscendingOrder);
     treeWidget_vars->setUpdatesEnabled(true);
 }
 
@@ -5885,7 +5889,7 @@ void dlgTriggerEditor::slot_show_vars()
         if( pI->childCount() > 0 )
         {
             mpVarsMainArea->show();
-            slot_var_clicked( treeWidget_vars->currentItem(), 0 );
+            slot_var_clicked( (QTreeWidgetItem*)treeWidget_vars->currentItem(), 0 );
         }
         else
         {

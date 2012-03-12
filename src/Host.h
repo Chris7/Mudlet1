@@ -288,6 +288,7 @@ public:
     QMap<QString, QStringList> mInstalledModules;
     QMap<QString, int> mModulePriorities;
     QMap<QString, QStringList> modulesToWrite;
+    QMap<QString, QMap<QString, QString> > moduleHelp;
     QStringList        mActiveModules;
     bool               mModuleSaveBlock;
 
@@ -300,6 +301,7 @@ public:
     QPushButton *                 moduleInstallButton;
     double             mLineSize;
     double             mRoomSize;
+    int                mPanSpeed;
     bool               mShowInfo;
     bool               mBubbleMode;
     int                mServerGUI_Package_version;

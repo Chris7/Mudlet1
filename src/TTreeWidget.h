@@ -22,6 +22,8 @@
 #define TTREE_WIDGET_H
 
 #include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QStringList>
 #include <QDebug>
 
 class Host;
