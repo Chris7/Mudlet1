@@ -182,6 +182,16 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         nodesWritten+=1;
         }
     }
+    writeStartElement("HelpPackage");
+    if (mpHost->moduleHelp.contains(moduleName) && mpHost->moduleHelp[moduleName].contains("helpURL"))
+        writeTextElement( "helpURL", mpHost->moduleHelp[moduleName]["helpURL"]);
+    else
+        writeTextElement( "helpURL", "");
+    if (mpHost->moduleHelp.contains(moduleName) && mpHost->moduleHelp[moduleName].contains("helpHTML"))
+        writeTextElement( "helpHTML", mpHost->moduleHelp[moduleName]["helpHTML"]);
+    else
+        writeTextElement( "helpHTML", "");
+    writeEndElement(); //end trigger package tag
     if (!nodesWritten)
         writeEndElement(); //end trigger package tag
     nodesWritten=0;
