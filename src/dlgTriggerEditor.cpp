@@ -277,7 +277,6 @@ dlgTriggerEditor::dlgTriggerEditor( Host * pH )
     treeWidget_vars->setIsVarTree();
     treeWidget_vars->setColumnCount(2);
     treeWidget_vars->hideColumn(1);
-    //treeWidget_vars->setSou
     treeWidget_vars->header()->hide();
     treeWidget_vars->setRootIsDecorated( false );
     connect( treeWidget_vars, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(slot_itemClicked(QTreeWidgetItem*,int)) );
