@@ -224,6 +224,7 @@ void dlgMapper::replyFinished( QNetworkReply * reply )
     }
 
     XMLimport reader( mpHost );
+    qDebug()<<"mapper import";
     reader.importPackage( & file );
 
     mpHost->mpMap->init( mpHost );

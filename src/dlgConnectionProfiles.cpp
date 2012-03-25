@@ -1109,7 +1109,7 @@ void dlgConnectionProfiles::slot_connectToServer()
 
     if( profile_name.size() < 1 )
         return;
-
+    qDebug()<<"slot connect";
     Host * pOH = HostManager::self()->getHost( profile_name );
     if( pOH )
     {

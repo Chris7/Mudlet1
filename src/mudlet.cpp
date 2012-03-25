@@ -454,18 +454,16 @@ void mudlet::slot_module_manager(){
     QDialog * d = dynamic_cast<QDialog *>(loader.load(&file, this));
     file.close();
     if( ! d ) return;
-    //moduleList = d->findChild<QListWidget *>("packageList");
     moduleTable = d->findChild<QTableWidget *>("moduleTable");
     moduleUninstallButton = d->findChild<QPushButton *>("uninstallButton");
     moduleInstallButton = d->findChild<QPushButton *>("installButton");
     moduleHelpButton = d->findChild<QPushButton *>("helpButton");
-    QDialogButtonBox * moduleButtonBox = d->findChild<QDialogButtonBox *>("buttonBox");
     if( !moduleTable || !moduleUninstallButton || !moduleHelpButton) return;
     layoutModules();
     connect(moduleUninstallButton, SIGNAL(clicked()), this, SLOT(slot_uninstall_module()));
     connect(moduleInstallButton, SIGNAL(clicked()), this, SLOT(slot_install_module()));
     connect(moduleHelpButton, SIGNAL(clicked()), this, SLOT(slot_help_module()));
-    connect(moduleButtonBox, SIGNAL(accepted()), this, SLOT(slot_ok_module()));
+    connect(moduleTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(slot_module_clicked(QTableWidgetItem*)));
     d->setWindowTitle("Module Manager");
     d->show();
     d->raise();
@@ -500,21 +498,24 @@ void mudlet::slot_help_module(){
     view->show();
 }
 
-void mudlet::slot_ok_module(){
+void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
+    int i = pItem->row();
     Host * pH = getActiveHost();
     QStringList moduleStringList;
-    for (int i=0;i<moduleTable->rowCount();i++){
-        QTableWidgetItem * entry = moduleTable->item(i,2);
-        QTableWidgetItem * checkStatus = moduleTable->item(i,0);
-        QTableWidgetItem * itemPriority = moduleTable->item(i,1);
-        moduleStringList = pH->mInstalledModules[entry->text()];
-        if (checkStatus->checkState() == Qt::Unchecked)
-            moduleStringList[1] = "0";
-        if (checkStatus->checkState() == Qt::Checked)
-            moduleStringList[1] = "1";
-        pH->mInstalledModules[entry->text()] = moduleStringList;
-        pH->mModulePriorities[entry->text()] = itemPriority->text().toInt();
+    QTableWidgetItem * entry = moduleTable->item(i,2);
+    QTableWidgetItem * checkStatus = moduleTable->item(i,0);
+    QTableWidgetItem * itemPriority = moduleTable->item(i,1);
+    moduleStringList = pH->mInstalledModules[entry->text()];
+    if (checkStatus->checkState() == Qt::Unchecked){
+        moduleStringList[1] = "0";
+        checkStatus->setText("NO");
     }
+    if (checkStatus->checkState() == Qt::Checked){
+        moduleStringList[1] = "1";
+        checkStatus->setText("YES");
+    }
+    pH->mInstalledModules[entry->text()] = moduleStringList;
+    pH->mModulePriorities[entry->text()] = itemPriority->text().toInt();
 }
 
 void mudlet::slot_install_module()
@@ -1944,6 +1945,7 @@ void mudlet::doAutoLogin( QString & profile_name )
     test << "test";
     QTreeWidgetItem * fake = new QTreeWidgetItem( test);
     lI->getVars(fake, 1, false);
+    qDebug()<<"autologin";
     if( entries.size() > 0 )
     {
         QFile file(folder+"/"+entries[0]);

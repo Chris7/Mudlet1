@@ -44,13 +44,11 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
     acceptServerGUI->setChecked(mpHost->mAcceptServerGUI);
     panSpeed->setValue(mpHost->mPanSpeed);
     strongHighlight->setChecked(mpHost->mMapStrongHighlight);
-    /*if (mpHost->mpMap->mpMapper->isEnabled()){
-        roomSize->setValue(mpHost->mpMap->mpMapper->mp2dMap->rSize);
-        lineSize->setValue(mpHost->mpMap->mpMapper->mp2dMap->eSize);
-        bubbles->setChecked(mpHost->mpMap->mpMapper->mp2dMap->mBubbleMode);
-        grid->setChecked(pHost->mpMap->mpMapper->mp2dMap->mShowGrid);
-        showRoomIDs->setChecked(pHost->mpMap->mpMapper->mp2dMap->mShowRoomID);
-    }*/
+    roomSize->setValue(mpHost->mRoomSize);
+    lineSize->setValue(mpHost->mLineSize);
+    bubbles->setChecked(mpHost->mBubbleMode);
+    grid->setChecked(mpHost->mShowGrid);
+    showRoomIDs->setChecked(mpHost->mShowRoomID);
     QString nick = tr("Mudlet%1").arg(QString::number(rand()%10000));
     QFile file( QDir::homePath()+"/.config/mudlet/irc_nick" );
     file.open( QIODevice::ReadOnly );
@@ -1340,13 +1338,13 @@ void dlgProfilePreferences::slot_save_and_exit()
     if( pHost->mpMap ){
         if( pHost->mpMap->mpMapper ){
             pHost->mpMap->mpMapper->mp2dMap->mMapperUseAntiAlias = mMapperUseAntiAlias->isChecked();
-            pHost->mpMap->mpMapper->mp2dMap->setRoomSize(roomSize->value());
-            pHost->mpMap->mpMapper->mp2dMap->setExitSize(lineSize->value());
-            pHost->mpMap->mpMapper->mp2dMap->setPanSpeed(panSpeed->value());
-            pHost->mpMap->mpMapper->mp2dMap->mBubbleMode = bubbles->isChecked();
-            pHost->mpMap->mpMapper->mp2dMap->mShowGrid = grid->isChecked();
-            pHost->mMapStrongHighlight = strongHighlight->isChecked();
-            pHost->mpMap->mpMapper->mp2dMap->mShowRoomID = showRoomIDs->isChecked();
+            pHost->mpMap->mpMapper->mp2dMap->setRoomSize((double)roomSize->value());
+            pHost->mpMap->mpMapper->mp2dMap->setExitSize((double)lineSize->value());
+            pHost->mpMap->mpMapper->mp2dMap->setPanSpeed((int)panSpeed->value());
+            pHost->mpMap->mpMapper->mp2dMap->setBubbleMode(bubbles->isChecked());
+            pHost->mpMap->mpMapper->mp2dMap->setGridMode(grid->isChecked());
+            pHost->mpMap->mpMapper->mp2dMap->setStrongHighlight(strongHighlight->isChecked());
+            pHost->mpMap->mpMapper->mp2dMap->showRoomIDs(showRoomIDs->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->update();
         }
     }

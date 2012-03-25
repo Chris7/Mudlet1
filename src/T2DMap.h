@@ -48,6 +48,10 @@ public:
     void     setRoomSize( double );
     void     setExitSize( double );
     void     setPanSpeed( double );
+    void     setBubbleMode(bool);
+    void     setGridMode(bool);
+    void     setStrongHighlight(bool);
+    void     showRoomIDs(bool);
 
 
     TMap *   mpMap;
@@ -108,6 +112,7 @@ public:
     QPointF mLastMouseClick;
     bool mBubbleMode;
     bool mMapperUseAntiAlias;
+    bool mStrongHighlight;
 
 signals:
 

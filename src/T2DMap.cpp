@@ -2415,6 +2415,25 @@ void T2DMap::wheelEvent ( QWheelEvent * e )
     return;
 }
 
+void T2DMap::setBubbleMode(bool checked){
+    mBubbleMode = checked;
+    if (mpHost) mpHost->mBubbleMode = checked;
+}
+
+void T2DMap::setGridMode(bool checked){
+    mShowGrid = checked;
+    if (mpHost) mpHost->mShowGrid = checked;
+}
+
+void T2DMap::setStrongHighlight(bool checked){
+    mStrongHighlight = checked;
+    if (mpHost) mpHost->mMapStrongHighlight = checked;
+}
+
+void T2DMap::showRoomIDs(bool checked){
+    mShowRoomID = checked;
+    if (mpHost) mpHost->mShowRoomID = checked;
+}
 
 void T2DMap::setRoomSize( double f )
 {

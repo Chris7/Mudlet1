@@ -304,6 +304,8 @@ public:
     int                mPanSpeed;
     bool               mShowInfo;
     bool               mBubbleMode;
+    bool               mShowGrid;
+    bool               mShowRoomID;
     int                mServerGUI_Package_version;
     QString            mServerGUI_Package_name;
     bool               mAcceptServerGUI;
