@@ -505,6 +505,8 @@ void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
     QTableWidgetItem * entry = moduleTable->item(i,2);
     QTableWidgetItem * checkStatus = moduleTable->item(i,0);
     QTableWidgetItem * itemPriority = moduleTable->item(i,1);
+    if (!entry || !pH->mInstalledModules.contains(entry->text()))
+        return;
     moduleStringList = pH->mInstalledModules[entry->text()];
     if (checkStatus->checkState() == Qt::Unchecked){
         moduleStringList[1] = "0";
