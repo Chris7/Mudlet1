@@ -129,6 +129,7 @@ public:
     float m2DPanYStart;
     int mViewArea;
     int mOldId;
+    QString mapLocation;
     QMap<QString, mVarTypes> mVars;
     int mTargetID;
     QList<int> mPathList;

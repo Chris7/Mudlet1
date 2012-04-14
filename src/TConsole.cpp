@@ -1721,6 +1721,7 @@ bool TConsole::loadMap(QString location)
 {
     if (!mpHost || !mpHost->mpMap || !mpHost->mpMap->mpMapper)
         return false;
+    qDebug()<<"loadMap called";
     mpHost->mpMap->restore(location);
     mpHost->mpMap->init( mpHost );
     mpHost->mpMap->mpMapper->mp2dMap->init();
@@ -2350,6 +2351,7 @@ void TConsole::createMapper( int x, int y, int width, int height )
         mpHost->mpMap->mpHost = mpHost;
         mpHost->mpMap->mpMapper = mpMapper;
         mpMapper->mpHost = mpHost;
+        qDebug()<<"createMapper called";
         mpHost->mpMap->restore("");
         mpHost->mpMap->init( mpHost );
     }

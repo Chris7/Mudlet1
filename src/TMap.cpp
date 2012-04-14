@@ -1153,7 +1153,10 @@ bool TMap::restore(QString location)
     QString folder;
     QStringList entries;
     qDebug()<<"RESTORING MAP";
-
+    if (location == "" && mapLocation != ""){
+        //no need to restore
+        return true;
+    }
     if (location == "") {
         folder = QDir::homePath()+"/.config/mudlet/profiles/"+mpHost->getName()+"/map/";
         QDir dir( folder );
@@ -1315,6 +1318,7 @@ bool TMap::restore(QString location)
         qDebug()<<"LOADED rooms:"<<rooms.size();
         if( canRestore )
         {
+            mapLocation = file.fileName();
             return true;
         }
     }

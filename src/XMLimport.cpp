@@ -800,6 +800,19 @@ void XMLimport::readHostPackage( Host * pT )
     pT->mAcceptServerGUI = ( attributes().value("mAcceptServerGUI") == "yes" );
     pT->mMapperUseAntiAlias = ( attributes().value("mMapperUseAntiAlias") == "yes" );
     pT->mFORCE_MXP_NEGOTIATION_OFF = ( attributes().value("mFORCE_MXP_NEGOTIATION_OFF") == "yes" );
+    pT->mPanSpeed = attributes().value("mPanSpeed").toString().toInt();
+    if (!pT->mPanSpeed)
+        pT->mPanSpeed=1;
+    pT->mRoomSize = attributes().value("mRoomSize").toString().toInt();
+    if (!pT->mRoomSize)
+        pT->mRoomSize=3;
+    pT->mLineSize = attributes().value("mLineSize").toString().toInt();
+    if (!pT->mLineSize)
+        pT->mLineSize=1;
+    pT->mMapStrongHighlight = ( attributes().value("mStrongHighlight") == "yes" );
+    pT->mBubbleMode = ( attributes().value("mBubbleMode") == "yes" );
+    pT->mShowGrid = ( attributes().value("mShowGrid") == "yes" );
+    pT->mShowRoomID = ( attributes().value("mShowRoomIDs") == "yes" );
 
     while( ! atEnd() )
     {
@@ -1460,19 +1473,23 @@ void XMLimport::readAliasGroup( TAlias * pParent )
             else if( name() == "command")
             {
                 pT->mCommand = readElementText();
+                qDebug()<<"comm"<<pT->getID()<<pT->mCommand;
                 continue;
             }
             else if( name() == "regex")
             {
                 pT->setRegexCode( readElementText() );
+                qDebug()<<"regex"<<pT->getID()<<pT->mRegexCode;
                 continue;
             }
             else if( name() == "AliasGroup" )
             {
+                qDebug()<<"alias group"<<pT->getID()<<pT->mName;
                 readAliasGroup( pT );
             }
             else if( name() == "Alias" )
             {
+                qDebug()<<"alias"<<pT->getID()<<pT->mName;
                 readAliasGroup( pT );
             }
             else

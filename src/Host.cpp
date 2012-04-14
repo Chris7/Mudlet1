@@ -161,6 +161,7 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
     mErrorLogFile.setFileName( logFileName );
     mErrorLogFile.open( QIODevice::Append );
     mErrorLogStream.setDevice( &mErrorLogFile );
+    qDebug()<<"host mpMap restore called";
     mpMap->restore("");
     mpMap->init( this );
     mMapStrongHighlight = false;
@@ -289,9 +290,9 @@ Host::Host()
     mErrorLogFile.setFileName( logFileName );
     mErrorLogFile.open( QIODevice::Append );
     mErrorLogStream.setDevice( &mErrorLogFile );
-    mpMap->restore("");
-    mpMap->init( this );
-    mMapStrongHighlight = false;
+    //mpMap->restore("");
+    //mpMap->init( this );
+    //mMapStrongHighlight = false;
     mGMCP_merge_table_keys.append("Char.Status");
 }
 

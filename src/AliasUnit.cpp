@@ -121,10 +121,12 @@ void AliasUnit::addAliasRootNode( TAlias * pT, int parentPosition, int childPosi
          // insert item at proper position
         int cnt = 0;
         typedef std::list<TAlias *>::iterator IT;
+        qDebug()<<"getting rdy to insert"<<pT->mFuncName;
         for( IT it = mAliasRootNodeList.begin(); it != mAliasRootNodeList.end(); it ++ )
         {
             if( cnt >= childPosition )
             {
+                qDebug()<<"inserting"<<pT->mFuncName<<"at"<<cnt;
                 mAliasRootNodeList.insert( it, pT );
                 break;
             }
@@ -212,7 +214,6 @@ TAlias * AliasUnit::getAliasPrivate( int id )
 bool AliasUnit::registerAlias( TAlias * pT )
 {
     if( ! pT ) return false;
-
     if( pT->getParent() )
     {
         addAlias( pT );
@@ -249,7 +250,7 @@ void AliasUnit::addAlias( TAlias * pT )
     {
         pT->setID( getNewID() );
     }
-
+    qDebug()<<"adding alias"<<pT->getID();
     mAliasMap.insert( pT->getID(), pT );
 }
 
