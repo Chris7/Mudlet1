@@ -45,8 +45,6 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
     gotAction = false;
     gotScript = false;
     module = moduleFlag;
-    /*if (moduleFlag)
-        module=1;*/
     qDebug()<<"module flag:"<<module<<" importing: "<<mPackageName;
 
 
@@ -145,6 +143,7 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpHost->getTriggerUnit()->unregisterTrigger( mpTrigger );
        if( ! gotTimer )
             mpHost->getTimerUnit()->unregisterTimer( mpTimer );
+       qDebug()<<"gotAlias status"<<gotAlias;
        if( ! gotAlias )
             mpHost->getAliasUnit()->unregisterAlias( mpAlias );
        if( ! gotAction )

@@ -223,19 +223,19 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
             }
             //delete everything from cItem
             luaInterface * lI = new luaInterface(mpHost);
-            QString dName = cItem->text(0);
-            QStringList itemInfo = cItem->data(0, Qt::UserRole).toStringList();
+            //QString dName = cItem->text(0);
+            //QStringList itemInfo = cItem->data(0, Qt::UserRole).toStringList();
             QString varName;
             QMap<QString, QTreeWidgetItem *> varsToChange;
-            int itemType = itemInfo[1].toInt();
+            /*int itemType = itemInfo[1].toInt();
             for (int i=3;i<itemInfo.size();i++){
                 varName+=itemInfo[i];
             }
             if (itemType != LUA_TTABLE){
                 varName+=itemInfo[0]+cItem->text(0);
-            }
+            }*/
             recurseVarTree(cItem, varsToChange);
-            qDebug()<<varsToChange;
+//            qDebug()<<"Vars we're going to change:"<<varsToChange;
             lI->deleteVar(cItem);
             QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
             while (it.hasNext()){
@@ -256,22 +256,24 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
                  //   newItemInfo.removeLast();
                 //qDebug()<<itemInfo;
                 //qDebug()<<newItemInfo;
-                qDebug()<<pI->text(0);
+//                qDebug()<<pI->text(0);
                 pI->setData(0, Qt::UserRole, newItemInfo);
                 newItemInfo.prepend(pI->text(0));
                 //lI->saveVar(pI, pI->text(0), newItemInfo[2],1);
-                qDebug()<<"restoring"<<newItemInfo;
+//                qDebug()<<"restoring"<<newItemInfo;
                 lI->restoreVar(newItemInfo);
+//                qDebug()<<mpHost->savedVariables;
                 if (mpHost->savedVariables.contains(it.key())){
                     mpHost->savedVariables.remove(it.key());
                     varName = "";
-                    int itemType = newItemInfo[1].toInt();
-                    for (int i=3;i<newItemInfo.size();i++){
+                    int itemType = newItemInfo[2].toInt();
+                    for (int i=4;i<newItemInfo.size();i++){
                         varName+=newItemInfo[i];
                     }
                     if (itemType != LUA_TTABLE){
-                        varName+=newItemInfo[0]+pI->text(0);
+                        varName+=newItemInfo[1]+pI->text(0);
                     }
+//                    qDebug()<<"new saved var name"<<varName;
                     mpHost->savedVariables.insert(varName, pI);
                 }
             }

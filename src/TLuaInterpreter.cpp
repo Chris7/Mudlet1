@@ -157,7 +157,20 @@ void TLuaInterpreter::slotPurge() {
     }
 }
 
+/*
+   Function: Wait
 
+   Suspends the lua interpretter for a given time
+
+   Parameters:
+
+      duration - Time in msecs (so 5000=5s) to wait
+
+   Returns:
+
+      Nothing
+
+*/
 int TLuaInterpreter::Wait( lua_State *L )
 {
   int n = lua_gettop( L );
@@ -220,9 +233,6 @@ int TLuaInterpreter::resetProfile( lua_State * L )
     return 0;
 }
 
-
-
-// cursorPositionInLine = select( text ) if not found -1
 int TLuaInterpreter::select( lua_State * L )
 {
     int s = 1;
@@ -306,6 +316,24 @@ int TLuaInterpreter::selectCurrentLine( lua_State * L )
     return 0;
 }
 
+/*
+   Function: isAnsiFgColor
+
+   Checks if the currently selected line is the specified ansi color
+
+   Parameters:
+
+      ansi color
+
+   Returns:
+
+      Boolean true or false
+
+   See also:
+
+      ansi color list
+
+*/
 int TLuaInterpreter::isAnsiFgColor( lua_State * L )
 {
     int ansiFg;
@@ -376,6 +404,25 @@ int TLuaInterpreter::isAnsiFgColor( lua_State * L )
     return 1;
 }
 
+
+/*
+   Function: isAnsiBgColor
+
+   Checks if the currently selected line is the specified ansi color
+
+   Parameters:
+
+      ansi color
+
+   Returns:
+
+      Boolean true or false
+
+   See also:
+
+      ansi color list
+
+*/
 int TLuaInterpreter::isAnsiBgColor( lua_State * L )
 {
     int ansiFg;
@@ -447,6 +494,24 @@ int TLuaInterpreter::isAnsiBgColor( lua_State * L )
     return 1;
 }
 
+/*
+   Function: getFgColor
+
+   Returns the ansi color of the current selection
+
+   Parameters:
+
+      None
+
+   Returns:
+
+      A R,G,B table giving the color intensity of each channel
+
+   See also:
+
+      <getBgColor>
+
+*/
 int TLuaInterpreter::getFgColor( lua_State * L )
 {
     string luaSendText="";
@@ -480,6 +545,24 @@ int TLuaInterpreter::getFgColor( lua_State * L )
     return result.size();
 }
 
+/*
+   Function: getBgColor
+
+   Returns the ansi color of the current selection
+
+   Parameters:
+
+      None
+
+   Returns:
+
+      A R,G,B table giving the color intensity of each channel
+
+   See also:
+
+      <getFgColor>
+
+*/
 int TLuaInterpreter::getBgColor( lua_State * L )
 {
     string luaSendText="";
@@ -513,6 +596,34 @@ int TLuaInterpreter::getBgColor( lua_State * L )
     return result.size();
 }
 
+/*
+   Function: wrapLine
+
+   wrap line lineNumber of mini console (window) windowName. This
+   function will interpret \n characters, apply word wrap and
+   display the new lines on the screen. This function may be
+   necessary if you use deleteLine() and thus erase the entire
+   current line in the buffer, but you want to do some further
+   echo() calls after calling deleteLine(). You will then need
+   to re-wrap the last line of the buffer to actually see what
+   you have echoed and get your \n interpreted as newline characters
+   properly. Using this function is not good programming practice and
+   should be avoided.
+
+   Parameters:
+
+      window name - string
+      wrap length - integer
+
+   Returns:
+
+      Nothing
+
+   See also:
+
+      <deleteLine>
+
+*/
 int TLuaInterpreter::wrapLine( lua_State * L )
 {
     int s = 1;
@@ -559,7 +670,24 @@ int TLuaInterpreter::spawn( lua_State * L )
 }
 
 
+/*
+   Function: selectCaptureGroup
 
+   Makes the current selection the captured regex
+
+   Parameters:
+
+      Capture group (starts at 1)
+
+   Returns:
+
+      None
+
+   See also:
+
+      None
+
+*/
 // cursorPositionInLine = selectCaptureGroup( groupNumber ) if not found -1
 int TLuaInterpreter::selectCaptureGroup( lua_State * L )
 {
@@ -774,6 +902,25 @@ int TLuaInterpreter::getLineNumber( lua_State * L )
     return 1;
 }
 
+
+/*
+   Function: updateMap
+
+   Forces the map to update.  Useful after some setMapVar actions.
+
+   Parameters:
+
+      None
+
+   Returns:
+
+      None
+
+   See also:
+
+      <setMapVar>
+
+*/
 int TLuaInterpreter::updateMap(lua_State * L){
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     if( pHost->mpMap)
@@ -8018,6 +8165,24 @@ int TLuaInterpreter::insertHTML( lua_State *L )
     return 0;
 }
 
+/*
+   Function: echo
+
+   Echos to the screen
+
+   Parameters:
+
+      text/window - Text to echo to main screen OR window to echo to
+      text - If echoing to a window, this is the text to echo.  Optional argument.
+
+   Returns:
+
+      None
+
+   See Also:
+
+*/
+
 int TLuaInterpreter::Echo( lua_State *L )
 {
     string a1;
@@ -8534,6 +8699,23 @@ int TLuaInterpreter::registerAnonymousEventHandler( lua_State * L )
     return 0;
 }
 
+/*
+   Function: expandAlias
+
+   Sends an alias from a script
+
+   Parameters:
+
+      alias name - The name of the alias to send.
+      print - A boolean value to print the alias to the screen
+
+   Returns:
+
+      None
+
+   See Also:
+
+*/
 
 int TLuaInterpreter::Send( lua_State * L )
 {

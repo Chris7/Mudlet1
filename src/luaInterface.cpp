@@ -251,6 +251,7 @@ void luaInterface::deleteVar(QTreeWidgetItem * pItem){
 }
 
 void luaInterface::restoreVar(QStringList pInfo){
+    qDebug()<<"pinfo we're trying to restore"<<pInfo;
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
     QStringList nested;
@@ -263,6 +264,8 @@ void luaInterface::restoreVar(QStringList pInfo){
     for (int i=3;i<pInfo.size();i++)
         if (pInfo[i] != "")
             nested<<pInfo[i];
+    if (nested.size() && (nested.first() == "Table" || nested.first() == "NewTable"))
+        nested.pop_front();
     if (nested.size()){
         for (int i=0;i<nested.size();i++){
             QString tableName = nested[i];

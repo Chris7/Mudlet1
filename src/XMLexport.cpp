@@ -418,9 +418,11 @@ bool XMLexport::writeHost( Host * pT )
         mpHost->mpEditorDialog->repopulateVars();
         QMap<QString, QTreeWidgetItem *> savedVariables = mpHost->savedVariables;
         QMapIterator<QString, QTreeWidgetItem *> it(savedVariables);
+        qDebug()<<savedVariables;
         luaInterface * lI = new luaInterface(mpHost);
         while (it.hasNext()){
             it.next();
+//            qDebug()<<it.key();
             QStringList info = it.value()->data(0, Qt::UserRole).toStringList();
             QString value = "";
             if (QString(info[1]).toInt() != LUA_TTABLE)
