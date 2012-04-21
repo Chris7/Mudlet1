@@ -221,6 +221,7 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
                 if (newInfo[i] != "")
                     newRoot << newInfo[i];
             }
+            //who is our new parent?
             //delete everything from cItem
             luaInterface * lI = new luaInterface(mpHost);
             //QString dName = cItem->text(0);
@@ -236,26 +237,33 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
             }*/
             recurseVarTree(cItem, varsToChange);
 //            qDebug()<<"Vars we're going to change:"<<varsToChange;
+//            qDebug()<<"our new parent"<<newInfo;
+//            qDebug()<<"our old parent"<<oldInfo;
+//            qDebug()<<"our old root"<<oldRoot;
+//            qDebug()<<"our new root"<<newRoot;
             lI->deleteVar(cItem);
             QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
             while (it.hasNext()){
                 it.next();
-                qDebug()<<it.key();
+//                qDebug()<<it.key();
                 QTreeWidgetItem * pI = it.value();
                 //lI->deleteVar(pI,pI->text(0));
                 QStringList itemInfo = pI->data(0, Qt::UserRole).toStringList();
                 QStringList newItemInfo;
                 newItemInfo = itemInfo;
+//                qDebug()<<"before change"<<newItemInfo;
                 for (int i=0;i<oldRoot.size();i++){
-                    newItemInfo.removeAt(3+i);
+                    newItemInfo.removeAt(3);
                 }
+//                qDebug()<<"after removing old root:"<<newItemInfo;
                 for (int i=0;i<newRoot.size();i++){
                     newItemInfo.insert(3+i,newRoot[i]);
                 }
+//                qDebug()<<"with new root:"<<newItemInfo;
                // if (newItemInfo[1].toInt() == LUA_TTABLE)
                  //   newItemInfo.removeLast();
                 //qDebug()<<itemInfo;
-                //qDebug()<<newItemInfo;
+//                qDebug()<<newItemInfo;
 //                qDebug()<<pI->text(0);
                 pI->setData(0, Qt::UserRole, newItemInfo);
                 newItemInfo.prepend(pI->text(0));
