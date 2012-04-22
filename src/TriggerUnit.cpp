@@ -60,10 +60,11 @@ void TriggerUnit::_uninstall( TTrigger * pChild, QString packageName )
     {
         TTrigger * pT = *it2;
         _uninstall( pT, packageName );
-        if( pT->mPackageName == packageName )
-        {
-            uninstallList.append( pT );
-        }
+//        if( pT->mPackageName == packageName )
+//        {
+//            uninstallList.append( pT );
+//        }
+        uninstallList.append( pT );
     }
 
 }
@@ -86,6 +87,7 @@ void TriggerUnit::uninstall( QString packageName )
         unregisterTrigger(uninstallList[i]);
 
     }
+    uninstallList.clear();
 }
 
 void TriggerUnit::removeAllTempTriggers()

@@ -71,14 +71,14 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
         mpTrigger->setIsFolder( true );
 
         mpTimer = new TTimer( 0, mpHost );
+        mpTimer->setIsFolder( true );
         if (module){
             mpTimer->mModuleMasterFolder=true;
             mpTimer->mModuleMember=true;
         }
+        mpTimer->setIsActive( false );
         mpTimer->setPackageName( mPackageName );
-        mpTimer->setIsActive( true );
         mpTimer->setName( mPackageName );
-        mpTimer->setIsFolder( true );
 
         mpAlias = new TAlias( 0, mpHost );
         if (module){
@@ -137,6 +137,11 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
                 qDebug()<<"ERROR:name="<<name().toString()<<"text:"<<text().toString();
             }
         }
+    }
+    if( gotTimer && ! packName.isEmpty() )
+    {
+        mpTimer->setIsActive( true );
+        mpTimer->enableTimer( mpTimer->getID() );
     }
     if( ! packName.isEmpty()){
        if( ! gotTrigger ){
@@ -1328,9 +1333,10 @@ void XMLimport::readTimerGroup( TTimer * pParent )
         pT = new TTimer( 0, mpHost );
     }
     pT->registerTimer();
-    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
+//    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     pT->mIsTempTimer = ( attributes().value("isTempTimer") == "yes" );
+    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
     if (module)
         pT->mModuleMember = true;
 

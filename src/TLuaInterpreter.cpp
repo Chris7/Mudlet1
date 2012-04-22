@@ -6417,9 +6417,13 @@ int TLuaInterpreter::deleteArea( lua_State *L )
         QString _name = name.c_str();
         if( pHost->mpMap->areaNamesMap.values().contains( _name ) )
         {
-            pHost->mpMap->deleteArea( id );
+//            pHost->mpMap->deleteArea( id );
+            pHost->mpMap->deleteArea( pHost->mpMap->areaNamesMap.key(_name) );
             pHost->mpMap->mMapGraphNeedsUpdate = false;
+            pHost->mpMap->areaNamesMap.remove( pHost->mpMap->areaNamesMap.key(_name) );
         }
+        else
+            pHost->mpMap->areaNamesMap.remove( pHost->mpMap->areaNamesMap.key(_name) );
     }
     else
     {
@@ -6427,7 +6431,10 @@ int TLuaInterpreter::deleteArea( lua_State *L )
         {
             pHost->mpMap->deleteArea( id );
             pHost->mpMap->mMapGraphNeedsUpdate = false;
+            pHost->mpMap->areaNamesMap.remove( id );
         }
+        else
+            pHost->mpMap->areaNamesMap.remove( id );
     }
     return 0;
 }
