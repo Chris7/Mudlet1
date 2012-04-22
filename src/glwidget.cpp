@@ -25,6 +25,9 @@
 #include "glwidget.h"
 #include "Host.h"
 #include "dlgMapper.h"
+#if QT_VERSION >= 0x040800
+    #include <gl/GLU.h>
+#endif
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D

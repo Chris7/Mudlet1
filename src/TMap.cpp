@@ -390,6 +390,17 @@ void TMap::buildAreas()
             areas[rooms[id]->area] = new TArea( this );
         }
     }
+    // if the area has been created without any rooms add the area ID
+    QMapIterator<int, QString> it2( areaNamesMap );
+    while( it2.hasNext() )
+    {
+        it2.next();
+        int id = it2.key();
+        if( ! areas.contains( id ) )
+        {
+            areas[id] = new TArea( this );
+        }
+    }
 }
 
 void TMap::setView(float x, float y, float z, float zoom )
@@ -739,7 +750,7 @@ void TMap::initGraph()
 {
     locations.clear();
     g.clear();
-    g = mygraph_t(rooms.size()*10);//FIXME
+    g = mygraph_t();
     weightmap = get(edge_weight, g);
     QMapIterator<int, TRoom *> it( rooms );
     int roomCount=0;

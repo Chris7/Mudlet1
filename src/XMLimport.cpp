@@ -19,6 +19,7 @@
 
 
 #include "XMLimport.h"
+#include "mudlet.h"
 #include "luaInterface.h"
 #include <QStringList>
 #include <QDebug>
@@ -76,9 +77,9 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpTimer->mModuleMasterFolder=true;
             mpTimer->mModuleMember=true;
         }
-        mpTimer->setIsActive( false );
         mpTimer->setPackageName( mPackageName );
         mpTimer->setName( mPackageName );
+        mpTimer->setIsActive( true );
 
         mpAlias = new TAlias( 0, mpHost );
         if (module){
@@ -86,9 +87,12 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpAlias->mModuleMember=true;
         }
         mpAlias->setPackageName( mPackageName );
-        mpAlias->setIsActive( true );
         mpAlias->setName( mPackageName );
         mpAlias->setIsFolder( true );
+        QString _nothing = "";
+        mpAlias->setScript(_nothing);
+        mpAlias->setRegexCode("");
+        mpAlias->setIsActive( true );
         mpAction = new TAction( 0, mpHost );
         if (module){
             mpAction->mModuleMasterFolder=true;
@@ -142,6 +146,10 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
     {
         mpTimer->setIsActive( true );
         mpTimer->enableTimer( mpTimer->getID() );
+    }
+    if( gotAlias && ! packName.isEmpty() )
+    {
+        mpAlias->setIsActive( true );
     }
     if( ! packName.isEmpty()){
        if( ! gotTrigger ){
@@ -1324,6 +1332,7 @@ void XMLimport::readTimerPackage()
 void XMLimport::readTimerGroup( TTimer * pParent )
 {
     TTimer * pT;
+    QTime _time(10,0,0,0);
     if( pParent )
     {
         pT = new TTimer( pParent, mpHost );
@@ -1332,11 +1341,13 @@ void XMLimport::readTimerGroup( TTimer * pParent )
     {
         pT = new TTimer( 0, mpHost );
     }
-    pT->registerTimer();
+
 //    pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
     pT->mIsFolder = ( attributes().value("isFolder") == "yes" );
     pT->mIsTempTimer = ( attributes().value("isTempTimer") == "yes" );
+    mpHost->getTimerUnit()->registerTimer( pT );
     pT->setShouldBeActive( ( attributes().value("isActive") == "yes" ) );
+    bool isOffsetTimer = ( attributes().value("isOffsetTimer") == "yes" );
     if (module)
         pT->mModuleMember = true;
 
@@ -1389,11 +1400,21 @@ void XMLimport::readTimerGroup( TTimer * pParent )
             }
         }
     }
-
-    if( ( ! pT->isOffsetTimer() ) && ( pT->shouldBeActive() ) )
+    mudlet::self()->registerTimer( pT, pT->mpTimer );
+    if( ! pT->mpParent && pT->shouldBeActive() )
+    {
+        qDebug()<<"regular Timer enabling name:"<<pT->getName();
+        pT->setIsActive( true );
         pT->enableTimer( pT->getID() );
+    }
     else
-        pT->disableTimer( pT->getID() );
+    {
+        qDebug()<<"NOT enabling Timer name:"<<pT->getName();
+        //pT->disableTimer( pT->getID() );
+        //pT->deactivate();
+        //pT->mpTimer->stop();
+        //pT->setIsActive( pT->shouldBeActive() );
+    }
 
 }
 
