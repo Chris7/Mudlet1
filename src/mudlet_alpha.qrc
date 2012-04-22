@@ -119,5 +119,6 @@
         <file>ui/custom_lines.ui</file>
         <file>generic_mapper_script.xml</file>
         <file>mudlet-mapper.xml</file>
+        <file>icons/3slogo.png</file>
     </qresource>
 </RCC>

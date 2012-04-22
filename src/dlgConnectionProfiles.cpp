@@ -697,6 +697,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "<center><a href='http://www.lusternia.com/'>http://www.lusternia.com</a></center>";;
         if( profile_name == "Imperian" )
             val = "<center><a href='http://www.imperian.com/'>http://www.imperian.com</a></center>";;
+        if( profile_name == "3Scapes" )
+            val = "<center><a href='http://www.3scapes.org/'>http://www.3scapes.org</a></center>";;
     }
     website_entry->setText( val );
 
@@ -921,7 +923,7 @@ void dlgConnectionProfiles::fillout_form()
     muds = "BatMUD";
     QPixmap pb(":/icons/batmud_mud.png");
     QPixmap pb1 = pb.scaled(QSize(120,30)).copy();
-    mi = QIcon( pb1 );
+    mi = QIcon( pb1.copy() );
     pM = new QListWidgetItem( muds );
     pM->setFont(font);
     pM->setForeground(QColor(255,255,255));
@@ -939,6 +941,17 @@ void dlgConnectionProfiles::fillout_form()
     QPixmap pa1 = pa.scaled(QSize(120,30)).copy();
     QIcon mi3( pa1 );
     pM3->setIcon(mi3);
+    muds.clear();
+
+    muds = "3Scapes";
+    pM = new QListWidgetItem( muds );
+    pM->setFont(font);
+    pM->setForeground(QColor(255,255,255));
+    profiles_tree_widget->addItem(pM);
+    QPixmap pc(":/icons/3slogo.png");
+    QPixmap pc1 = pc.scaled(QSize(120,30),Qt::IgnoreAspectRatio, Qt::SmoothTransformation).copy();
+    QIcon mi4(pc1);
+    pM->setIcon(mi4);
     muds.clear();
     QDateTime test_date;
     QListWidgetItem * toselect = 0;
@@ -971,6 +984,8 @@ void dlgConnectionProfiles::fillout_form()
         if( mProfileList[i] == "Realms of Despair" )
             continue;
         if( mProfileList[i] == "ZombieMUD" )
+            continue;
+        if( mProfileList[i] == "3Scapes" )
             continue;
         QString sList;
         sList = mProfileList[i];
