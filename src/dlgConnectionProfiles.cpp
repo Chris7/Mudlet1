@@ -610,6 +610,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "realmsofdespair.com";
         if( profile_name == "ZombieMUD" )
             val = "zombiemud.org";
+        if( profile_name == "3Scapes")
+            val = "3k.org"
     }
     host_name_entry->setText( val );
     item = "port";
@@ -640,6 +642,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "4000";
         if( profile_name == "ZombieMUD" )
             val = "23";
+        if( profile_name == "3Scapes")
+            val = "3200";
     }
     port_entry->setText( val );
     item = "password";
