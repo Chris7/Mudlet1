@@ -6300,6 +6300,7 @@ int TLuaInterpreter::setAreaName( lua_State *L )
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     QString _name = name.c_str();
     pHost->mpMap->areaNamesMap[id] = _name;
+    pHost->mpMap->mpMapper->repopulateAreas();
     return 0;
 }
 
@@ -6383,6 +6384,7 @@ int TLuaInterpreter::addAreaName( lua_State *L )
             id++;
         }
         pHost->mpMap->areaNamesMap[id] = _name;
+        pHost->mpMap->mpMapper->repopulateAreas();
         lua_pushnumber( L, id );
     }
     else
@@ -6436,6 +6438,7 @@ int TLuaInterpreter::deleteArea( lua_State *L )
         else
             pHost->mpMap->areaNamesMap.remove( id );
     }
+    pHost->mpMap->mpMapper->repopulateAreas();
     return 0;
 }
 
