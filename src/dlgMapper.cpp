@@ -109,25 +109,27 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
 
 void dlgMapper::repopulateAreas(){
     //if (mpMap && mpMap->areaNamesMap && showArea){
-        QMapIterator<int, QString> it( mpMap->areaNamesMap );
-        //sort them alphabetically (case sensitive so we use lower)
-        QMap <QString, QStringList> areaNames;
-        showArea->clear();
-        while( it.hasNext() )
-        {
-            it.next();
-            QStringList info;
-            info.append(it.value());
-            info.append(QString::number(it.key()));
-            areaNames.insert(it.value().toLower(), info);
-        }
-        QMapIterator<QString, QStringList> areaIt( areaNames );
-        while( areaIt.hasNext() )
-        {
-            areaIt.next();
-            QStringList info = areaIt.value();
-            showArea->addItem( info[0], info[1].toInt() );
-        }
+    if (!mpMap)
+        return;
+    QMapIterator<int, QString> it( mpMap->areaNamesMap );
+    //sort them alphabetically (case sensitive so we use lower)
+    QMap <QString, QStringList> areaNames;
+    showArea->clear();
+    while( it.hasNext() )
+    {
+        it.next();
+        QStringList info;
+        info.append(it.value());
+        info.append(QString::number(it.key()));
+        areaNames.insert(it.value().toLower(), info);
+    }
+    QMapIterator<QString, QStringList> areaIt( areaNames );
+    while( areaIt.hasNext() )
+    {
+        areaIt.next();
+        QStringList info = areaIt.value();
+        showArea->addItem( info[0], info[1].toInt() );
+    }
     //}
 }
 

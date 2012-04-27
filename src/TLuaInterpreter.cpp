@@ -6384,7 +6384,8 @@ int TLuaInterpreter::addAreaName( lua_State *L )
             id++;
         }
         pHost->mpMap->areaNamesMap[id] = _name;
-        pHost->mpMap->mpMapper->repopulateAreas();
+        if (pHost->mpMap->mpMapper)
+            pHost->mpMap->mpMapper->repopulateAreas();
         lua_pushnumber( L, id );
     }
     else

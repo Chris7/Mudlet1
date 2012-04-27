@@ -611,7 +611,7 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
         if( profile_name == "ZombieMUD" )
             val = "zombiemud.org";
         if( profile_name == "3Scapes")
-            val = "3k.org"
+            val = "3k.org";
     }
     host_name_entry->setText( val );
     item = "port";
