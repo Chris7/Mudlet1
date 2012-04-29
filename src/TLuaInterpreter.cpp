@@ -5014,11 +5014,15 @@ int TLuaInterpreter::tempTrigger( lua_State *L )
         luaFunction = lua_tostring( L, 2 );
     }
 
+    bool autokill = false;
+    if (lua_isboolean(L,3))
+        autokill=lua_toboolean(L,3);
+
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
     TLuaInterpreter * pLuaInterpreter = pHost->getLuaInterpreter();
     QString _reg = luaRegex.c_str();
     QString _fun = luaFunction.c_str();
-    int timerID = pLuaInterpreter->startTempTrigger( _reg, _fun );
+    int timerID = pLuaInterpreter->startTempTrigger( _reg, _fun, autokill );
     lua_pushnumber( L, timerID );
     //lua_pushstring( L, _reg.toLatin1().data());
     return 1;
@@ -10245,7 +10249,7 @@ int TLuaInterpreter::startTempBeginOfLineTrigger( QString & regex, QString & fun
 }
 
 
-int TLuaInterpreter::startTempTrigger( QString & regex, QString & function )
+int TLuaInterpreter::startTempTrigger( QString & regex, QString & function, bool autoKill )
 {
     TTrigger * pT;
     QStringList sList;
@@ -10258,6 +10262,7 @@ int TLuaInterpreter::startTempTrigger( QString & regex, QString & function )
     pT->setIsTempTrigger( true );
     pT->registerTrigger();
     pT->setScript( function );
+    pT->setAutoKill(autoKill);
     int id = pT->getID();
     pT->setName( QString::number( id ) );
     return id;

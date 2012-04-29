@@ -99,7 +99,7 @@ public:
     bool             setScript( QString & script );
     bool             compileScript();
     bool             match( char *, QString &, int line, int posOffset = 0 );
-
+    void             setAutoKill(bool);
     bool             isFolder()                      { return mIsFolder; }
     bool             isMultiline()                   { return mIsMultiline; }
     int              getTriggerType()                { return mTriggerType; }
@@ -147,6 +147,7 @@ public:
     int              mColorTriggerFgAnsi;
     int              mColorTriggerBgAnsi;
     int              mKeepFiring;
+    bool             mAutoKill;
     bool             isClone( TTrigger & ) const;
     Host *           mpHost;
     QString                                mName;

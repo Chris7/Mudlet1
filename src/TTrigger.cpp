@@ -54,6 +54,7 @@ TTrigger::TTrigger( TTrigger * parent, Host * pHost )
 , mColorTriggerFg( false )
 , mColorTriggerBg( false )
 , mKeepFiring( 0 )
+, mAutoKill(false)
 , mpHost( pHost )
 , mIsTempTrigger( false )
 , mModuleMember(false)
@@ -83,6 +84,7 @@ TTrigger::TTrigger( QString name, QStringList regexList, QList<int> regexPropery
 , mColorTriggerFg( false )
 , mColorTriggerBg( false )
 , mKeepFiring( 0 )
+, mAutoKill(false)
 , mpHost( pHost )
 , mName( name )
 , mIsTempTrigger( false )
@@ -1446,6 +1448,10 @@ bool TTrigger::compileScript()
     }
 }
 
+void TTrigger::setAutoKill(bool val){
+    mAutoKill=val;
+}
+
 void TTrigger::execute()
 {
     if( mSoundTrigger )
@@ -1471,6 +1477,8 @@ void TTrigger::execute()
     {
         mpLua->call( mFuncName, mName );
     }
+    if (mAutoKill)
+        killTrigger(mName);
 }
 
 void TTrigger::enableTrigger( QString & name )

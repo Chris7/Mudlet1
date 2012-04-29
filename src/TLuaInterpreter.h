@@ -101,7 +101,7 @@ public:
 
     int startTempTimer( double, QString & );
     int startTempAlias( QString &, QString & );
-    int startTempTrigger( QString &, QString & );
+    int startTempTrigger( QString &, QString &, bool);
     int startTempBeginOfLineTrigger( QString &, QString & );
     int startTempExactMatchTrigger( QString &, QString & );
     int startTempLineTrigger( int, int, QString & );
