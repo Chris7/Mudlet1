@@ -122,6 +122,7 @@ public:
    void                          readSettings();
    void                          writeSettings();
    void                          showUnzipProgress( QString txt );
+   void                          openWebPage(QString path);
    static TConsole *             mpDebugConsole;
    static QMainWindow *          mpDebugArea;
    static bool                   debugMode;

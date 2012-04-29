@@ -470,32 +470,32 @@ void mudlet::slot_module_manager(){
 
 }
 
-void mudlet::slot_help_module(){
+void mudlet::openWebPage(QString path){
+    if (path.isEmpty() || path.isNull())
+        return;
     QWebView *view = new QWebView(this);
-    //view->load(QUrl(""))
-    Host * pH = getActiveHost();
-    if (!pH)
-        return;
-    int cRow = moduleTable->currentRow();
-    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
-    QString url, htmlContent;
-    if (pH->moduleHelp[pI->text()].contains("helpURL"))
-        url = pH->moduleHelp[pI->text()]["helpURL"];
-    if (pH->moduleHelp[pI->text()].contains("helpHTML"))
-        htmlContent = pH->moduleHelp[pI->text()]["helpHTML"];
-    if (url != ""){
-        view->setUrl(QUrl(url));
-    }
-    else if (htmlContent != ""){
-        view->setHtml(htmlContent);
-    }
+    QUrl url(path);
+    if (url.isValid())
+        view->setUrl(url);
     else
-        return;
+        view->setHtml(path);
     view->setFixedHeight(600);
     view->setFixedWidth(600);
     view->setWindowFlags(Qt::Window);
     view->move(QPoint(50,50));
     view->show();
+}
+
+void mudlet::slot_help_module(){
+    Host * pH = getActiveHost();
+    if (!pH)
+        return;
+    int cRow = moduleTable->currentRow();
+    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
+    if (pH->moduleHelp[pI->text()].contains("helpURL"))
+        openWebPage(pH->moduleHelp[pI->text()]["helpURL"]);
+    if (pH->moduleHelp[pI->text()].contains("helpHTML"))
+        openWebPage(pH->moduleHelp[pI->text()]["helpHTML"]);
 }
 
 void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
