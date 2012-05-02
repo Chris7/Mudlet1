@@ -827,7 +827,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
             for( int k=0; k<pR->exitStubs.size(); k++ ){
                 int direction = pR->exitStubs[k];
                 QVector3D uDirection = unitVectors[direction];
-                p.drawLine((int)pR->x*tx+_rx, (int)pR->y*ty*-1+_ry,(int)pR->x*tx+_rx+(int)uDirection.x()*tx, (int)pR->y*ty*-1+_ry+uDirection.y()*ty);
+                p.drawLine((int)pR->x*tx+_rx, (int)pR->y*ty*-1+_ry,(int)pR->x*tx+_rx+(int)uDirection.x()*tx*rSize/2, (int)pR->y*ty*-1+_ry+uDirection.y()*ty*rSize/2);
             }
             QPen __pen;
             for( int k=0; k<exitList.size(); k++ )

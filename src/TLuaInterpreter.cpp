@@ -7423,6 +7423,8 @@ int TLuaInterpreter::getSpecialExits( lua_State * L )
             it.next();
             int id_to = it.key();
             QString dir = it.value();
+            int lock = QString(dir.at(0)).toInt();
+            dir.remove(0,1);
             lua_pushnumber( L, id_to );
             lua_pushstring( L, dir.toLatin1().data() );
             lua_settable(L, -3);
@@ -7455,6 +7457,8 @@ int TLuaInterpreter::getSpecialExitsSwap( lua_State * L )
             it.next();
             int id_to = it.key();
             QString dir = it.value();
+            int lock = QString(dir.at(0)).toInt();
+            dir.remove(0,1);
             lua_pushstring( L, dir.toLatin1().data() );
             lua_pushnumber( L, id_to );
             lua_settable(L, -3);
