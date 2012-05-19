@@ -1214,8 +1214,6 @@ bool TMap::restore(QString location)
         }
         if (version >= 12){
             ifs >> mRoomId;
-            mVars["RoomId"].i = &mRoomId;
-            mVars["RoomId"].c[8] = 'I';
         }
         if( version >= 11 )
         {
@@ -1360,6 +1358,7 @@ bool TMap::restore(QString location)
             mpHost->mpMap->init( mpHost );
         }
     }
+    qDebug()<<"done loading";
     return canRestore;//FIXME
 }
 

@@ -245,6 +245,7 @@ bool XMLexport::writeHost( Host * pT )
     writeAttribute( "mMapperUseAntiAlias", pT->mMapperUseAntiAlias ? "yes" : "no" );
     writeAttribute( "mFORCE_MXP_NEGOTIATION_OFF", pT->mFORCE_MXP_NEGOTIATION_OFF ? "yes" : "no" );
     writeAttribute( "mPanSpeed", QString::number(pT->mPanSpeed));
+    writeAttribute( "mPanDefault", pT->mPanDefault ? "yes" : "no");
     writeAttribute( "mStrongHighlight", pT->mMapStrongHighlight ? "yes" : "no");
     writeAttribute( "mRoomSize", QString::number(pT->mRoomSize));
     writeAttribute( "mLineSize", QString::number(pT->mLineSize));

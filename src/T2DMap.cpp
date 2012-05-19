@@ -168,26 +168,6 @@ void T2DMap::init()
         }
     }
     mpMap->mViewArea=0;
-    mpMap->mVars["XView"].i = &mOx;
-    mpMap->mVars["XView"].c[8] = 'I';
-    mpMap->mVars["YView"].i = &mOy;
-    mpMap->mVars["YView"].c[8] = 'I';
-    mpMap->mVars["ZView"].i = &mOz;
-    mpMap->mVars["ZView"].c[8] = 'I';
-    mpMap->mVars["GridZoom"].i = &gzoom;
-    mpMap->mVars["GridZoom"].c[8] = 'I';
-    mpMap->mVars["XZoom"].i = &xzoom;
-    mpMap->mVars["XZoom"].c[8] = 'I';
-    mpMap->mVars["YZoom"].i = &yzoom;
-    mpMap->mVars["YZoom"].c[8] = 'I';
-    mpMap->mVars["mWidth"].f = &xspan;
-    mpMap->mVars["mWidth"].c[8] = 'F';
-    mpMap->mVars["mHeight"].f = &yspan;
-    mpMap->mVars["mHeight"].c[8] = 'F';
-    mpMap->mVars["SelectedRoom"].i = &mRoomSelection;
-    mpMap->mVars["SelectedRoom"].c[8] = 'I';
-    mpMap->mVars["ViewArea"].i = &(mpMap->mViewArea);
-    mpMap->mVars["ViewArea"].c[8] = 'I';
     TEvent event;
     event.mArgumentList.append( "sys2DMapLoad" );
     event.mArgumentTypeList.append(ARGUMENT_TYPE_STRING);
@@ -1460,7 +1440,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
     if (mpMap->mLeftDown){
         mpMap->mLeftDown = false;
         mpMap->m2DPanMode=false;
-        if(event->modifiers().testFlag(Qt::ControlModifier))
+        if(event->modifiers().testFlag(getModifier(mpHost->mMapModKey)))
         {
             if( mCustomLinesRoomFrom > 0 )
             {
@@ -1653,7 +1633,7 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
         }
         else{
             mMultiSelection = true;
-            mMultiZSelection = !event->modifiers().testFlag(Qt::ShiftModifier);
+            mMultiZSelection = !(event->modifiers().testFlag(getModifier(mpHost->mMapSecModKey)));
             mMultiRect = QRect(event->pos(), event->pos());
             mPHighlight = event->pos();
             mPick = true;
@@ -2064,9 +2044,28 @@ void T2DMap::slot_setRoomWeight()
     }
 }
 
+void T2DMap::setMapModKey(int val){
+    if (mpHost) mpHost->mMapModKey=val;
+}
+
+void T2DMap::setMapSecModKey(int val){
+    if (mpHost) mpHost->mMapSecModKey=val;
+}
+
+Qt::KeyboardModifier T2DMap::getModifier(int val){
+    switch (val){
+    case 0:
+        return Qt::AltModifier;
+    case 1:
+        return Qt::ControlModifier;
+    case 2:
+        return Qt::ShiftModifier;
+    }
+}
+
 void T2DMap::mouseMoveEvent( QMouseEvent * event )
 {
-    if (mpMap->mLeftDown & !mpMap->m2DPanMode & !event->modifiers().testFlag(Qt::ControlModifier)){
+    if (mpMap->mLeftDown && !mpMap->m2DPanMode && ((!event->modifiers().testFlag(getModifier(mpHost->mMapModKey)) && mpHost->mPanDefault) || (event->modifiers().testFlag(getModifier(mpHost->mMapModKey)) && !mpHost->mPanDefault))){
         mpMap->m2DPanXStart = event->x();
         mpMap->m2DPanYStart = event->y();
         mpMap->m2DPanMode=true;
@@ -2076,25 +2075,31 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
     {
         int x = event->x();
         int y = height()-event->y();//opengl ursprungspunkt liegt unten links
-        if ((mpMap->m2DPanXStart-x) > 1){
-            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                shiftRight();
-            mpMap->m2DPanXStart = x;
-        }
-        else if ((mpMap->m2DPanXStart-x) < -1){
-            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                shiftLeft();
-            mpMap->m2DPanXStart = x;
-        }
-        if ((mpMap->m2DPanYStart-y) > 1){
-            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                shiftDown();
-            mpMap->m2DPanYStart = y;
-        }
-        else if ((mpMap->m2DPanYStart-y) < -1){
-            for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                shiftUp();
-            mpMap->m2DPanYStart = y;
+        bool newX = false, newY= false;
+        for (int i=0;i<(int)mpHost->mPanSpeed;i++){
+            if ((mpMap->m2DPanXStart-x) > 1){
+                    shiftRight();
+                newX=true;
+            }
+            else if ((mpMap->m2DPanXStart-x) < -1){
+                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                    shiftLeft();
+                newX=true;
+            }
+            if ((mpMap->m2DPanYStart-y) > 1){
+                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                    shiftDown();
+                newY=true;
+            }
+            else if ((mpMap->m2DPanYStart-y) < -1){
+                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+                    shiftUp();
+                newY=true;
+            }
+            if (newX)
+                mpMap->m2DPanXStart = x;
+            if (newY)
+                mpMap->m2DPanYStart = y;
         }
     }
     else{
@@ -2306,28 +2311,48 @@ void T2DMap::slot_setArea()
 
     if( mMultiSelection )
     {
-        //int w = QInputDialog::getInt(this,"Enter the area ID:", "area ID:", 1);
+       //int w = QInputDialog::getInt(this,"Enter the area ID:", "area ID:", 1);
 
-        mMultiRect = QRect(0,0,0,0);
-        for( int j=0; j<mMultiSelectionList.size(); j++ )
-        {
-            if( mpMap->rooms.contains( mMultiSelectionList[j] ) )
-            {
-                mpMap->setRoomArea( mMultiSelectionList[j], w );
-                //mpMap->rooms[mMultiSelectionList[j]]->area = w;
-            }
-        }
-        repaint();
+       mMultiRect = QRect(0,0,0,0);
+       for( int j=0; j<mMultiSelectionList.size(); j++ )
+       {
+           if( mpMap->rooms.contains( mMultiSelectionList[j] ) )
+           {
+               mpMap->setRoomArea( mMultiSelectionList[j], w );
+               //mpMap->rooms[mMultiSelectionList[j]]->area = w;
+           }
+       }
+       repaint();
     }
     else
     {
-        if( mpMap->rooms.contains(mRoomSelection) )
-        {
-            //int _w = mpHost->mpMap->rooms[mRoomSelection]->area;
-            //int w = QInputDialog::getInt(this, "Enter area ID:","area ID:",_w);
-            mpMap->setRoomArea( mRoomSelection, w );
-        }
+       if( mpMap->rooms.contains(mRoomSelection) )
+       {
+           //int _w = mpHost->mpMap->rooms[mRoomSelection]->area;
+           //int w = QInputDialog::getInt(this, "Enter area ID:","area ID:",_w);
+           mpMap->setRoomArea( mRoomSelection, w );
+       }
     }
+}
+
+void T2DMap::setBubbleMode(bool checked){
+    mBubbleMode = checked;
+    if (mpHost) mpHost->mBubbleMode = checked;
+}
+
+void T2DMap::setGridMode(bool checked){
+    mShowGrid = checked;
+    if (mpHost) mpHost->mShowGrid = checked;
+}
+
+void T2DMap::setStrongHighlight(bool checked){
+    mStrongHighlight = checked;
+    if (mpHost) mpHost->mMapStrongHighlight = checked;
+}
+
+void T2DMap::showRoomIDs(bool checked){
+    mShowRoomID = checked;
+    if (mpHost) mpHost->mShowRoomID = checked;
 }
 
 // return -1 on error
@@ -2415,26 +2440,6 @@ void T2DMap::wheelEvent ( QWheelEvent * e )
     return;
 }
 
-void T2DMap::setBubbleMode(bool checked){
-    mBubbleMode = checked;
-    if (mpHost) mpHost->mBubbleMode = checked;
-}
-
-void T2DMap::setGridMode(bool checked){
-    mShowGrid = checked;
-    if (mpHost) mpHost->mShowGrid = checked;
-}
-
-void T2DMap::setStrongHighlight(bool checked){
-    mStrongHighlight = checked;
-    if (mpHost) mpHost->mMapStrongHighlight = checked;
-}
-
-void T2DMap::showRoomIDs(bool checked){
-    mShowRoomID = checked;
-    if (mpHost) mpHost->mShowRoomID = checked;
-}
-
 void T2DMap::setRoomSize( double f )
 {
     rSize = f;
@@ -2452,6 +2457,10 @@ void T2DMap::setPanSpeed( double f )
 {
     //pSpeed = f;
     if( mpHost ) mpHost->mPanSpeed = f;
+}
+
+void T2DMap::setPanDefault(bool val){
+    if (mpHost) mpHost->mPanDefault = val;
 }
 
 #include <QTreeWidget>

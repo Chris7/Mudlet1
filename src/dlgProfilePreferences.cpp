@@ -43,12 +43,16 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
     mMapperUseAntiAlias->setChecked(mpHost->mMapperUseAntiAlias);
     acceptServerGUI->setChecked(mpHost->mAcceptServerGUI);
     panSpeed->setValue(mpHost->mPanSpeed);
+    panDefault->setChecked(mpHost->mPanDefault);
     strongHighlight->setChecked(mpHost->mMapStrongHighlight);
     roomSize->setValue(mpHost->mRoomSize);
     lineSize->setValue(mpHost->mLineSize);
     bubbles->setChecked(mpHost->mBubbleMode);
     grid->setChecked(mpHost->mShowGrid);
     showRoomIDs->setChecked(mpHost->mShowRoomID);
+    mapModKey->setCurrentIndex(mpHost->mMapModKey);
+    mapModSecKey->setCurrentIndex(mpHost->mMapSecModKey);
+
     QString nick = tr("Mudlet%1").arg(QString::number(rand()%10000));
     QFile file( QDir::homePath()+"/.config/mudlet/irc_nick" );
     file.open( QIODevice::ReadOnly );
@@ -1345,6 +1349,9 @@ void dlgProfilePreferences::slot_save_and_exit()
             pHost->mpMap->mpMapper->mp2dMap->setGridMode(grid->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->setStrongHighlight(strongHighlight->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->showRoomIDs(showRoomIDs->isChecked());
+            pHost->mpMap->mpMapper->mp2dMap->setPanDefault(panDefault->isChecked());
+            pHost->mpMap->mpMapper->mp2dMap->setMapModKey(mapModKey->currentIndex());
+            pHost->mpMap->mpMapper->mp2dMap->setMapSecModKey(mapModSecKey->currentIndex());
             pHost->mpMap->mpMapper->mp2dMap->update();
         }
     }

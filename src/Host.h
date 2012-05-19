@@ -302,10 +302,13 @@ public:
     double             mLineSize;
     double             mRoomSize;
     int                mPanSpeed;
+    bool               mPanDefault;
     bool               mShowInfo;
     bool               mBubbleMode;
     bool               mShowGrid;
     bool               mShowRoomID;
+    int                mMapModKey;
+    int                mMapSecModKey;
     int                mServerGUI_Package_version;
     QString            mServerGUI_Package_name;
     bool               mAcceptServerGUI;

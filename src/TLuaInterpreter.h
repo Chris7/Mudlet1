@@ -344,6 +344,10 @@ public:
     static int addMapMenu(lua_State * L);
     static int removeMapMenu(lua_State * L);
     static int getMapMenus(lua_State * L);
+    static int getMapCoords(lua_State * L);
+    static int getMapSize(lua_State * L);
+    static int getMapLocation(lua_State * L);
+    static int setMapLocation(lua_State * L);
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;

@@ -48,10 +48,14 @@ public:
     void     setRoomSize( double );
     void     setExitSize( double );
     void     setPanSpeed( double );
+    void     setPanDefault(bool);
     void     setBubbleMode(bool);
     void     setGridMode(bool);
     void     setStrongHighlight(bool);
     void     showRoomIDs(bool);
+    void     setMapModKey(int);
+    void     setMapSecModKey(int);
+    Qt::KeyboardModifier getModifier(int);
 
 
     TMap *   mpMap;

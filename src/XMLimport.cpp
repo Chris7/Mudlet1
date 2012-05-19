@@ -815,6 +815,7 @@ void XMLimport::readHostPackage( Host * pT )
     pT->mPanSpeed = attributes().value("mPanSpeed").toString().toInt();
     if (!pT->mPanSpeed)
         pT->mPanSpeed=1;
+    pT->mPanDefault = (attributes().value("mPanDefault") == "yes");
     pT->mRoomSize = attributes().value("mRoomSize").toString().toInt();
     if (!pT->mRoomSize)
         pT->mRoomSize=3;
