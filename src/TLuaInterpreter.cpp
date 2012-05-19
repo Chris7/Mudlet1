@@ -7229,82 +7229,6 @@ int TLuaInterpreter::clearSpecialExits( lua_State * L )
     return 0;
 }
 
-int TLuaInterpreter::getSpecialExitsTable( lua_State * L )
-{
-    int id_from;
-    if( ! lua_isnumber( L, 1 ) )
-    {
-        lua_pushstring( L, "getSpecialExits: wrong argument type" );
-        lua_error( L );
-        return 1;
-    }
-    else
-    {
-        id_from = lua_tointeger( L, 1 );
-    }
-    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-    if( pHost->mpMap->rooms.contains( id_from ) )
-    {
-        QMapIterator<int, QString> it(pHost->mpMap->rooms[id_from]->other);
-        lua_newtable(L);
-        while( it.hasNext() )
-        {
-            it.next();
-            lua_newtable(L);
-            int id_to = it.key();
-            QString dir = it.value();
-            QString exitStatus = dir.left(1);
-            QString exit = dir.remove(0,1);
-            lua_pushstring( L, exit.toLatin1().data() );//done to remove the prepended special exit status
-            lua_pushstring( L, exitStatus.toLatin1().data() );//done to remove the prepended special exit status
-            lua_settable(L, -3);
-            lua_pushnumber(L, id_to);
-            lua_insert(L,-2);
-            lua_settable(L, -3);
-        }
-        return 1;
-    }
-    return 0;
-}
-
-int TLuaInterpreter::getSpecialExitsSwapTable( lua_State * L )
-{
-    int id_from;
-    if( ! lua_isnumber( L, 1 ) )
-    {
-        lua_pushstring( L, "getSpecialExitsSwap: wrong argument type" );
-        lua_error( L );
-        return 1;
-    }
-    else
-    {
-        id_from = lua_tointeger( L, 1 );
-    }
-    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-    if( pHost->mpMap->rooms.contains( id_from ) )
-    {
-        QMapIterator<int, QString> it(pHost->mpMap->rooms[id_from]->other);
-        lua_newtable(L);
-        while( it.hasNext() )
-        {
-            it.next();
-            lua_newtable(L);
-            int id_to = it.key();
-            QString dir = it.value();
-            QString exitStatus = dir.left(1);
-            QString exit = dir.remove(0,1);
-            lua_pushnumber( L, id_to );//done to remove the prepended special exit status
-            lua_pushstring( L, exitStatus.toLatin1().data() );//done to remove the prepended special exit status
-            lua_settable(L, -3);
-            lua_pushstring(L, exit.toLatin1().data());
-            lua_insert(L,-2);
-            lua_settable(L, -3);
-        }
-        return 1;
-    }
-    return 0;
-}
-
 int TLuaInterpreter::getSpecialExits( lua_State * L )
 {
     int id_from;
@@ -9831,8 +9755,6 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "addSpecialExit", TLuaInterpreter::addSpecialExit );
     lua_register( pGlobalLua, "getSpecialExits", TLuaInterpreter::getSpecialExits );
     lua_register( pGlobalLua, "getSpecialExitsSwap", TLuaInterpreter::getSpecialExitsSwap );
-    lua_register( pGlobalLua, "getSpecialExitsTable", TLuaInterpreter::getSpecialExitsTable );
-    lua_register( pGlobalLua, "getSpecialExitsSwapTable", TLuaInterpreter::getSpecialExitsSwapTable );
     lua_register( pGlobalLua, "clearSpecialExits", TLuaInterpreter::clearSpecialExits );
     lua_register( pGlobalLua, "getRoomEnv", TLuaInterpreter::getRoomEnv );
     lua_register( pGlobalLua, "getRoomUserData", TLuaInterpreter::getRoomUserData );
