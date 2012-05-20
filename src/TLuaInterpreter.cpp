@@ -235,7 +235,7 @@ int TLuaInterpreter::resetProfile( lua_State * L )
 
 int TLuaInterpreter::clearLabels( lua_State * L){
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-    mudlet::self()->clearLabel( pHost);
+    mudlet::self()->clearLabels( pHost);
     return 0;
 }
 
@@ -9639,6 +9639,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getNetworkLatency", TLuaInterpreter::getNetworkLatency );
     lua_register( pGlobalLua, "createMiniConsole", TLuaInterpreter::createMiniConsole );
     lua_register( pGlobalLua, "createLabel", TLuaInterpreter::createLabel );
+    lua_register( pGlobalLua, "clearLabels", TLuaInterpreter::clearLabels );
     lua_register( pGlobalLua, "hideWindow", TLuaInterpreter::hideUserWindow );
     lua_register( pGlobalLua, "showWindow", TLuaInterpreter::showUserWindow );
     lua_register( pGlobalLua, "createBuffer", TLuaInterpreter::createBuffer );

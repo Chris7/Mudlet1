@@ -924,13 +924,13 @@ bool mudlet::createLabel( Host * pHost, QString & name, int x, int y, int width,
 }
 
 void mudlet::clearLabels(Host * pHost){
-    QMap<QString, TLabel *> & labelMap = mHostLabelMap[pHost];
-    QMapIterator<QString, TLabel *> it(labelMap);
+    QMapIterator<QString, TLabel *> it( mHostLabelMap[pHost]);
     while (it.hasNext()){
         it.next();
-        it.value()->destroy();
+        it.value()->setAttribute(Qt::WA_DeleteOnClose);
+        bool status = it.value()->close();
     }
-    labelMap.clear();
+    mHostLabelMap[pHost].clear();
     pHost->mpConsole->mLabelMap.clear();
 }
 
