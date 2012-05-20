@@ -923,6 +923,17 @@ bool mudlet::createLabel( Host * pHost, QString & name, int x, int y, int width,
     return false;
 }
 
+void mudlet::clearLabels(Host * pHost){
+    QMap<QString, TLabel *> & labelMap = mHostLabelMap[pHost];
+    QMapIterator<QString, TLabel *> it(labelMap);
+    while (it.hasNext()){
+        it.next();
+        it.value()->destroy();
+    }
+    labelMap.clear();
+    pHost->mpConsole->mLabelMap.clear();
+}
+
 bool mudlet::createBuffer( Host * pHost, QString & name )
 {
     if( ! pHost ) return false;

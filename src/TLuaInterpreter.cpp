@@ -233,6 +233,12 @@ int TLuaInterpreter::resetProfile( lua_State * L )
     return 0;
 }
 
+int TLuaInterpreter::clearLabels( lua_State * L){
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    mudlet::self()->clearLabel( pHost);
+    return 0;
+}
+
 int TLuaInterpreter::select( lua_State * L )
 {
     int s = 1;

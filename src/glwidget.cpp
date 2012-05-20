@@ -26,7 +26,7 @@
 #include "Host.h"
 #include "dlgMapper.h"
 #if QT_VERSION >= 0x040800
-    #include <gl/GLU.h>
+    #include <GL/glu.h>
 #endif
 
 #ifndef GL_MULTISAMPLE

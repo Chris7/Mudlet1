@@ -2360,6 +2360,8 @@ int T2DMap::getTopLeftSelection()
 {
     int min_x, min_y, min_z, id;
     if( mMultiSelectionList.size() < 1 ) return -1;
+    if (!mpMap->rooms.contains(mMultiSelectionList[0]))
+        return -1;
     min_x = mpMap->rooms[mMultiSelectionList[0]]->x;
     min_y = mpMap->rooms[mMultiSelectionList[0]]->y;
 	min_z = mpMap->rooms[mMultiSelectionList[0]]->z;

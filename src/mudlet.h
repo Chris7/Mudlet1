@@ -81,6 +81,7 @@ public:
    bool                          openWindow( Host *, QString & );
    bool                          createMiniConsole( Host *, QString &, int, int, int, int );
    bool                          createLabel( Host *, QString &, int, int, int, int, bool );
+   void                          clearLabels( Host * );
    bool                          echoWindow( Host *, QString &, QString & );
    bool                          echoLink( Host * pHost, QString & name, QString & text, QStringList &, QStringList &, bool customFormat=false );
    void                          insertLink( Host *, QString &, QString, QStringList &, QStringList &, bool customFormat=false );
