@@ -1387,6 +1387,8 @@ int TMap::createMapLabel(int area, QString text, float x, float y, float z, QCol
     else
     {
         labelID = mapLabels[area].size();
+        while (mapLabels[area].contains(labelID))
+            labelID++;
         mapLabels[area].insert(labelID, label);
     }
 
