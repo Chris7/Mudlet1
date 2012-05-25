@@ -7206,9 +7206,18 @@ int TLuaInterpreter::clearRoomUserData( lua_State * L )
         id_from = lua_tointeger( L, 1 );
     }
     Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
-    if( pHost->mpMap->rooms.contains( id_from ) )
-    {
-        pHost->mpMap->rooms[id_from]->userData.clear();
+    if (lua_isstring(L,2)){
+        QString dataName = lua_tostring(L,2);
+        if( pHost->mpMap->rooms.contains( id_from )){
+            if (pHost->mpMap->rooms[id_from]->userData.contains(dataName))
+                pHost->mpMap->rooms[id_from]->userData.remove(dataName);
+        }
+    }
+    else{
+        if( pHost->mpMap->rooms.contains( id_from ) )
+        {
+            pHost->mpMap->rooms[id_from]->userData.clear();
+        }
     }
     return 0;
 }
