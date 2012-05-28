@@ -2302,6 +2302,22 @@ int TLuaInterpreter::createMiniConsole( lua_State *L )
     return 1;
 }
 
+int TLuaInterpreter::deleteLabel( lua_State *L){
+    //deletes a named label
+    QString labelName;
+    if (!lua_isstring(L,1)){
+        lua_pushstring(L, "deleteLabel: argument must a label name(string)");
+        lua_error(L);
+        return 1;
+    }
+    else
+        labelName = lua_tostring(L,1);
+    Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+    bool deleted = mudlet::self()->deleteLabel( pHost, labelName);
+    lua_pushboolean(L,deleted);
+    return 1;
+}
+
 int TLuaInterpreter::createLabel( lua_State *L )
 {
     string luaSendText="";
@@ -9648,6 +9664,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getNetworkLatency", TLuaInterpreter::getNetworkLatency );
     lua_register( pGlobalLua, "createMiniConsole", TLuaInterpreter::createMiniConsole );
     lua_register( pGlobalLua, "createLabel", TLuaInterpreter::createLabel );
+    lua_register( pGlobalLua, "deleteLabel", TLuaInterpreter::deleteLabel );
     lua_register( pGlobalLua, "clearLabels", TLuaInterpreter::clearLabels );
     lua_register( pGlobalLua, "hideWindow", TLuaInterpreter::hideUserWindow );
     lua_register( pGlobalLua, "showWindow", TLuaInterpreter::showUserWindow );

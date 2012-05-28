@@ -934,6 +934,27 @@ void mudlet::clearLabels(Host * pHost){
     pHost->mpConsole->mLabelMap.clear();
 }
 
+bool mudlet::deleteLabel(Host * pHost, QString labelName){
+    QMapIterator<QString, TLabel *> it( mHostLabelMap[pHost]);
+    bool cleared;
+    while (it.hasNext()){
+        it.next();
+        if (it.key() == labelName){
+            it.value()->setAttribute(Qt::WA_DeleteOnClose);
+            cleared = it.value()->close();
+        }
+    }
+    if (cleared){
+        if (mHostLabelMap[pHost].contains(labelName))
+            mHostLabelMap[pHost].remove(labelName);
+        std::map<std::string, TLabel *>::iterator it2;
+        std::string lName = labelName.toUtf8().constData();
+        it2 = pHost->mpConsole->mLabelMap.find( lName );
+        if (it2 != pHost->mpConsole->mLabelMap.end())
+            pHost->mpConsole->mLabelMap.erase(it2);
+    }
+}
+
 bool mudlet::createBuffer( Host * pHost, QString & name )
 {
     if( ! pHost ) return false;

@@ -156,7 +156,11 @@ function closeNest(label)
     end
     --is the current label on the same level of the prior label?
     local lParent = Geyser.Label:getWindow(label).nestParent
-    local cParent = Geyser.Label:getWindow(Geyser.Label.currentLabel).nestParent
+    local cLabel = Geyser.Label:getWindow(Geyser.Label.currentLabel)
+    if not cLabel then
+	return
+    end
+    local cParent = cLabel.nestParent
     if lParent and cParent then
         if lParent == cParent then
             --if so, don't do anything, but close any fly outs of the label
@@ -345,7 +349,7 @@ function doNestEnter(label)
     --echo("entering window"..window.name.."\n")
     --Geyser.display(window)
     Geyser.Label.currentLabel = label
-    if window.nestedLabels then
+    if window and window.nestedLabels then
         Geyser.Label:displayNest(label)
     end
 end
@@ -430,6 +434,7 @@ function Geyser.Label:addScrollbars(parent,layout)
     backward:setClickCallback("doNestScroll", backward.name)
     return {backward, forward}
 end
+
 
 function Geyser.Label:addChild(cons, container)
     cons = cons or {}
