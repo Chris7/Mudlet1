@@ -368,22 +368,30 @@ void TTreeWidget::dragEnterEvent(QDragEnterEvent *event)
 void TTreeWidget::dropEvent(QDropEvent *event)
 {
     QTreeWidgetItem * pItem = itemAt( event->pos() );
-
     if( ! pItem )
     {
         event->setDropAction( Qt::IgnoreAction );
         event->ignore();
     }
-
-    if( pItem == topLevelItem(0) )
-    {
-        if( (dropIndicatorPosition() == QAbstractItemView::AboveItem )
-         || (dropIndicatorPosition() == QAbstractItemView::BelowItem ) )
+    else if( pItem == topLevelItem(0) )
         {
-            event->setDropAction( Qt::IgnoreAction );
-            event->ignore();
+            if( (dropIndicatorPosition() == QAbstractItemView::AboveItem )
+             || (dropIndicatorPosition() == QAbstractItemView::BelowItem ) )
+            {
+                event->setDropAction( Qt::IgnoreAction );
+                event->ignore();
+            }
+    }
+    else if (mIsVarTree){
+        if (pItem && pItem  != topLevelItem(0)){
+            QStringList item = pItem->data(0,Qt::UserRole).toStringList();
+            if (QString(item[1]).toInt() != LUA_TTABLE){
+                event->setDropAction( Qt::IgnoreAction );
+                event->ignore();
+            }
         }
     }
+
     mIsDropAction = true;
     QTreeWidget::dropEvent( event );
     return;
