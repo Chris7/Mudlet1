@@ -32,15 +32,14 @@ class T2DMap : public QWidget
 public:
 
     T2DMap();
-    explicit T2DMap(QWidget *parent = 0);
+    explicit T2DMap( QWidget *parent = 0);
     QColor   getColor( int id );
     QColor   _getColor( int id );
     void     init();
-    void     drawPlayerLocation(QPointF _center, float _radius, QPainter * p);
-    void     drawMapInfo(bool gridMode, QTime __time, QPainter * p);
     void     paintEvent( QPaintEvent * );
     void     mousePressEvent(QMouseEvent * );
     void     mouseDoubleClickEvent ( QMouseEvent * event );
+    bool     event(QEvent * event );
     void     wheelEvent ( QWheelEvent * );
     void     mouseMoveEvent( QMouseEvent * event );
     void     mouseReleaseEvent(QMouseEvent * e );
@@ -58,6 +57,7 @@ public:
     Qt::KeyboardModifier getModifier(int);
 
 
+    void     createLabel( QRectF labelRect );
     TMap *   mpMap;
     Host *   mpHost;
     int      xzoom;
@@ -66,7 +66,6 @@ public:
     int      _ry;
     QPoint   mPHighlight;
     bool     mPick;
-    QRect    mPickBox;
     int      mTarget;
     int      mRoomSelection;
     bool     mStartSpeedWalk;
@@ -82,7 +81,6 @@ public:
     float    xspan;
     float    yspan;
     bool     mMultiSelection;
-	bool	 mMultiZSelection;
     QRectF   mMultiRect;
     bool     mPopupMenu;
     QList<int> mMultiSelectionList;
@@ -117,13 +115,25 @@ public:
     bool mBubbleMode;
     bool mMapperUseAntiAlias;
     bool mStrongHighlight;
+    bool mLabelHilite;
+    bool mMoveLabel;
+    int mCustomLineSelectedRoom;
+    QString mCustomLineSelectedExit;
+    int mCustomLineSelectedPoint;
+    QTreeWidget mMultiSelectionListWidget;
+    bool mSizeLabel;
 
 signals:
 
 public slots:
 
-    void slot_createLabel();
+    void slot_roomSelectionChanged();
+    void slot_deleteCustomExitLine();
+    void slot_moveLabel();
+    void slot_deleteLabel();
+    void slot_editLabel();
     void slot_setPlayerLocation();
+    void slot_createLabel();
     void slot_customLineColor();
     void showInfo();
     void shiftZup();
@@ -134,7 +144,6 @@ public slots:
     void shiftDown();
     void shiftLeft();
     void shiftRight();
-    void cleanupMap();
     void slot_setCharacter();
     void slot_setImage();
     void slot_movePosition();

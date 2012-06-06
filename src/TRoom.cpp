@@ -29,6 +29,10 @@ TRoom::TRoom()
 , highlight( false )
 , highlightColor( QColor( 255,150,0 ) )
 , rendered(false)
+, min_x( 0 )
+, max_x( 0 )
+, min_y( 0 )
+, max_y( 0 )
 {
 }
 
@@ -180,10 +184,8 @@ void TRoom::addSpecialExit( int to, QString cmd )
                 _cmd.prepend("0");
                 _cmd.append( cmd );
             }
-            if (it.value() == _cmd)
-                other.replace( to, _cmd );
-            else
-                other.insertMulti( to, _cmd );
+
+            other.replace( to, _cmd );
             return;
         }
     }
@@ -195,8 +197,8 @@ void TRoom::addSpecialExit( int to, QString cmd )
     }
     else
     {
-        _cmd = cmd;
         _cmd.prepend("0");
+        _cmd.append( cmd );
     }
     other.insertMulti( to, _cmd );
 }
@@ -207,3 +209,42 @@ void TRoom::removeSpecialExit( int to, QString cmd )
     other.remove(to, cmd.prepend("0"));
     other.remove(to, cmd.prepend("1"));
 }
+
+void TRoom::calcRoomDimensions()
+{
+    QMapIterator<QString, QList<QPointF> > it(customLines);
+    while( it.hasNext() )
+    {
+        it.next();
+        const QString & _e = it.key();
+        const QList<QPointF> & _pL= it.value();
+        if( _pL.size() < 1 ) continue;
+        if( min_x == min_y == max_x == max_y == 1 )
+        {
+            min_x = _pL[0].x();
+            max_x = min_x;
+            min_y = _pL[0].y();
+            max_y = min_y;
+        }
+        for( int i=0; i<_pL.size(); i++ )
+        {
+            int _x = _pL[i].x();
+            int _y = _pL[i].y();
+            if( min_x > _x )
+                min_x = _x;
+            if( max_x < _x )
+                max_x = _x;
+            if( min_y > _y )
+                min_y = _y;
+            if( max_y < _y )
+                max_y = _y;
+        }
+        qDebug()<<"custom lines span: x("<<min_x<<"/"<<max_x<<") y("<<min_y<<"/"<<max_y<<")";
+    }
+}
+
+
+
+
+
+
