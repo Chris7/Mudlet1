@@ -46,6 +46,7 @@ public:
     int      getTopLeftSelection();
     void     setRoomSize( double );
     void     setExitSize( double );
+    void     createLabel( QRectF labelRect );
     void     setPanSpeed( double );
     void     setPanDefault(bool);
     void     setBubbleMode(bool);
@@ -55,9 +56,8 @@ public:
     void     setMapModKey(int);
     void     setMapSecModKey(int);
     Qt::KeyboardModifier getModifier(int);
-
-
-    void     createLabel( QRectF labelRect );
+    bool     primaryModEnabled(QMouseEvent *);
+    bool     secondaryModEnabled(QMouseEvent *);
     TMap *   mpMap;
     Host *   mpHost;
     int      xzoom;
@@ -89,6 +89,7 @@ public:
     QRectF   mMapInfoRect;
     int      mFontHeight;
     bool     mShowRoomID;
+    bool     mStrongHighlight;
     QMap<int,QPixmap> mPixMap;
     QMap<int, QPixmap *> mGridPix;
     int      gzoom;
@@ -114,7 +115,6 @@ public:
     QPointF mLastMouseClick;
     bool mBubbleMode;
     bool mMapperUseAntiAlias;
-    bool mStrongHighlight;
     bool mLabelHilite;
     bool mMoveLabel;
     int mCustomLineSelectedRoom;
@@ -163,6 +163,7 @@ public slots:
     void slot_setCustomLine2();
     void slot_userAction(QString);
     void slot_setCustomLine2B(QTreeWidgetItem*, int);
+
 };
 
 #endif // T2DMAP_H

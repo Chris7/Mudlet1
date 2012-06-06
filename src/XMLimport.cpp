@@ -826,6 +826,16 @@ void XMLimport::readHostPackage( Host * pT )
     pT->mBubbleMode = ( attributes().value("mBubbleMode") == "yes" );
     pT->mShowGrid = ( attributes().value("mShowGrid") == "yes" );
     pT->mShowRoomID = ( attributes().value("mShowRoomIDs") == "yes" );
+    int mkey = attributes().value("mMapModKey").toString().toInt();
+    if (mkey)
+        pT->mMapModKey = mkey;
+    else
+        pT->mMapModKey = 0;
+    mkey = attributes().value("mMapSecModKey").toString().toInt();
+    if (mkey)
+        pT->mMapSecModKey = mkey;
+    else
+        pT->mMapSecModKey = 1;
 
     while( ! atEnd() )
     {

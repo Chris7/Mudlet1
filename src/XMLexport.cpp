@@ -252,6 +252,8 @@ bool XMLexport::writeHost( Host * pT )
     writeAttribute( "mBubbleMode", pT->mBubbleMode ? "yes" : "no");
     writeAttribute( "mShowGrid", pT->mShowGrid ? "yes" : "no");
     writeAttribute( "mShowRoomIDs", pT->mShowRoomID ? "yes" : "no");
+    writeAttribute( "mMapModKey", QString::number(pT->mMapModKey));
+    writeAttribute( "mMapSecModKey", QString::number(pT->mMapSecModKey));
 
     writeTextElement( "name", pT->mHostName );
     //writeTextElement( "login", pT->mLogin );
