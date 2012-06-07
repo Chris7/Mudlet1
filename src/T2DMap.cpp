@@ -642,9 +642,26 @@ void T2DMap::paintEvent( QPaintEvent * e )
             int _lh = abs(it.value().size.height())*ty;
 
             if( ! ( ( 0<_lx || 0<_lx+_lw ) && (_w>_lx || _w>_lx+_lw ) ) ) continue;
-            if( ! ( ( 0<_ly || 0<_ly+_lh ) && (_h>_ly || _h>_ly+_lh ) ) ) continue;
+            if( ! ( ( 0<_ly || 0<_ly+_lh ) && (_h>_ly || _h>_ly+_lh ) ) ) continue;            
             QRectF _drawRect = QRect(it.value().pos.x()*tx+_rx, it.value().pos.y()*ty*-1+_ry, _lw, _lh);
-            p.drawPixmap( lpos, it.value().pix.scaled(_drawRect.size().toSize()) );
+            if (it.value().pix.isNull()){
+                //they're coming from old labels, might as well draw an old label
+                QRectF lr = QRectF( 0, 0, 1000, 100 );
+                //lr.normalized().toRect();
+                QPixmap pix(lr.size().toSize());
+                pix.fill(it.value().bgColor);
+                QPainter lp( &pix );
+                QPen lpen;
+                lpen.setColor( it.value().fgColor );
+                lp.setPen( lpen );
+                QRectF br;
+                lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+                p.drawPixmap(lpos, pix );
+            }
+            else{
+
+                p.drawPixmap( lpos, it.value().pix.scaled(_drawRect.size().toSize()) );
+            }
             if( it.value().hilite )
             {
                 p.fillRect(_drawRect, QColor(255, 155, 55, 190));
