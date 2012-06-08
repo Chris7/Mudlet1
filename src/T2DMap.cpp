@@ -656,7 +656,7 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 lp.setPen( lpen );
                 QRectF br;
                 lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
-                p.drawPixmap(lpos, pix );
+                p.drawPixmap(lpos, pix, br.toRect() );
             }
             else{
 
