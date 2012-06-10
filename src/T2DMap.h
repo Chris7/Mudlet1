@@ -24,8 +24,10 @@
 #include <QWidget>
 #include <TMap.h>
 #include <QPixmap>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
-class T2DMap : public QWidget
+class T2DMap : public QGraphicsView//Widget
 {
     Q_OBJECT
 
@@ -55,6 +57,7 @@ public:
     void     showRoomIDs(bool);
     void     setMapModKey(int);
     void     setMapSecModKey(int);
+    void     repopulateView();
     Qt::KeyboardModifier getModifier(int);
     bool     primaryModEnabled(QMouseEvent *);
     bool     secondaryModEnabled(QMouseEvent *);
@@ -113,6 +116,7 @@ public:
     QCheckBox * mpCurrentLineArrow;
     bool mShowGrid;
     QPointF mLastMouseClick;
+    QPoint mMousePressPoint;
     bool mBubbleMode;
     bool mMapperUseAntiAlias;
     bool mLabelHilite;
@@ -122,6 +126,10 @@ public:
     int mCustomLineSelectedPoint;
     QTreeWidget mMultiSelectionListWidget;
     bool mSizeLabel;
+    QGraphicsScene* scene;
+    QGraphicsView* view;
+    QPointF mCurrentCenter;
+    void updateCenter(const QPointF&);
 
 signals:
 

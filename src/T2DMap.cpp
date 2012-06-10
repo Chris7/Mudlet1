@@ -21,6 +21,7 @@
 #include <QColorDialog>
 #include <QInputDialog>
 #include <QSignalMapper>
+#include <QGraphicsRectItem>
 
 #include "T2DMap.h"
 #include "TMap.h"
@@ -71,7 +72,7 @@ T2DMap::T2DMap()
 }
 
 T2DMap::T2DMap(QWidget * parent)
-: QWidget(parent)
+: QGraphicsView(parent)//Widget(parent)
 , mMultiSelectionListWidget(this)
 {
     mMultiSelectionListWidget.setHeaderLabel("Room Selection");
@@ -109,15 +110,26 @@ T2DMap::T2DMap(QWidget * parent)
     mMultiSelectionListWidget.setRootIsDecorated(false);
     mMultiSelectionListWidget.setColumnWidth(0,90);
     mSizeLabel = false;
+    view = new QGraphicsView();
+    scene = new QGraphicsScene();
+    view->setScene(scene);
     //setFocusPolicy( Qt::ClickFocus);
 }
 
 void T2DMap::init()
 {
-
     QTime _time; _time.start();
-    //setFocusPolicy( Qt::ClickFocus);
+    //view->setScene(scene);
+//    QFont font("MS Serif", -1, -1, true);
+//    QFontInfo info(font);
+//    scene->addText("text", font);
 
+//    qDebug()<<scene->items();
+    view->setViewport(this->parentWidget());
+    view->setFrameStyle(QFrame::NoFrame);
+    view->show();
+    repopulateView();
+    //setFocusPolicy( Qt::ClickFocus);
     if( ! mpMap ) return;
     eSize = mpMap->mpHost->mLineSize;
     rSize = mpMap->mpHost->mRoomSize;
@@ -201,6 +213,116 @@ void T2DMap::init()
         }
     }
     qDebug()<<"T2DMap::init() runtim: "<<_time.elapsed();
+}
+
+void T2DMap::repopulateView(){
+    if( !mpMap ) return;
+    scene->clear();
+    if( ! mpMap->rooms.contains( mpMap->mRoomId ) )
+    {
+        scene->addText("No map or no valid position.");
+        view->show();
+        return;
+    }
+    if( ! mpMap->areas.contains( mpMap->rooms[mpMap->mRoomId]->area) )
+        return;
+    mRID = mpMap->mRoomId;
+    mAID = mpMap->rooms[mRID]->area;
+    mOz = mpMap->rooms[mRID]->z;
+    TArea * pArea = mpMap->areas[mAID];
+    if( ! pArea ) return;
+    if( ! mpMap->rooms.contains( mRID ) ) return;
+
+//    if( mpMap->mapLabels.contains( mAID ) )
+//    {
+//        QMapIterator<int, TMapLabel> it(mpMap->mapLabels[mAID]);
+//        while( it.hasNext() )
+//        {
+//            it.next();
+//            if( it.value().pos.z() != mOz ) continue;
+//            if( it.value().text.length() < 1 )
+//            {
+//                mpMap->mapLabels[mAID][it.key()].text = "no text";
+//            }
+//            QPointF lpos;
+//            int _lx = it.value().pos.x()*tx+_rx;
+//            int _ly = it.value().pos.y()*ty*-1+_ry;
+
+//            lpos.setX( _lx );
+//            lpos.setY( _ly );
+//            int _lw = abs(it.value().size.width())*tx;
+//            int _lh = abs(it.value().size.height())*ty;
+
+//            if( ! ( ( 0<_lx || 0<_lx+_lw ) && (_w>_lx || _w>_lx+_lw ) ) ) continue;
+//            if( ! ( ( 0<_ly || 0<_ly+_lh ) && (_h>_ly || _h>_ly+_lh ) ) ) continue;
+//            QRectF _drawRect = QRect(it.value().pos.x()*tx+_rx, it.value().pos.y()*ty*-1+_ry, _lw, _lh);
+//            if (it.value().pix.isNull()){
+//                //they're coming from old labels, might as well draw an old label
+//                QRectF lr = QRectF( 0, 0, 1000, 100 );
+//                //lr.normalized().toRect();
+//                QPixmap pix(lr.size().toSize());
+//                pix.fill(it.value().bgColor);
+//                QPainter lp( &pix );
+//                QPen lpen;
+//                lpen.setColor( it.value().fgColor );
+//                lp.setPen( lpen );
+//                QRectF br;
+//                lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+//                p.drawPixmap(lpos, pix, br.toRect() );
+//            }
+//            else{
+
+//                p.drawPixmap( lpos, it.value().pix.scaled(_drawRect.size().toSize()) );
+//            }
+//            if( it.value().hilite )
+//            {
+//                p.fillRect(_drawRect, QColor(255, 155, 55, 190));
+//            }
+
+//        }
+//    }
+
+    if( ! pArea->gridMode )
+    {
+        for( int i=0; i<pArea->rooms.size(); i++ )
+        {
+            TRoom * pR = mpMap->rooms[pArea->rooms[i]];
+            int x=pR->x;
+            int y = pR->y;
+            int z = pR->z;
+            if (z != mOz)
+                continue;
+            QRectF dr = QRectF(x,y, rSize, rSize);
+            scene->addRect(dr,QPen(pR->c), QBrush(pR->c));
+            //draw exits
+            QList<int> exitList;
+            if( pR->north > 0 )
+                exitList.push_back( pR->north );
+            if( pR->northwest > 0 )
+                exitList.push_back( pR->northwest );
+            if( pR->east > 0 )
+                exitList.push_back( pR->east );
+            if( pR->southeast > 0 )
+                exitList.push_back( pR->southeast );
+            if( pR->south > 0 )
+                exitList.push_back( pR->south );
+            if( pR->southwest > 0 )
+                exitList.push_back( pR->southwest );
+            if( pR->west > 0 )
+                exitList.push_back( pR->west );
+            if( pR->northeast > 0 )
+                exitList.push_back( pR->northeast );
+            QListIterator<int> it(exitList);
+            while (it.hasNext()){
+                int rid = it.next();
+                TRoom * pe = mpMap->rooms[rid];
+                QPen co(QColor(255,0,0,255));
+                scene->addLine(x,y, pe->x, pe->y, co);
+            }
+
+        }
+    }
+    view->show();
 }
 
 QColor T2DMap::_getColor( int id )
@@ -440,7 +562,9 @@ void T2DMap::switchArea(QString name)
 
 void T2DMap::paintEvent( QPaintEvent * e )
 {
+    return;
     if( !mpMap ) return;
+
     bool __Pick = mPick;
     QTime __time; __time.start();
 
@@ -526,11 +650,9 @@ void T2DMap::paintEvent( QPaintEvent * e )
 
     if( ! mpMap ) return;
     if( ! mpMap->rooms.contains( mRID ) ) return;
+    repopulateView();
 
     float wegBreite = 1/eSize * tx * rSize;
-
-    p.fillRect( 0, 0, width(), height(), mpHost->mBgColor_2 );
-
     if( pArea->gridMode )
     {
         int areaID = mpMap->rooms[mRID]->area;
@@ -692,7 +814,6 @@ void T2DMap::paintEvent( QPaintEvent * e )
             }
 
             pR->rendered = true;
-
             exitList.clear();
             if( pR->customLines.size() > 0 )
             {
@@ -1195,7 +1316,9 @@ void T2DMap::paintEvent( QPaintEvent * e )
                     _color = ( 7 ) * 254 + _ch;
                 else
                     _color = ( 6 ) * 254 + _ch;
-
+                QBrush br(c);
+                QGraphicsRectItem * rect = scene->addRect(dr,p.pen(), br);
+                qDebug()<<"adding rect at"<<rect;
                 p.fillRect( dr, c );
                 if( mPixMap.contains( _color ) )
                 {
@@ -1633,6 +1756,7 @@ void T2DMap::createLabel( QRectF labelRect )
         mpMap->mapLabels[mAID].insert(labelID, label);
     }
     update();
+    show();
 }
 
 bool T2DMap::primaryModEnabled(QMouseEvent * event){
@@ -2070,6 +2194,7 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
         mpMap->mRightDown = true;
     else
         mpMap->mRightDown = false;
+    mMousePressPoint = event->pos();
 }
 
 
@@ -2669,8 +2794,62 @@ void T2DMap::slot_setArea()
 }
 
 
+void T2DMap::updateCenter(const QPointF& centerPoint){
+    //Get the rectangle of the visible area in scene coords
+        QRectF visibleArea = view->mapToScene(rect()).boundingRect();
+
+        //Get the scene area
+        QRectF sceneBounds = view->sceneRect();
+
+        double boundX = visibleArea.width() / 2.0;
+        double boundY = visibleArea.height() / 2.0;
+        double boundWidth = sceneBounds.width() - 2.0 * boundX;
+        double boundHeight = sceneBounds.height() - 2.0 * boundY;
+
+        //The max boundary that the centerPoint can be to
+        QRectF bounds(boundX, boundY, boundWidth, boundHeight);
+
+        if(bounds.contains(centerPoint)) {
+            //We are within the bounds
+           mCurrentCenter = centerPoint;
+        } else {
+            //We need to clamp or use the center of the screen
+            if(visibleArea.contains(sceneBounds)) {
+                //Use the center of scene ie. we can see the whole scene
+                mCurrentCenter = sceneBounds.center();
+            } else {
+
+                mCurrentCenter = centerPoint;
+
+                //We need to clamp the center. The centerPoint is too large
+                if(centerPoint.x() > bounds.x() + bounds.width()) {
+                    mCurrentCenter.setX(bounds.x() + bounds.width());
+                } else if(centerPoint.x() < bounds.x()) {
+                    mCurrentCenter.setX(bounds.x());
+                }
+
+                if(centerPoint.y() > bounds.y() + bounds.height()) {
+                    mCurrentCenter.setY(bounds.y() + bounds.height());
+                } else if(centerPoint.y() < bounds.y()) {
+                    mCurrentCenter.setY(bounds.y());
+                }
+
+            }
+        }
+
+        //Update the scrollbars
+        view->centerOn(mCurrentCenter);
+}
+
 void T2DMap::mouseMoveEvent( QMouseEvent * event )
 {
+    QPointF delta = view->mapToScene(mMousePressPoint)-view->mapToScene(event->pos());
+    qDebug()<<view->mapToScene(mMousePressPoint);
+    qDebug()<<view->mapToScene(event->pos());
+    qDebug()<<"moving map"<<delta;
+    updateCenter(delta+mMousePressPoint);
+    mMousePressPoint=event->pos();
+    return;
     if (mpMap->mLeftDown && !mpMap->m2DPanMode && primaryModEnabled(event))
     {
         mpMap->m2DPanXStart = event->x();
@@ -2940,6 +3119,32 @@ int T2DMap::getTopLeftSelection()
 void T2DMap::wheelEvent ( QWheelEvent * e )
 {
     int delta = e->delta() / 8 / 15;
+
+    //Get the position of the mouse before scaling, in scene coords
+    QPointF pointBeforeScale = view->mapToScene(e->pos());
+
+    //Get the original screen centerpoint
+    QPointF screenCenter = mCurrentCenter; //CurrentCenterPoint; //(visRect.center());
+
+    //Scale the view ie. do the zoom
+    double scaleFactor = 1.15; //How fast we zoom
+    if(delta > 0) {
+        //Zoom in
+        view->scale(scaleFactor, scaleFactor);
+    } else {
+        //Zooming out
+        view->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+    }
+
+    //Get the position after scaling, in scene coords
+    QPointF pointAfterScale = view->mapToScene(e->pos());
+
+    //Get the offset of how the screen moved
+    QPointF offset = pointBeforeScale - pointAfterScale;
+
+    //Adjust to the new center for correct zooming
+    QPointF newCenter = screenCenter + offset;
+    updateCenter(newCenter);
     if( e->delta() < 0 )
     {
         mPick = false;
