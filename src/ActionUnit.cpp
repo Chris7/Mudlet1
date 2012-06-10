@@ -93,7 +93,6 @@ TAction * ActionUnit::findAction( QString & name )
     {
         it.next();
         if (it.value()->getName() == name){
-            qDebug()<<it.value()->getName();
             TAction * pT = it.value();
             return pT;
         }

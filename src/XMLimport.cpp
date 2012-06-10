@@ -1510,23 +1510,19 @@ void XMLimport::readAliasGroup( TAlias * pParent )
             else if( name() == "command")
             {
                 pT->mCommand = readElementText();
-                qDebug()<<"comm"<<pT->getID()<<pT->mCommand;
                 continue;
             }
             else if( name() == "regex")
             {
                 pT->setRegexCode( readElementText() );
-                qDebug()<<"regex"<<pT->getID()<<pT->mRegexCode;
                 continue;
             }
             else if( name() == "AliasGroup" )
             {
-                qDebug()<<"alias group"<<pT->getID()<<pT->mName;
                 readAliasGroup( pT );
             }
             else if( name() == "Alias" )
             {
-                qDebug()<<"alias"<<pT->getID()<<pT->mName;
                 readAliasGroup( pT );
             }
             else
