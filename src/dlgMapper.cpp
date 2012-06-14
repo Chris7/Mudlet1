@@ -31,6 +31,8 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
 , mpHost( pH )
 {
     setupUi(this);
+    gView->mpMap = pM;
+    gView->mpHost = pH;
     glWidget->mpMap = pM;
     mp2dMap->mpMap = pM;
     mp2dMap->mpHost = pH;
@@ -61,6 +63,9 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(shiftDown, SIGNAL(pressed()), mp2dMap, SLOT(shiftDown()));
     connect(showInfo, SIGNAL(clicked()), mp2dMap, SLOT(showInfo()));
 
+    connect(shiftZup, SIGNAL(pressed()), gView, SLOT(shiftZup()));
+    connect(shiftZdown, SIGNAL(pressed()), gView, SLOT(shiftZdown()));
+
     connect(shiftZup, SIGNAL(pressed()), glWidget, SLOT(shiftZup()));
     connect(shiftZdown, SIGNAL(pressed()), glWidget, SLOT(shiftZdown()));
     connect(shiftLeft, SIGNAL(pressed()), glWidget, SLOT(shiftLeft()));
@@ -72,6 +77,7 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(showArea, SIGNAL(activated(QString)), glWidget, SLOT(showArea(QString)));
     connect(defaultView, SIGNAL(pressed()), glWidget, SLOT(defaultView()));
     connect(dim2,SIGNAL(pressed()), this, SLOT(show2dView()));
+    connect(gViewToggle, SIGNAL(pressed()), this, SLOT(showGView()));
     connect(sideView, SIGNAL(pressed()), glWidget, SLOT(sideView()));
     connect(topView, SIGNAL(pressed()), glWidget, SLOT(topView()));
     connect(togglePanel, SIGNAL(pressed()), this, SLOT(slot_togglePanel()));
@@ -172,6 +178,14 @@ void dlgMapper::show2dView()
     else
         d3buttons->setVisible(false);
 
+}
+
+void dlgMapper::showGView(){
+    glWidget->setVisible(false);
+    mp2dMap->setVisible(false);
+    d3buttons->setVisible(false);
+    gView->setVisible(true);
+    gView->repopulateMap();
 }
 
 void dlgMapper::downloadMap()

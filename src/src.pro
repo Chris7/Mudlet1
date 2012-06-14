@@ -3,8 +3,8 @@ CONFIG += debug uitools
 
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-deprecated -Wno-unused-parameter
 QMAKE_CXXFLAGS_DEBUG += -O0 -Wno-deprecated -Wno-unused-parameter
-MOC_DIR = ./tmp
-OBJECTS_DIR = ./tmp
+MOC_DIR = ./gviewtmp
+OBJECTS_DIR = ./gviewtmp
 QT += network opengl phonon webkit
 DEPENDPATH += .
 INCLUDEPATH += .
@@ -116,7 +116,8 @@ SOURCES += TConsole.cpp \
     T2DMap.cpp \
     dlgRoomExits.cpp \
     luaInterface.cpp \
-    dlgVarsMainArea.cpp
+    dlgVarsMainArea.cpp \
+    TGraphicsView.cpp
 
 
 HEADERS += mudlet.h \
@@ -193,7 +194,8 @@ HEADERS += mudlet.h \
     T2DMap.h \
     dlgRoomExits.h \
     luaInterface.h \
-    dlgVarsMainArea.h
+    dlgVarsMainArea.h \
+    TGraphicsView.h
 
 FORMS += ui/connection_profiles.ui \
     ui/main_window.ui \

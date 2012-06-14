@@ -58,6 +58,7 @@ public slots:
         void repopulateAreas();
         void setArea(int);
         void show2dView();
+        void showGView();
         void slot_togglePanel();
         void setDownloadProgress( qint64, qint64 );
         void cancel();

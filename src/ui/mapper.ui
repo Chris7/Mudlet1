@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>390</width>
+    <width>410</width>
     <height>387</height>
    </rect>
   </property>
@@ -124,6 +124,9 @@
          </sizepolicy>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="TGraphicsView" name="gView" native="true"/>
       </item>
       <item>
        <widget class="QToolButton" name="togglePanel">
@@ -481,6 +484,13 @@
               </property>
               <property name="text">
                <string>2D/3D</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="gViewToggle">
+              <property name="text">
+               <string>GView</string>
               </property>
              </widget>
             </item>
@@ -995,6 +1005,12 @@
    <class>T2DMap</class>
    <extends>QWidget</extends>
    <header location="global">T2DMap.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TGraphicsView</class>
+   <extends>QWidget</extends>
+   <header>TGraphicsView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
