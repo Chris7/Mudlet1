@@ -19,8 +19,6 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void resizeEvent(QResizeEvent *event);
-    void shiftZup();
-    void shiftZdown();
     void setCenter(const QPointF& centerPoint);
     void setCenter(int);
     TMap * mpMap;
@@ -41,6 +39,8 @@ public:
 signals:
     
 public slots:
+    void shiftZup();
+    void shiftZdown();
     
 };
 

@@ -50,6 +50,7 @@ void TGraphicsView::repopulateMap(){
     int mAID = mpMap->rooms[mRID]->area;
     TArea * pArea = mpMap->areas[mAID];
     QListIterator<int> it(pArea->rooms);
+    float rs = (float)rSize;
     while (it.hasNext()){
         //draw rooms
         int nRID = it.next();
@@ -61,8 +62,53 @@ void TGraphicsView::repopulateMap(){
             qDebug()<<nRID<<"out of plane";
             continue;
         }
-        scene->addRect(x,y,rSize,rSize,QPen(QColor(255,0,0,255)),QBrush(QColor(255,0,0,255)));
+        QGraphicsRectItem * rect = scene->addRect(x,y,rSize,rSize,QPen(QColor(255,0,0,255)),QBrush(QColor(255,0,0,255)));
+        rect->setZValue(1);
+        //draw exits
+        QPointF p1(x+rs/2,y+rs/2);
+        QList<int> exitList;
+        if( pR->north > 0 )
+            exitList.push_back( pR->north );
+        if( pR->northwest > 0 )
+            exitList.push_back( pR->northwest );
+        if( pR->east > 0 )
+            exitList.push_back( pR->east );
+        if( pR->southeast > 0 )
+            exitList.push_back( pR->southeast );
+        if( pR->south > 0 )
+            exitList.push_back( pR->south );
+        if( pR->southwest > 0 )
+            exitList.push_back( pR->southwest );
+        if( pR->west > 0 )
+            exitList.push_back( pR->west );
+        if( pR->northeast > 0 )
+            exitList.push_back( pR->northeast );
+        for (int k=0;k<exitList.size();k++)
+        {
+            int rID = exitList[k];
+            if( rID <= 0 ) continue;
+
+            bool areaExit;
+
+            TRoom * pE = mpMap->rooms[rID];
+            if( pE->area != mAID )
+            {
+                areaExit = true;
+            }
+            else
+                areaExit = false;
+            float ex = pE->x;
+            float ey = pE->y;
+            QPointF p2(ex+rs/2,ey+rs/2);
+            int ez = pE->z;
+            if( ! areaExit )
+            {
+               QGraphicsLineItem * line = scene->addLine(p1.x(),p1.y(),p2.x(),p2.y(),QPen(QColor(0,0,0,255)));
+               line->setZValue(0);
+            }
+        }
     }
+    //draw labels
     QRectF sR = scene->sceneRect();
     sR.setX(sR.x()-sR.width()/4);
     sR.setY(sR.y()-sR.height()/4);
