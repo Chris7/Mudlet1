@@ -28,6 +28,7 @@ class TArea;
 class Host;
 class GLWidget;
 class T2DMap;
+class TGraphicsView;
 
 #include <QMap>
 #include "TRoom.h"
@@ -40,6 +41,7 @@ class T2DMap;
 #include <QColor>
 #include <QPixmap>
 #include <QVector3D>
+#include "TGraphicsView.h"
 
 class dlgMapper;
 
@@ -145,6 +147,7 @@ public:
     QMap<int, int> reverseDirections; //contains complementary directions of dirs on TRoom.h
     GLWidget * mpM;
     dlgMapper * mpMapper;
+    TGraphicsView * gView;
     QList<int> mTestedNodes;
     QList<int> conList;
     int mPlausaOptOut;

@@ -1208,6 +1208,9 @@ int TLuaInterpreter::centerview( lua_State * L )
             if (pHost->mpMap->mpMapper->mp2dMap && pHost->mpMap->mpMapper->mp2dMap->isVisible())
                 pHost->mpMap->mpMapper->mp2dMap->update();
         }
+        if (pHost->mpMap->gView){
+            pHost->mpMap->gView->drawPlayerLocation(roomid);
+        }
         int area = pHost->mpMap->rooms[roomid]->area;
         if (pHost->mpMap->areas.contains(area))
             pHost->mpMap->mpMapper->setArea(area);

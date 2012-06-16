@@ -21,6 +21,8 @@ public:
     void resizeEvent(QResizeEvent *event);
     void setCenter(const QPointF& centerPoint);
     void setCenter(int);
+    void makeMargins();
+    void drawPlayerLocation(int);
     TMap * mpMap;
     Host * mpHost;
     QGraphicsScene * scene;
@@ -36,6 +38,9 @@ public:
     QPoint mReleasedAt;
     QPoint lastPoint;
     QPointF mCenterPoint;
+    QMap<int, QGraphicsScene *> scenes;
+    QMap<int, QGraphicsEllipseItem *> pLocs;
+    int cAID;
 signals:
     
 public slots:
