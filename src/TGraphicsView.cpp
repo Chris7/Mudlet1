@@ -38,7 +38,7 @@ TGraphicsView::TGraphicsView(QWidget *parent) :
     setCenter(QPointF(500.0, 500.0)); //A modified version of setCenter(), handles special cases
     //setCursor(Qt::OpenHandCursor);
     */
-    setViewport(new QGLWidget());
+//    setViewport(new QGLWidget());
     zPlane=0;
     rSize=1;
 }

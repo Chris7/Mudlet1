@@ -94,6 +94,7 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(showRoomIDs, SIGNAL(stateChanged(int)), this, SLOT(slot_toggleShowRoomIDs(int)));
     mp2dMap->mFontHeight = QFontMetrics( mpHost->mDisplayFont ).height();
     glWidget->hide();
+    gView->hide();
     mpMap->customEnvColors[257] = mpHost->mRed_2;
     mpMap->customEnvColors[258] = mpHost->mGreen_2;
     mpMap->customEnvColors[259] = mpHost->mYellow_2;
@@ -173,6 +174,7 @@ void dlgMapper::show2dView()
 {
     glWidget->setVisible(!glWidget->isVisible());
     mp2dMap->setVisible(!mp2dMap->isVisible());
+    gView->setVisible(false);
     if(glWidget->isVisible())
         d3buttons->setVisible(true);
     else
@@ -181,11 +183,18 @@ void dlgMapper::show2dView()
 }
 
 void dlgMapper::showGView(){
-    glWidget->setVisible(false);
-    mp2dMap->setVisible(false);
-    d3buttons->setVisible(false);
-    gView->setVisible(true);
-    gView->repopulateMap();
+    if (gView->isVisible()){
+        glWidget->setVisible(false);
+        mp2dMap->setVisible(true);
+        gView->setVisible(false);
+    }
+    else{
+        glWidget->setVisible(false);
+        mp2dMap->setVisible(false);
+        d3buttons->setVisible(false);
+        gView->setVisible(true);
+        gView->repopulateMap();
+    }
 }
 
 void dlgMapper::downloadMap()
