@@ -86,6 +86,7 @@ void TGraphicsItemRoom::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     menu->addAction(act1);
     menu->popup(event->screenPos());
     QObject::connect(act1, SIGNAL(triggered(QAction*)), scene, SLOT(slot_menuClicked(QAction*)));
+    scene->roomPressed = this;
 }
 
 TGraphicsScene::TGraphicsScene(QObject *parent) :
@@ -95,11 +96,13 @@ TGraphicsScene::TGraphicsScene(QObject *parent) :
 
 void TGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     QGraphicsScene::contextMenuEvent(event);
-    QMenu *menu = new QMenu();
-    QAction * act1 = new QAction("Create Label", this);
-    connect(act1, SIGNAL(triggered(QAction*)), this, SLOT(slot_sceneMenuClicked(QAction*)));
-    menu->addAction(act1);
-    menu->popup(event->screenPos());
+    if (!roomPressed){
+        QMenu *menu = new QMenu();
+        QAction * act1 = new QAction("Create Label", this);
+        connect(act1, SIGNAL(triggered(QAction*)), this, SLOT(slot_sceneMenuClicked(QAction*)));
+        menu->addAction(act1);
+        menu->popup(event->screenPos());
+    }
 }
 
 void TGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event){
@@ -126,7 +129,7 @@ void TGraphicsScene::slot_sceneMenuClicked(QAction * act){
     qDebug()<<"Scene clicked"<<act;
 }
 
-void slot_roomMenuClicked(QAction *act){
+void TGraphicsScene::slot_roomMenuClicked(QAction *act){
     qDebug()<<"room clicked"<<act;
 }
 
