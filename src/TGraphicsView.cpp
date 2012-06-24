@@ -1,7 +1,11 @@
 #include "TGraphicsView.h"
 
+#include <QObject>
+#include <QAction>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
+#include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QTextStream>
 #include <QScrollBar>
 #include <QMouseEvent>
@@ -9,36 +13,153 @@
 #include <QDebug>
 #include <QListIterator>
 #include <QFontMetrics>
+#include <QApplication>
 
 #include "TArea.h"
 #include "TRoom.h"
 
+TGraphicsItemRoom::TGraphicsItemRoom(QGraphicsItem *parent, TGraphicsScene *s, TRoom *pR) :
+    QGraphicsItem(parent)
+{
+    roomType = 1;
+    selected = false;
+    scene = s;
+    room = pR;
+    setFlags(QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable);
+    setAcceptsHoverEvents(true);
+}
+
+void TGraphicsItemRoom::setRect(qreal w, qreal h){
+    rWidth = h;
+    rHeight = h;
+    roomType = 1;
+}
+
+QRectF TGraphicsItemRoom::boundingRect() const{
+    qreal w = rWidth;
+    qreal h = rHeight;
+    return QRectF(x(), y(),
+                  w , h);
+}
+
+void TGraphicsItemRoom::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+    Q_UNUSED(widget);
+    painter->setClipRect( option->exposedRect );
+    if (roomType){
+        QColor c = scene->view->mpMap->customEnvColors[room->environment];
+        if (selected)
+            c = c.light(125);
+        qreal w = rWidth;
+        qreal h = rHeight;
+        painter->fillRect(x(), y(), w, h, c);
+    }
+}
+
+void TGraphicsItemRoom::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsItem::mousePressEvent(event);
+    qDebug()<<"room mouse press";
+    scene->roomPressed = this;
+    selected=true;
+    update();
+}
+
+void TGraphicsItemRoom::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+
+//    qDebug()<<"moving"<<event->modifiers();
+    if (event->modifiers() & Qt::ShiftModifier) {
+        setPos(event->pos());
+        update();
+        return;
+    }
+}
+
+void TGraphicsItemRoom::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+//     QGraphicsItem::mouseReleaseEvent(event);
+     scene->roomReleased = this;
+     update();
+}
+
+void TGraphicsItemRoom::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+    QMenu *menu = new QMenu();
+    QAction *act1 = new QAction("Delete Room", scene);
+    menu->addAction(act1);
+    menu->popup(event->screenPos());
+    QObject::connect(act1, SIGNAL(triggered(QAction*)), scene, SLOT(slot_menuClicked(QAction*)));
+}
+
+TGraphicsScene::TGraphicsScene(QObject *parent) :
+    QGraphicsScene(parent){
+//    view = parent;
+}
+
+void TGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+    QGraphicsScene::contextMenuEvent(event);
+    QMenu *menu = new QMenu();
+    QAction * act1 = new QAction("Create Label", this);
+    connect(act1, SIGNAL(triggered(QAction*)), this, SLOT(slot_sceneMenuClicked(QAction*)));
+    menu->addAction(act1);
+    menu->popup(event->screenPos());
+}
+
+void TGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsScene::mousePressEvent(event);
+    qDebug()<<"scene mouse press";
+//    qDebug()<<"press event"<<roomPressed;
+    if (roomPressed){
+        qDebug()<<"item pressed";//<<roomPressed;
+        //selectedItems().append(item);
+    }
+    else{
+        qDebug()<<"no items";
+        //clear selected items
+        selectedItems().clear();
+        lastPoint = event->scenePos();
+        if (event->buttons() & Qt::LeftButton)
+            mLeftDown=true;
+        if (event->buttons() & Qt::RightButton)
+            mRightDown=true;
+    }
+}
+
+void TGraphicsScene::slot_sceneMenuClicked(QAction * act){
+    qDebug()<<"Scene clicked"<<act;
+}
+
+void slot_roomMenuClicked(QAction *act){
+    qDebug()<<"room clicked"<<act;
+}
+
+void TGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsScene::mouseMoveEvent(event);
+}
+
+void TGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsScene::mouseReleaseEvent(event);
+    if (roomReleased && roomPressed && roomPressed == roomReleased){
+//        qDebug()<<selectedItems();
+        //selectedItems().append(roomPressed);
+//        view->selectedItem = roomPressed;
+//        view->selectedItemGroup->addToGroup(roomPressed);
+//        qDebug()<<view->selectedItemGroup;
+    }
+    roomReleased = 0;
+    roomPressed = 0;
+    if (mLeftDown)
+        mLeftDown=false;
+    if (mRightDown)
+        mRightDown=false;
+}
+
 TGraphicsView::TGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
 {
-//    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    /*for(int x = 0; x < 1000; x = x + 25) {
-        for(int y = 0; y < 1000; y = y + 25) {
-
-            if(x % 100 == 0 && y % 100 == 0) {
-                scene->addRect(x, y, 2, 2);
-
-                QString pointString;
-                QTextStream stream(&pointString);
-                stream << "(" << x << "," << y << ")";
-                QGraphicsTextItem* item = scene->addText(pointString);
-                item->setPos(x, y);
-            } else {
-                scene->addRect(x, y, 1, 1);
-            }
-        }
-    }
-
-    setSceneRect(0, 0, 1000, 1000);
-    setCenter(QPointF(500.0, 500.0)); //A modified version of setCenter(), handles special cases
-    //setCursor(Qt::OpenHandCursor);
-    */
-//    setViewport(new QGLWidget());
+    setRenderHint(QPainter::Antialiasing, false);
+    setOptimizationFlags(QGraphicsView::DontSavePainterState);
+    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+//    setCacheMode(QGraphicsView::CacheBackground);
+//    setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
     zPlane=0;
     rSize=1;
 }
@@ -50,12 +171,13 @@ void TGraphicsView::repopulateMap(){
     int mRID = mpMap->mRoomId;
     int mAID = mpMap->rooms[mRID]->area;
     if (cAID != mAID || !scenes.contains(mAID)){
-        if (scenes.contains(mAID)){
-            scene = scenes[mAID];
+        if (scenes.contains(mAID) && scenes[mAID].contains(zPlane)){
+            scene = scenes[mAID][zPlane];
             setScene(scene);
         }
         else{
-            scene = new QGraphicsScene(this);
+            scene = new TGraphicsScene(this);
+            scene->view = this;
             setScene(scene);
             TArea * pArea = mpMap->areas[mAID];
             QListIterator<int> itr(pArea->rooms);
@@ -71,8 +193,12 @@ void TGraphicsView::repopulateMap(){
                     qDebug()<<nRID<<"out of plane";
                     continue;
                 }
-                QGraphicsRectItem * rect = scene->addRect(x,y,rSize,rSize,QPen(QColor(255,0,0,255)),QBrush(QColor(255,0,0,255)));
-                rect->setZValue(1);
+                TGraphicsItemRoom * room = new TGraphicsItemRoom(0, scene, pR);
+                room->setPos(x, y);
+                room->setRect(rSize, rSize);
+                scene->addItem(room);
+//                QGraphicsRectItem * rect = scene->addRect(x,y,rSize,rSize,QPen(QColor(255,0,0,255)),QBrush(QColor(255,0,0,255)));
+                //rect->setZValue(1);
                 //draw exits
                 QPointF p1(x+rs/2,y+rs/2);
                 QList<int> exitList;
@@ -118,7 +244,7 @@ void TGraphicsView::repopulateMap(){
                 }
             }
             //draw labels
-            QMapIterator<int, TMapLabel> it(mpMap->mapLabels[mAID]);
+            /*QMapIterator<int, TMapLabel> it(mpMap->mapLabels[mAID]);
             while( it.hasNext() )
             {
                 it.next();
@@ -150,21 +276,23 @@ void TGraphicsView::repopulateMap(){
         //        QRectF br;
         //        lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
         //        scene->addPixmap(pix);
-            }
+            }*/
             makeMargins();
-            scenes.insert(mAID,scene);
+            QMap<int, TGraphicsScene *> tmap;
+            tmap.insert(zPlane, scene);
+            scenes.insert(mAID,tmap);
         }
     }
 }
 
 void TGraphicsView::makeMargins(){
     //put some margins around us
-    QRectF sR = scene->sceneRect();
+    /*QRectF sR = scene->sceneRect();
     sR.setX(sR.x()-sR.width()/4);
     sR.setY(sR.y()-sR.height()/4);
     sR.setWidth(sR.width()*1.5);
     sR.setHeight(sR.height()*1.5);
-    scene->setSceneRect(sR);
+    scene->setSceneRect(sR);*/
 }
 
 void TGraphicsView::setCenter(int room){
@@ -194,7 +322,8 @@ void TGraphicsView::drawPlayerLocation(int room){
 }
 
 void TGraphicsView::mouseReleaseEvent(QMouseEvent *event){
-    mReleasedAt = event->pos();
+//    event->ignore();
+    QGraphicsView::mouseReleaseEvent(event);
     if (mLeftDown){
         mLeftDown=false;
     }
@@ -204,7 +333,9 @@ void TGraphicsView::mouseReleaseEvent(QMouseEvent *event){
 }
 
 void TGraphicsView::mousePressEvent(QMouseEvent *event){
-    mPressedAt = event->pos();
+//    event->ignore();
+    QGraphicsView::mousePressEvent(event);
+    qDebug()<<"view mouse press";
     lastPoint = event->pos();
     if (event->buttons() & Qt::LeftButton)
         mLeftDown = true;
@@ -213,14 +344,13 @@ void TGraphicsView::mousePressEvent(QMouseEvent *event){
 }
 
 void TGraphicsView::mouseMoveEvent(QMouseEvent *event){
+    QGraphicsView::mouseMoveEvent(event);
+    /*event->ignore();
     if (mLeftDown){
         QPointF delta = mapToScene(lastPoint) - mapToScene(event->pos());
         lastPoint = event->pos();
-        qDebug()<<lastPoint;
-        qDebug()<<mCenterPoint;
-        qDebug()<<delta;
         setCenter(mCenterPoint+delta);
-    }
+    }*/
 
 }
 
@@ -259,15 +389,14 @@ void TGraphicsView::setCenter(const QPointF &centerPoint){
     else if(centerPoint.y() < yMin)
         mCenterPoint.setY(yMin);
 
-
     //Update the scrollbars
     centerOn(mCenterPoint);
 }
 
-void TGraphicsView::mouseDoubleClickEvent(QMouseEvent *event){
+/*void TGraphicsView::mouseDoubleClickEvent(QMouseEvent *event){
 
 }
-
+*/
 void TGraphicsView::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::NoAnchor);
     if (event->delta() > 0){
@@ -291,7 +420,8 @@ void TGraphicsView::shiftZdown(){
     zPlane--;
     repopulateMap();
 }
-
+/*
 void TGraphicsView::resizeEvent(QResizeEvent *event){
 
 }
+*/

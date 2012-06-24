@@ -1,16 +1,17 @@
 
-CONFIG += debug uitools
+CONFIG += uitools
 
 QMAKE_CXXFLAGS_RELEASE += -O3 -Wno-deprecated -Wno-unused-parameter
 QMAKE_CXXFLAGS_DEBUG += -O0 -Wno-deprecated -Wno-unused-parameter
-MOC_DIR = ./gviewtmp
-OBJECTS_DIR = ./gviewtmp
+MOC_DIR = ./tmp
+OBJECTS_DIR = ./tmp
 QT += network opengl phonon webkit
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBLUA = -llua5.1
 !exists(/usr/lib/liblua5.1.a):LIBLUA = -llua
 
+EXTERNAL_INCLUDES = "C:\mudlet_package\includes"
 # automatically link to LuaJIT if it exists
 exists(/usr/local/lib/libluajit-5.1.a):LIBLUA = -L/usr/local/lib -lluajit-5.1
 
@@ -18,9 +19,9 @@ unix:LIBS += -lpcre \
     $$LIBLUA \
     -lhunspell \
     -lyajl \
-    -lzzip 
+    -lzzip
 
-win32:LIBS += -L"c:\mudlet2_package" \
+win32:LIBS += -L"C:\mudlet_package\mudlet_libs" \
     -llua51 \
     -lpcre \
     -lhunspell \
@@ -28,19 +29,19 @@ win32:LIBS += -L"c:\mudlet2_package" \
 
 unix:INCLUDEPATH += /usr/include/lua5.1
 
-win32:INCLUDEPATH += "c:\mudlet_package_MINGW\Lua_src\include" \
-    "c:\mudlet_package_MINGW\zlib-1.2.5" \
-    "c:\mudlet_package_MINGW\boost_1_45_0" \
-    "c:\mudlet_package_MINGW\pcre-8.0-lib\include" \
-    #"C:\mudlet_package_MSVC\lloyd-yajl-f4b2b1a\yajl-2.0.1\include" \
-    "c:\mudlet2_package\src\yajl1-src\src\include" \
-    "C:\mudlet_package_MINGW\hunspell-1.3.1\src"
+win32:INCLUDEPATH += $$EXTERNAL_INCLUDES\lua-5.1.4\src \
+    $$EXTERNAL_INCLUDES\zlib123-dll\include \
+    $$EXTERNAL_INCLUDES\boost_1_47_0 \
+    $$EXTERNAL_INCLUDES\pcre-8.13 \
+    $$EXTERNAL_INCLUDES\lloyd-yajl-17b1790\src \
+    $$EXTERNAL_INCLUDES\hunspell-1.3.2\src
 
 unix:isEmpty( INSTALL_PREFIX ):INSTALL_PREFIX = /usr/local
 unix: {
     SHARE_DIR = /usr/local/share/mudlet
     BIN_DIR = $$INSTALL_PREFIX/bin
 }
+
 INCLUDEPATH += irc/include
 SOURCES += TConsole.cpp \
     ctelnet.cpp \

@@ -953,6 +953,7 @@ bool mudlet::deleteLabel(Host * pHost, QString labelName){
         if (it2 != pHost->mpConsole->mLabelMap.end())
             pHost->mpConsole->mLabelMap.erase(it2);
     }
+    return cleared;
 }
 
 bool mudlet::createBuffer( Host * pHost, QString & name )
