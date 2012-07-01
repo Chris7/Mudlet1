@@ -18,6 +18,49 @@
 #include "TArea.h"
 #include "TRoom.h"
 
+TGraphicsItemLine::TGraphicsItemLine(QGraphicsItem *parent, TGraphicsScene *s, TRoom *from, TRoom *to) :
+    QGraphicsPathItem(parent)
+{
+    selected = false;
+    scene = s;
+    roomFrom = from;
+    roomTo = to;
+    QPointF f(from->x+scene->view->rSize/2,from->y*-1+scene->view->rSize/2);
+    QPointF t(to->x+scene->view->rSize/2, to->y*-1+scene->view->rSize/2);
+    points.append(f);
+    points.append(t);
+    QPainterPath p(f);
+    p.lineTo(t);
+    setPath(p);
+    setFlags(QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable);
+    setAcceptsHoverEvents(true);
+}
+
+void TGraphicsItemLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+    Q_UNUSED(widget);
+    Q_UNUSED(option);
+    if (!points.size())
+        return;
+    QListIterator<QPointF> it(points);
+//    qDebug()<<points;
+//    qDebug()<<roomFrom->x<<roomFrom->y*-1;
+//    qDebug()<<roomTo->x<<roomTo->y*-1;
+    painter->setPen(QPen(QColor(255,0,0,255)));
+    QPainterPath p(it.next());
+    while (it.hasNext()){
+        p.lineTo(mapFromScene(it.next()));
+    }
+    painter->drawPath(p);
+}
+
+/*QRectF TGraphicsItemLine::boundingRect() const{
+    QPointF from = QPointF(roomFrom->x, roomFrom->y);
+    QPainterPath p(from);
+    QPointF to = QPointF(roomTo->x, roomTo->y);
+    p.lineTo(to);
+    return p.boundingRect();
+}*/
+
 TGraphicsItemRoom::TGraphicsItemRoom(QGraphicsItem *parent, TGraphicsScene *s, TRoom *pR) :
     QGraphicsItem(parent)
 {
@@ -44,7 +87,7 @@ QRectF TGraphicsItemRoom::boundingRect() const{
 
 void TGraphicsItemRoom::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(widget);
-    painter->setClipRect( option->exposedRect );
+    Q_UNUSED(option);
     if (roomType){
         QColor c = scene->view->mpMap->customEnvColors[room->environment];
         if (selected)
@@ -125,6 +168,10 @@ void TGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event){
     }
 }
 
+void TGraphicsScene::slot_lineMenuClicked(QAction * act){
+    qDebug()<<"line clicked"<<act;
+}
+
 void TGraphicsScene::slot_sceneMenuClicked(QAction * act){
     qDebug()<<"Scene clicked"<<act;
 }
@@ -199,11 +246,9 @@ void TGraphicsView::repopulateMap(){
                 TGraphicsItemRoom * room = new TGraphicsItemRoom(0, scene, pR);
                 room->setPos(x, y);
                 room->setRect(rSize, rSize);
+                room->setZValue(1);
                 scene->addItem(room);
-//                QGraphicsRectItem * rect = scene->addRect(x,y,rSize,rSize,QPen(QColor(255,0,0,255)),QBrush(QColor(255,0,0,255)));
-                //rect->setZValue(1);
                 //draw exits
-                QPointF p1(x+rs/2,y+rs/2);
                 QList<int> exitList;
                 if( pR->north > 0 )
                     exitList.push_back( pR->north );
@@ -235,14 +280,12 @@ void TGraphicsView::repopulateMap(){
                     }
                     else
                         areaExit = false;
-                    float ex = pE->x;
-                    float ey = pE->y*-1;
-                    QPointF p2(ex+rs/2,ey+rs/2);
-                    int ez = pE->z;
                     if( ! areaExit )
                     {
-                       QGraphicsLineItem * line = scene->addLine(p1.x(),p1.y(),p2.x(),p2.y(),QPen(QColor(0,0,0,255)));
+                       TGraphicsItemLine * line = new TGraphicsItemLine(0, scene, pR, pE);
+                       //QGraphicsLineItem * line = scene->addLine(p1.x(),p1.y(),p2.x(),p2.y(),QPen(QColor(0,0,0,255)));
                        line->setZValue(0);
+                       scene->addItem(line);
                     }
                 }
             }

@@ -11,6 +11,7 @@
 #include <Host.h>
 class TGraphicsScene;
 class TGraphicsItemRoom;
+class TGraphicsItemLine;
 
 class TGraphicsView : public QGraphicsView
 {
@@ -67,6 +68,8 @@ public:
     bool mRightDown;
     TGraphicsItemRoom * roomPressed;
     TGraphicsItemRoom * roomReleased;
+    TGraphicsItemLine * linePressed;
+    TGraphicsItemLine * lineReleased;
     QPoint mPressedAt;
     QPoint mReleasedAt;
     QPointF lastPoint;
@@ -74,6 +77,7 @@ public:
 public slots:
     void slot_roomMenuClicked(QAction*);
     void slot_sceneMenuClicked(QAction*);
+    void slot_lineMenuClicked(QAction*);
 };
 
 class TGraphicsItemRoom : public QGraphicsItem{
@@ -98,6 +102,22 @@ public:
     qreal minorAxis;
     qreal radius;
     TGraphicsScene * scene;
+};
+
+class TGraphicsItemLine : public QGraphicsPathItem{
+public:
+    TGraphicsItemLine(QGraphicsItem *parent = 0, TGraphicsScene *s = 0, TRoom * = 0, TRoom * = 0);
+    //QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+//    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+//    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+//    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+//    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    TRoom * roomFrom;
+    TRoom * roomTo;
+    bool selected;
+    TGraphicsScene * scene;
+    QList<QPointF> points;
 };
 
 #endif // TGRAPHICSVIEW_H

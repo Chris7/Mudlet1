@@ -612,6 +612,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "zombiemud.org";
         if( profile_name == "3Scapes")
             val = "3k.org";
+        if( profile_name == "3Kingdoms")
+            val = "3k.org";
     }
     host_name_entry->setText( val );
     item = "port";
@@ -644,6 +646,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "23";
         if( profile_name == "3Scapes")
             val = "3200";
+        if( profile_name == "3Kingdoms")
+            val = "3000";
     }
     port_entry->setText( val );
     item = "password";
@@ -703,6 +707,8 @@ void dlgConnectionProfiles::slot_item_clicked(QListWidgetItem *pItem)
             val = "<center><a href='http://www.imperian.com/'>http://www.imperian.com</a></center>";;
         if( profile_name == "3Scapes" )
             val = "<center><a href='http://www.3scapes.org/'>http://www.3scapes.org</a></center>";;
+        if( profile_name == "3Scapes" )
+            val = "<center><a href='http://www.3k.org/'>http://www.3scapes.org</a></center>";;
     }
     website_entry->setText( val );
 
@@ -957,6 +963,17 @@ void dlgConnectionProfiles::fillout_form()
     QIcon mi4(pc1);
     pM->setIcon(mi4);
     muds.clear();
+
+    muds = "3Kingdoms";
+    pM = new QListWidgetItem( muds );
+    pM->setFont(font);
+    pM->setForeground(QColor(255,255,255));
+    profiles_tree_widget->addItem(pM);
+    QPixmap p3k(":/icons/3klogo.png");
+    QPixmap p3k1 = p3k.scaled(QSize(120,30),Qt::IgnoreAspectRatio, Qt::SmoothTransformation).copy();
+    QIcon mi3k(p3k1);
+    pM->setIcon(mi3k);
+    muds.clear();
     QDateTime test_date;
     QListWidgetItem * toselect = 0;
     for( int i=0; i<mProfileList.size(); i++ )
@@ -990,6 +1007,8 @@ void dlgConnectionProfiles::fillout_form()
         if( mProfileList[i] == "ZombieMUD" )
             continue;
         if( mProfileList[i] == "3Scapes" )
+            continue;
+        if( mProfileList[i] == "3Kingdoms" )
             continue;
         QString sList;
         sList = mProfileList[i];
