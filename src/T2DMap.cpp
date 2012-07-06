@@ -351,7 +351,12 @@ QColor T2DMap::getColor( int id )
 void T2DMap::shiftDown()
 {
     mShiftMode = true;
-    mOy--;
+    if (mpHost->mPanSpeed){
+        for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+            mOy--;
+    }
+    else
+        mOy--;
     update();
 }
 
@@ -364,21 +369,36 @@ void T2DMap::toggleShiftMode()
 void T2DMap::shiftUp()
 {
     mShiftMode = true;
-    mOy++;
+    if (mpHost->mPanSpeed){
+        for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+            mOy++;
+    }
+    else
+        mOy++;
     update();
 }
 
 void T2DMap::shiftLeft()
 {
     mShiftMode = true;
-    mOx--;
+    if (mpHost->mPanSpeed){
+        for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+            mOx--;
+    }
+    else
+        mOx--;
     update();
 }
 
 void T2DMap::shiftRight()
 {
     mShiftMode = true;
-    mOx++;
+    if (mpHost->mPanSpeed){
+        for (int i=0;i<(int)mpHost->mPanSpeed;i++)
+            mOx++;
+    }
+    else
+        mOx++;
     update();
 }
 void T2DMap::shiftZup()
@@ -2685,33 +2705,15 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
     {
         int x = event->x();
         int y = height()-event->y();
-        bool newX = false, newY= false;
-        for (int i=0;i<(int)mpHost->mPanSpeed;i++){
-            if ((mpMap->m2DPanXStart-x) > 1){
-                    shiftRight();
-                newX=true;
-            }
-            else if ((mpMap->m2DPanXStart-x) < -1){
-                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                    shiftLeft();
-                newX=true;
-            }
-            if ((mpMap->m2DPanYStart-y) > 1){
-                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                    shiftDown();
-                newY=true;
-            }
-            else if ((mpMap->m2DPanYStart-y) < -1){
-                for (int i=0;i<(int)mpHost->mPanSpeed;i++)
-                    shiftUp();
-                newY=true;
-            }
-            if (newX)
-                mpMap->m2DPanXStart = x;
-            if (newY)
-                mpMap->m2DPanYStart = y;
+        if ((mpMap->m2DPanXStart-x) > 1)
+            shiftRight();
+        else if ((mpMap->m2DPanXStart-x) < -1)
+            shiftLeft();
+        if ((mpMap->m2DPanYStart-y) > 1)
+            shiftDown();
+        else if ((mpMap->m2DPanYStart-y) < -1)
+            shiftUp();
         return;
-        }
     }
 
     if( mCustomLineSelectedRoom != 0 && mCustomLineSelectedPoint >= 0 )

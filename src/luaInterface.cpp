@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QSet>
+#include <setjmp.h>
 
 using namespace std;
 
@@ -51,12 +52,25 @@ int tableObject::getType(){
     return tableType;
 }
 
+jmp_buf buf;
+
 luaInterface::luaInterface( Host * pH)
 :mpHost( pH )
 {
     interpreter = mpHost->getLuaInterpreter();
 }
 
+int luaInterface::lua_panic (lua_State *L){
+    QString error = lua_tostring(L, -1);
+    qDebug()<<"panic hit"<<error;//<<error;
+    lua_pushstring(L,error.toLatin1().data());
+    lua_error(L);
+    longjmp(buf,1);
+//    lua_getglobal(L, "ERROR");
+//    throw VarPanic(error, (int)lua_tonumber(L, -1));
+
+    return 0;
+}
 
 int luaInterface::pushVariable(lua_State* L, int varType, QString varName){
     switch (varType){
@@ -105,52 +119,64 @@ int luaInterface::getVariable(lua_State* L, QStringList varInfo){
     //indicates: 0 means something broke, 1 means we're at global level,
     //2 means we're a table @ root, 3 means we're a table in a table,
     //4 means we're a variable in a table
+    qDebug()<<"variable we're fetching"<<varInfo;
     QString curVar = varInfo.first();
     int kType = QString(curVar.at(1)).toInt();
     int startStack = lua_gettop(L);
-    int vType = QString(curVar.at(0)).toInt();
-    curVar = curVar.remove(0,2);
-    int tabled = 0;
-    while (vType == LUA_TTABLE){
-        //fetch tables until we're where we need to be
-        varInfo.pop_front();
+    if (setjmp(buf) == 0){
+    //    setjmp(buf);
+        int vType = QString(curVar.at(0)).toInt();
+        curVar = curVar.remove(0,2);
+        int tabled = 0;
+        while (vType == LUA_TTABLE){
+            //fetch tables until we're where we need to be
+            varInfo.pop_front();
+            if (!pushVariable(L, kType, curVar)){
+                lua_settop(L, startStack);
+                return 0;
+            }
+            if (!tabled){
+                lua_pop(L,1);
+                lua_getglobal(L, curVar.toLatin1().data());
+                tabled=1;
+                if (!varInfo.size())
+                    return 2;
+            }
+            else
+                lua_gettable(L,-2);
+            if (varInfo.size()){
+                curVar = varInfo.first();
+                vType = QString(curVar.at(0)).toInt();
+                kType = QString(curVar.at(1)).toInt();
+                curVar = curVar.remove(0,2);
+            }
+            else{
+                //if nothing is left in varInfo, we are fetching a table, so return the stack
+                //which will contain our table at -1 position
+                if (lua_type(L,-1) == LUA_TTABLE)
+                    return 3;
+                //else we have no idea what we have
+                lua_settop(L, startStack);
+                return 0;
+            }
+        }
         if (!pushVariable(L, kType, curVar)){
             lua_settop(L, startStack);
             return 0;
         }
-        if (!tabled){
-            lua_pop(L,1);
-            lua_getglobal(L, curVar.toLatin1().data());
-            tabled=1;
-            if (!varInfo.size())
-                return 2;
-        }
-        else
-            lua_gettable(L,-2);
-        if (varInfo.size()){
-            curVar = varInfo.first();
-            kType = QString(curVar.at(0)).toInt();
-            kType = QString(curVar.at(1)).toInt();
-            curVar = curVar.remove(0,2);
-        }
-        else{
-            //if nothing is left in varInfo, we are fetching a table, so return the stack
-            //which will contain our table at -1 position
+        if (tabled){
+            lua_gettable(L, -2);
             return 3;
         }
-    }
-    if (!pushVariable(L, kType, curVar)){
-        lua_settop(L, startStack);
-        return 0;
-    }
-    if (tabled){
-        lua_gettable(L, -2);
-        return 3;
+        else{
+            lua_pop(L,1);
+            lua_getglobal(L, curVar.toLatin1().data());
+            return 1;
+        }
     }
     else{
-        lua_pop(L,1);
-        lua_getglobal(L, curVar.toLatin1().data());
-        return 1;
+        lua_settop(L,startStack);
+        return 0;
     }
 }
 
@@ -170,191 +196,143 @@ int luaInterface::getVariable(lua_State* L, QTreeWidgetItem * pItem){
     return getVariable(L, testNest);
 }
 
-void luaInterface::deleteVar(lua_State* L, QTreeWidgetItem * pItem){
+int luaInterface::deleteVar(lua_State* L, QTreeWidgetItem * pItem){
 //    for (int i=1;i<=lua_gettop(L);i++){
 //        qDebug()<<i<<":"<<lua_type(L,i*-1);
 //    }
-    int tabled = getVariable(L, pItem);
-    lua_pop(L, 1);
-    QString vName = pItem->text(0);
-    pushVariable(L, pItem);
-    lua_pushnil(L);
-//    for (int i=1;i<=lua_gettop(L);i++){
-//        qDebug()<<i<<":"<<lua_type(L,i*-1);
-//    }
-    if (tabled == 1 || tabled == 2){
-        lua_setglobal(L, vName.toLatin1().data());
-    }
-    else if (tabled){
-        //we're in a table
-        lua_settable(L, -3);
+    int startSize = lua_gettop(L);
+    if (setjmp(buf) == 0){
+        int tabled = getVariable(L, pItem);
+        lua_pop(L, 1);
+        QString vName = pItem->text(0);
+        pushVariable(L, pItem);
+        lua_pushnil(L);
+        for (int i=1;i<=lua_gettop(L);i++){
+            qDebug()<<i<<":"<<lua_type(L,i*-1);
+        }
+        qDebug()<<"dtabled"<<tabled;
+        if (tabled == 1 || tabled == 2){
+            lua_setglobal(L, vName.toLatin1().data());
+        }
+        else if (tabled){
+            //we're in a table
+            lua_settable(L, -3);
+        }
+        else{
+            lua_settop(L,startSize);
+            return 0;
+        }
     }
     else{
-        return;
+        lua_settop(L,startSize);
+        return 0;
     }
 }
 
-void luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString newName){
+int luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString newName){
     int stackTop = lua_gettop(L);
-    int tabled = getVariable(L, pItem);
-//    for (int i=1;i<=lua_gettop(L);i++){
-//        qDebug()<<i<<":"<<lua_type(L,i*-1);
-//    }
-    //at this point -1 is the variable's value, we want its name below it
-    //then use replace, and then reset the variable
-    QStringList pInfo = pItem->data(0, Qt::UserRole).toStringList();
-    int kType = QString(pInfo[0]).toInt();
-    qDebug()<<"going to push"<<newName<<"of type"<<kType;
-    if (pushVariable(L, kType, newName)){
-        //right now we have -1 as key, -2 as value, we want to reverse this
-        lua_insert(L,-2);//now we're -1 value -2 key
-//        for (int i=1;i<=lua_gettop(L);i++){
-//            qDebug()<<i<<":"<<lua_type(L,i*-1);
-//        }
-        //if we're inside a table:
-        if (tabled == 1 || tabled == 2){
-            //global
-            lua_setglobal(L,newName.toLatin1().data());
-            deleteVar(L, pItem);
-            pItem->setText(0,newName);
-            pItem->setText(1,newName.toLower());
+    if (setjmp(buf) == 0){
+        int tabled = getVariable(L, pItem);
+    //    for (int i=1;i<=lua_gettop(L);i++){
+    //        qDebug()<<i<<":"<<lua_type(L,i*-1);
+    //    }
+        //at this point -1 is the variable's value, we want its name below it
+        //then use replace, and then reset the variable
+        QStringList pInfo = pItem->data(0, Qt::UserRole).toStringList();
+        int kType = QString(pInfo[0]).toInt();
+        qDebug()<<"going to push"<<newName<<"of type"<<kType<<"tabled:"<<tabled;
+        if (pushVariable(L, kType, newName)){
+            //right now we have -1 as key, -2 as value, we want to reverse this
+            lua_insert(L,-2);//now we're -1 value -2 key
+    //        for (int i=1;i<=lua_gettop(L);i++){
+    //            qDebug()<<i<<":"<<lua_type(L,i*-1);
+    //        }
+            //if we're inside a table:
+            if (tabled == 1 || tabled == 2){
+                //global
+                lua_setglobal(L,newName.toLatin1().data());
+                if (setjmp(buf) == 0)
+                    deleteVar(L, pItem);
+                else{
+                    lua_settop(L,stackTop);
+                    return 0;
+                }
+                pItem->setText(0,newName);
+                pItem->setText(1,newName.toLower());
+            }
+            else if (tabled>0){
+                //we're renaming a table, so first we save the value
+                lua_settable(L, -3);
+                //then we delete the old value
+                //lua_settop(L, stackTop);
+                //a quick hack to get the deletion right
+                QString oldName = pInfo.last();
+                pInfo[0] = oldName.at(0);
+                pItem->setData(0, Qt::UserRole, pInfo);
+                if (setjmp(buf) == 0)
+                    deleteVar(L, pItem);
+                else{
+                    lua_settop(L, stackTop);
+                    return 0;
+                }
+                pInfo[0] = QString::number(kType);
+                //now we need to reset the variable name itself inside the pInfo
+                pInfo.pop_back();
+                pInfo << pInfo[0]+newName;
+                pItem->setText(0,newName);
+                pItem->setText(1,newName.toLower());
+                pItem->setData(0, Qt::UserRole, pInfo);
+                return 1;
+            }
         }
-        else if (tabled>0){
-            //we're renaming a table, so first we save the value
-            lua_settable(L, -3);
-            //then we delete the old value
-            //lua_settop(L, stackTop);
-            //a quick hack to get the deletion right
-            QString oldName = pInfo.last();
-            pInfo[0] = oldName.at(0);
-            pItem->setData(0, Qt::UserRole, pInfo);
-            deleteVar(L, pItem);
-            pInfo[0] = QString::number(kType);
-            //now we need to reset the variable name itself inside the pInfo
-            pInfo.pop_back();
-            pInfo << pInfo[0]+newName;
-            pItem->setText(0,newName);
-            pItem->setText(1,newName.toLower());
-            pItem->setData(0, Qt::UserRole, pInfo);
-            return;
-        }
+    }
+    else{
+        lua_settop(L,stackTop);
+        return 0;
     }
 }
 
-void luaInterface::deleteVar(QTreeWidgetItem * pItem){
+int luaInterface::deleteVar(QTreeWidgetItem * pItem){
     if (!pItem)
-        return;
+        return 1;
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
-    deleteVar(L, pItem);
-    lua_settop(L,startSize);
+    if (setjmp(buf) == 0){
+        int st = deleteVar(L, pItem);
+        lua_settop(L,startSize);
+        return st;
+    }
+    else{
+        lua_settop(L,startSize);
+        return 0;
+    }
 }
 
-void luaInterface::restoreVar(QStringList pInfo){
+int luaInterface::restoreVar(QStringList pInfo){
     qDebug()<<"pinfo we're trying to restore"<<pInfo;
     L = interpreter->pGlobalLua;
     int startSize = lua_gettop(L);
-    QStringList nested;
-    QString newName = pInfo[0];
-    pInfo.pop_front();
-    int vType = pInfo[1].toInt();
-    QString newValue = pInfo[2];
-    if (vType == LUA_TTABLE)
-        pInfo.pop_back();//for this instance, we want to remove the self-reference
-    for (int i=3;i<pInfo.size();i++)
-        if (pInfo[i] != "")
-            nested<<pInfo[i];
-    if (nested.size() && (nested.first() == "Table" || nested.first() == "NewTable"))
-        nested.pop_front();
-    if (nested.size()){
-        for (int i=0;i<nested.size();i++){
-            QString tableName = nested[i];
-            int tableType = QString(tableName.at(0)).toInt();
-            tableName.remove(0,1);
-            if (tableType  == LUA_TNUMBER)
-                lua_pushnumber(L, tableName.toInt());
-            else
-                lua_pushstring(L, tableName.toLatin1().data());
-            if (i>0){
-                lua_gettable(L,-2);
-            }
-            else
-                lua_getglobal(L,tableName.toLatin1().data());
-            if (lua_type(L,-1) == LUA_TNIL){
-                lua_pop(L,1);
-                if (tableType  == LUA_TNUMBER)
-                    lua_pushnumber(L, tableName.toInt());
-                else
-                    lua_pushstring(L, tableName.toLatin1().data());
-                lua_newtable(L);
-                if (i>0)
-                    lua_settable(L,-3);
-                else{
-                    lua_setglobal(L,tableName.toLatin1().data());
-                    lua_pop(L,1);
-                }
-                i--; //reiterate after making the table to get it on the stack
-                continue;
-            }
-        }
-    }
-    pushVariable(L, pInfo[0].toInt(), newName);
-    pushVariable(L, vType, newValue);
-/*    for (int i=1;i<=lua_gettop(L);i++){
-        qDebug()<<lua_type(L,i*-1);
-    }*/
-    if (nested.size()){//(lua_type(L,-3) == LUA_TTABLE){
-        lua_settable(L,-3);
-    }
-    else
-        lua_setglobal(L,newName.toLatin1().data());
-    lua_settop(L,startSize);
-}
-
-void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue, int force){
-    if (newName=="")
-        return;
-    QTreeWidgetItem* pParent = (QTreeWidgetItem*)pItem->parent();
-    if (pItem == NULL || !(pItem->columnCount()))
-        return;
-    QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
-    if (!pParent)
-        return;
-    if (!force && !pInfo.size())// || pInfo.contains(newName)))
-        return;
-    L = interpreter->pGlobalLua;
-    if (!force && newName == pItem->text(0) && (newValue == pInfo[2] || pInfo[2] == "Table"))
-        return;
-    if (force == 2 || (pInfo[2] != "NewTable" && newName != pItem->text(0) && (newValue == pInfo[2] || pInfo[2] == "Table"))){
-        //renaming
-        renameVariable(L, pItem, newName);
-        return;
-    }
-    QStringList nested;
-    int tabled = 0;
-    int startSize = lua_gettop(L);
-    if (pParent){
+    if (setjmp(buf) == 0){
+        QStringList nested;
+        QString newName = pInfo[0];
+        pInfo.pop_front();
+        int vType = pInfo[1].toInt();
+        if (vType == -1 || pInfo[0].toInt() == -1)
+            return 0;
+        QString newValue = pInfo[2];
+        if (vType == LUA_TTABLE)
+            pInfo.pop_back();//for this instance, we want to remove the self-reference
         for (int i=3;i<pInfo.size();i++)
             if (pInfo[i] != "")
                 nested<<pInfo[i];
+        if (nested.size() && (nested.first() == "Table" || nested.first() == "NewTable"))
+            nested.pop_front();
         if (nested.size()){
             for (int i=0;i<nested.size();i++){
-                tabled++;
-                /*
-                  Sample setup for 2 tables:
-                  iteration 1:
-                  -1 {}
-                  -2 key
-                  iteration 2:
-                  -1 {}
-                  -2 key
-                  -3 {}
-                  -4 key
-                  */
                 QString tableName = nested[i];
                 int tableType = QString(tableName.at(0)).toInt();
                 tableName.remove(0,1);
-                if (tableType  == LUA_TNUMBER)
+                if (tableType == LUA_TNUMBER)
                     lua_pushnumber(L, tableName.toInt());
                 else
                     lua_pushstring(L, tableName.toLatin1().data());
@@ -363,62 +341,158 @@ void luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString new
                 }
                 else
                     lua_getglobal(L,tableName.toLatin1().data());
+                if (lua_type(L,-1) == LUA_TNIL){
+                    lua_pop(L,1);
+                    if (tableType  == LUA_TNUMBER)
+                        lua_pushnumber(L, tableName.toInt());
+                    else
+                        lua_pushstring(L, tableName.toLatin1().data());
+                    lua_newtable(L);
+                    if (i>0)
+                        lua_settable(L,-3);
+                    else{
+                        lua_setglobal(L,tableName.toLatin1().data());
+                        lua_pop(L,1);
+                    }
+                    i--; //reiterate after making the table to get it on the stack
+                    continue;
+                }
             }
         }
-    }
-    //push the key
-    int nameCast = QString(pInfo[0]).toInt();
-    int valueCast = QString(pInfo[1]).toInt();
-    if ((nameCast == LUA_TNUMBER) || (nameCast == LUA_TNONE && (newName == "0" || newName.toInt()))){
-        pInfo[0] = QString::number(LUA_TNUMBER);
-        lua_pushnumber(L, newName.toInt());
+        pushVariable(L, pInfo[0].toInt(), newName);
+        pushVariable(L, vType, newValue);
+    /*    for (int i=1;i<=lua_gettop(L);i++){
+            qDebug()<<lua_type(L,i*-1);
+        }*/
+        if (nested.size()){//(lua_type(L,-3) == LUA_TTABLE){
+            lua_settable(L,-3);
+        }
+        else
+            lua_setglobal(L,newName.toLatin1().data());
+        lua_settop(L,startSize);
+        return 1;
     }
     else{
-        pInfo[0] = QString::number(LUA_TSTRING);
-        lua_pushstring(L, newName.toLatin1().data());
+        lua_settop(L,startSize);
+        return 0;
     }
-    if (valueCast != LUA_TTABLE){
-        if (valueCast == LUA_TNUMBER || (valueCast == LUA_TNONE && (newValue.toInt() || newValue.toFloat()))){
-            if (newValue.toInt())
-                lua_pushnumber(L,newValue.toInt());
-            else
-                lua_pushnumber(L, newValue.toFloat());
-            pInfo[1] = QString::number(LUA_TNUMBER);
+}
+
+int luaInterface::saveVar(QTreeWidgetItem * pItem, QString newName, QString newValue, int force){
+    if (newName=="")
+        return 0;
+    QTreeWidgetItem* pParent = (QTreeWidgetItem*)pItem->parent();
+    if (pItem == NULL || !(pItem->columnCount()))
+        return 0;
+    QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
+    if (!pParent)
+        return 0;
+    if (!force && !pInfo.size())// || pInfo.contains(newName)))
+        return 0;
+    L = interpreter->pGlobalLua;
+        int startSize = lua_gettop(L);
+    if (!force && newName == pItem->text(0) && (newValue == pInfo[2] || pInfo[2] == "Table"))
+        return 0;
+    if (setjmp(buf) == 0){
+        if (force == 2 || (pInfo[2] != "NewTable" && newName != pItem->text(0) && (newValue == pInfo[2] || pInfo[2] == "Table"))){
+            //renaming
+            qDebug()<<"going to rename";
+            return renameVariable(L, pItem, newName);;
         }
-        else if (valueCast == LUA_TBOOLEAN || (valueCast == LUA_TNONE && (newValue.toLower() == "true" || newValue.toLower() == "false"))){
-            lua_pushboolean(L, newValue.toLower()=="true"?1:0);
-            pInfo[1] = QString::number(LUA_TBOOLEAN);
+        QStringList nested;
+        int tabled = 0;
+        if (pParent){
+            for (int i=3;i<pInfo.size();i++)
+                if (pInfo[i] != "")
+                    nested<<pInfo[i];
+            if (nested.size()){
+                for (int i=0;i<nested.size();i++){
+                    tabled++;
+                    /*
+                      Sample setup for 2 tables:
+                      iteration 1:
+                      -1 {}
+                      -2 key
+                      iteration 2:
+                      -1 {}
+                      -2 key
+                      -3 {}
+                      -4 key
+                      */
+                    QString tableName = nested[i];
+                    int tableType = QString(tableName.at(0)).toInt();
+                    tableName.remove(0,1);
+                    if (tableType  == LUA_TNUMBER)
+                        lua_pushnumber(L, tableName.toInt());
+                    else
+                        lua_pushstring(L, tableName.toLatin1().data());
+                    if (i>0){
+                        lua_gettable(L,-2);
+                    }
+                    else
+                        lua_getglobal(L,tableName.toLatin1().data());
+                }
+            }
+        }
+        //push the key
+        int nameCast = QString(pInfo[0]).toInt();
+        int valueCast = QString(pInfo[1]).toInt();
+        if ((nameCast == LUA_TNUMBER) || (nameCast == LUA_TNONE && (newName == "0" || newName.toInt()))){
+            pInfo[0] = QString::number(LUA_TNUMBER);
+            lua_pushnumber(L, newName.toInt());
         }
         else{
-            lua_pushstring(L, newValue.toLatin1().data());
-            pInfo[1] = QString::number(LUA_TSTRING);
+            pInfo[0] = QString::number(LUA_TSTRING);
+            lua_pushstring(L, newName.toLatin1().data());
         }
+        if (valueCast != LUA_TTABLE){
+            if (valueCast == LUA_TNUMBER || (valueCast == LUA_TNONE && (newValue.toInt() || newValue.toFloat()))){
+                if (newValue.toInt())
+                    lua_pushnumber(L,newValue.toInt());
+                else
+                    lua_pushnumber(L, newValue.toFloat());
+                pInfo[1] = QString::number(LUA_TNUMBER);
+            }
+            else if (valueCast == LUA_TBOOLEAN || (valueCast == LUA_TNONE && (newValue.toLower() == "true" || newValue.toLower() == "false"))){
+                lua_pushboolean(L, newValue.toLower()=="true"?1:0);
+                pInfo[1] = QString::number(LUA_TBOOLEAN);
+            }
+            else{
+                lua_pushstring(L, newValue.toLatin1().data());
+                pInfo[1] = QString::number(LUA_TSTRING);
+            }
+        }
+        else if (valueCast == LUA_TTABLE){
+            lua_newtable(L);
+            newValue = "Table";
+            if (pInfo[3] == "")
+                pInfo[3] = pInfo[0]+newName;
+            else
+                pInfo << pInfo[0]+newName;
+        }
+        /*while (lua_gettop(L)>startSize+2 && lua_type(L,-3) == LUA_TTABLE){
+            lua_settable(L,-3);//do our table functions if needed
+        }*/
+        pInfo[2] = newValue;
+        pItem->setText(0,newName);
+        pItem->setText(1,newName.toLower());
+        pItem->setData(0, Qt::UserRole, pInfo);
+        if (tabled && lua_type(L,-3) == LUA_TTABLE && lua_gettop(L)>startSize+2){
+            lua_settable(L,-3);
+            lua_settop(L, startSize);
+            return 1;
+        }
+        lua_pushvalue(L,-2);
+        QString name = lua_tostring(L,-1);
+        lua_pop(L,1);
+        lua_setglobal(L,name.toLatin1().data());
+        lua_settop(L,startSize);
+        return 1;
     }
-    else if (valueCast == LUA_TTABLE){
-        lua_newtable(L);
-        newValue = "Table";
-        if (pInfo[3] == "")
-            pInfo[3] = pInfo[0]+newName;
-        else
-            pInfo << pInfo[0]+newName;
-    }
-    /*while (lua_gettop(L)>startSize+2 && lua_type(L,-3) == LUA_TTABLE){
-        lua_settable(L,-3);//do our table functions if needed
-    }*/
-    pInfo[2] = newValue;
-    pItem->setText(0,newName);
-    pItem->setText(1,newName.toLower());
-    pItem->setData(0, Qt::UserRole, pInfo);
-    if (tabled && lua_type(L,-3) == LUA_TTABLE && lua_gettop(L)>startSize+2){
-        lua_settable(L,-3);
+    else{
         lua_settop(L, startSize);
-        return;
+        return 0;
     }
-    lua_pushvalue(L,-2);
-    QString name = lua_tostring(L,-1);
-    lua_pop(L,1);
-    lua_setglobal(L,name.toLatin1().data());
-    lua_settop(L,startSize);
 }
 
 void luaInterface::iterateTable(lua_State* L, QList<tableObject*> &tables, QList<tableObject*> &tables2, QStringList nestList){
@@ -488,21 +562,27 @@ QString luaInterface::getValue(QTreeWidgetItem * pItem){
     L = interpreter->pGlobalLua;
     //pushes the key/value, so value of global table is @ -1, key is -2
     int startSize = lua_gettop(L);
-    //QTreeWidgetItem* pParent = pItem->parent();
-    QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
-    if (!pInfo.size())
+    if (setjmp(buf) == 0){
+        //QTreeWidgetItem* pParent = pItem->parent();
+        QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
+        if (!pInfo.size())
+            return "";
+        if (!getVariable(L,pItem))
+            return "";
+        QString curValue;
+        if (pInfo[1].toInt() == LUA_TBOOLEAN)
+            curValue = lua_toboolean(L, -1) == 0 ? "false" : "true";
+        else
+            curValue = lua_tostring(L,-1);
+        lua_settop(L,startSize);
+        pInfo[2] = curValue;
+        pItem->setData(0, Qt::UserRole, pInfo);
+        return curValue;
+    }
+    else{
+        lua_settop(L,startSize);
         return "";
-    if (!getVariable(L,pItem))
-        return "";
-    QString curValue;
-    if (pInfo[1].toInt() == LUA_TBOOLEAN)
-        curValue = lua_toboolean(L, -1) == 0 ? "false" : "true";
-    else
-        curValue = lua_tostring(L,-1);
-    lua_settop(L,startSize);
-    pInfo[2] = curValue;
-    pItem->setData(0, Qt::UserRole, pInfo);
-    return curValue;
+    }
 }
 
 void luaInterface::getVars(QTreeWidgetItem * mpVarBaseItem, int hide, bool showHidden){

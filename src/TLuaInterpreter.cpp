@@ -4258,6 +4258,7 @@ int TLuaInterpreter::setAppStyleSheet( lua_State *L )
     else
         luaWindowName = "main";
     qApp->setStyleSheet( luaWindowName.c_str() );
+    return 0;
 }
 
 // this is an internal only function used by the package system
@@ -9843,6 +9844,8 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getMapSize", TLuaInterpreter::getMapSize );
     lua_register( pGlobalLua, "getMapLocation", TLuaInterpreter::getMapLocation );
     lua_register( pGlobalLua, "setMapLocation", TLuaInterpreter::setMapLocation );
+
+    lua_atpanic(pGlobalLua, luaInterface::lua_panic);
 
 
     luaopen_yajl(pGlobalLua);

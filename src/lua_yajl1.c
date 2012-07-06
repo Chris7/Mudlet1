@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#ifdef _MSC_VER
+#include <float.h>  // for _isnan() on VC++
+#define isnan(x) _isnan(x)  // VC++ uses _isnan() instead of isnan()
+#endif
 
 #define js_check_generator(L, narg) \
     (yajl_gen*)luaL_checkudata((L), (narg), "yajl.generator.meta")

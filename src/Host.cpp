@@ -905,6 +905,8 @@ bool Host::installPackage( QString fileName, int module )
     }
 
     QString packageName = fileName.section("/",-1 );
+    if (packageName.length() == fileName.length()) //using windows
+        packageName = fileName.section("\\", -1);
     packageName.replace( ".zip" , "" );
     packageName.replace( "trigger", "" );
     packageName.replace( "xml", "" );

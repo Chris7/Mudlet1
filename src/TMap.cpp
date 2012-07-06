@@ -805,7 +805,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->north,
                                              g );
                 weightmap[e] = rooms[rooms[i]->north]->weight;
@@ -819,7 +819,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->south,
                                              g );
                 weightmap[e] = rooms[rooms[i]->south]->weight;
@@ -832,7 +832,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                             rooms[i]->northeast,
                                             g );
                 weightmap[e] = rooms[rooms[i]->northeast]->weight;
@@ -846,7 +846,7 @@ void TMap::initGraph()
                edgeCount++;
                edge_descriptor e;
                bool inserted;
-               tie(e, inserted) = add_edge( i,
+               boost::tuples::tie(e, inserted) = add_edge( i,
                                             rooms[i]->east,
                                             g );
                weightmap[e] = rooms[rooms[i]->east]->weight;
@@ -859,7 +859,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->west,
                                              g );
                 weightmap[e] = rooms[rooms[i]->west]->weight;
@@ -872,7 +872,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->southwest,
                                              g );
                 weightmap[e] = rooms[rooms[i]->southwest]->weight;
@@ -885,7 +885,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->southeast,
                                              g );
                 weightmap[e] = rooms[rooms[i]->southeast]->weight;
@@ -898,7 +898,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->northwest,
                                              g );
                 weightmap[e] = rooms[rooms[i]->northwest]->weight;
@@ -911,7 +911,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->up,
                                              g );
                 weightmap[e] = rooms[rooms[i]->up]->weight;
@@ -924,7 +924,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->down,
                                              g );
                 weightmap[e] = rooms[rooms[i]->down]->weight;
@@ -937,7 +937,7 @@ void TMap::initGraph()
                 edgeCount++;
                 edge_descriptor e;
                 bool inserted;
-                tie(e, inserted) = add_edge( i,
+                boost::tuples::tie(e, inserted) = add_edge( i,
                                              rooms[i]->in,
                                              g );
                 weightmap[e] = rooms[rooms[i]->in]->weight;
@@ -950,7 +950,7 @@ void TMap::initGraph()
                  edgeCount++;
                  edge_descriptor e;
                  bool inserted;
-                 tie(e, inserted) = add_edge( i,
+                 boost::tuples::tie(e, inserted) = add_edge( i,
                                               rooms[i]->out,
                                               g );
                  weightmap[e] = rooms[rooms[i]->out]->weight;
@@ -968,7 +968,7 @@ void TMap::initGraph()
                     edgeCount++;
                     edge_descriptor e;
                     bool inserted;
-                    tie(e, inserted) = add_edge( i,
+                    boost::tuples::tie(e, inserted) = add_edge( i,
                                                  _id,
                                                  g );
                     weightmap[e] = rooms[_id]->weight;

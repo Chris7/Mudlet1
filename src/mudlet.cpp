@@ -936,7 +936,7 @@ void mudlet::clearLabels(Host * pHost){
 
 bool mudlet::deleteLabel(Host * pHost, QString labelName){
     QMapIterator<QString, TLabel *> it( mHostLabelMap[pHost]);
-    bool cleared;
+    bool cleared = false;
     while (it.hasNext()){
         it.next();
         if (it.key() == labelName){
@@ -953,6 +953,7 @@ bool mudlet::deleteLabel(Host * pHost, QString labelName){
         if (it2 != pHost->mpConsole->mLabelMap.end())
             pHost->mpConsole->mLabelMap.erase(it2);
     }
+    return cleared;
 }
 
 bool mudlet::createBuffer( Host * pHost, QString & name )
@@ -2090,6 +2091,8 @@ void mudlet::slot_connection_dlg_finnished( QString profile, int historyVersion 
         QStringList modules = it2.value();
         for (int i=0;i<modules.size();i++){
             QStringList entry = pHost->mInstalledModules[modules[i]];
+            qDebug()<<pHost->mInstalledModules;
+            qDebug()<<entry;
             pHost->installPackage(entry[0],1);
             qDebug()<<entry[0]<<","<<entry[1];
             //we repeat this step here b/c we use the same installPackage method for initial loading,

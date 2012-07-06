@@ -56,6 +56,7 @@ bool XMLimport::importPackage( QIODevice * device, QString packName, int moduleF
             mpKey->mModuleMasterFolder=true;
             mpKey->mModuleMember=true;
         }
+        qDebug()<<mPackageName;
         mpKey->setPackageName( mPackageName );
         mpKey->setIsActive( true );
         mpKey->setName( mPackageName );
@@ -725,18 +726,19 @@ void XMLimport::readVariables()
                 QStringList parents = readElementText().split("|");
                 parents.pop_back();
                 varInfo << parents;
-                lI->restoreVar(varInfo);
-                for (int i=0;i<parents.size();i++){
-                    QString pName = "";
-                    for (int j=0;j==i;j++)
-                        pName+=parents[j];
-                    if (pName != "" && !mpHost->savedVariables.contains(pName))
-                        mpHost->savedVariables.insert(pName,fake);
+                if (lI->restoreVar(varInfo)){
+                    for (int i=0;i<parents.size();i++){
+                        QString pName = "";
+                        for (int j=0;j==i;j++)
+                            pName+=parents[j];
+                        if (pName != "" && !mpHost->savedVariables.contains(pName))
+                            mpHost->savedVariables.insert(pName,fake);
+                    }
+                    if (varInfo[2].toInt() == LUA_TTABLE)
+                        mpHost->savedVariables.insert(parents.join(""),fake);
+                    else
+                        mpHost->savedVariables.insert(parents.join("")+varInfo[1]+varInfo[0],fake);
                 }
-                if (varInfo[2].toInt() == LUA_TTABLE)
-                    mpHost->savedVariables.insert(parents.join(""),fake);
-                else
-                    mpHost->savedVariables.insert(parents.join("")+varInfo[1]+varInfo[0],fake);
                 continue;
             }
         }

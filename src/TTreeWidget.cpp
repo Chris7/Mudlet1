@@ -20,6 +20,8 @@
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QList>
+#include <QListIterator>
 #include "TTreeWidget.h"
 #include <QtGui>
 #include "Host.h"
@@ -241,7 +243,8 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
 //            qDebug()<<"our old parent"<<oldInfo;
 //            qDebug()<<"our old root"<<oldRoot;
 //            qDebug()<<"our new root"<<newRoot;
-            lI->deleteVar(cItem);
+            int st = lI->deleteVar(cItem);
+            qDebug()<<"delete status"<<st;
             QMapIterator<QString, QTreeWidgetItem *> it(varsToChange);
             while (it.hasNext()){
                 it.next();
@@ -265,24 +268,27 @@ void TTreeWidget::rowsInserted( const QModelIndex & parent, int start, int end )
                 //qDebug()<<itemInfo;
 //                qDebug()<<newItemInfo;
 //                qDebug()<<pI->text(0);
-                pI->setData(0, Qt::UserRole, newItemInfo);
                 newItemInfo.prepend(pI->text(0));
                 //lI->saveVar(pI, pI->text(0), newItemInfo[2],1);
 //                qDebug()<<"restoring"<<newItemInfo;
-                lI->restoreVar(newItemInfo);
-//                qDebug()<<mpHost->savedVariables;
-                if (mpHost->savedVariables.contains(it.key())){
-                    mpHost->savedVariables.remove(it.key());
-                    varName = "";
-                    int itemType = newItemInfo[2].toInt();
-                    for (int i=4;i<newItemInfo.size();i++){
-                        varName+=newItemInfo[i];
+                if (st){//only do this if the delete worked
+                    lI->restoreVar(newItemInfo);
+                    newItemInfo.pop_front();
+                    pI->setData(0, Qt::UserRole, newItemInfo);
+    //                qDebug()<<mpHost->savedVariables;
+                    if (mpHost->savedVariables.contains(it.key())){
+                        mpHost->savedVariables.remove(it.key());
+                        varName = "";
+                        int itemType = newItemInfo[2].toInt();
+                        for (int i=4;i<newItemInfo.size();i++){
+                            varName+=newItemInfo[i];
+                        }
+                        if (itemType != LUA_TTABLE){
+                            varName+=newItemInfo[1]+pI->text(0);
+                        }
+    //                    qDebug()<<"new saved var name"<<varName;
+                        mpHost->savedVariables.insert(varName, pI);
                     }
-                    if (itemType != LUA_TTABLE){
-                        varName+=newItemInfo[1]+pI->text(0);
-                    }
-//                    qDebug()<<"new saved var name"<<varName;
-                    mpHost->savedVariables.insert(varName, pI);
                 }
             }
             qDebug()<<"OLD TEST"<<oldpItem->text(0);
@@ -373,7 +379,7 @@ void TTreeWidget::dropEvent(QDropEvent *event)
         event->setDropAction( Qt::IgnoreAction );
         event->ignore();
     }
-    else if( pItem == topLevelItem(0) )
+    else if( pItem == topLevelItem(0))
         {
             if( (dropIndicatorPosition() == QAbstractItemView::AboveItem )
              || (dropIndicatorPosition() == QAbstractItemView::BelowItem ) )
@@ -382,10 +388,31 @@ void TTreeWidget::dropEvent(QDropEvent *event)
                 event->ignore();
             }
     }
-    else if (mIsVarTree){
-        if (pItem && pItem  != topLevelItem(0)){
+    if (mIsVarTree){
+        QList<QTreeWidgetItem *> sItems = selectedItems();
+        QList<QTreeWidgetItem *>::iterator it;
+        qDebug()<<sItems;
+        for (it = sItems.begin();it != sItems.end(); ++it){
+            QTreeWidgetItem * sItem = *it;
+            if (!sItem){
+                event->setDropAction(Qt::IgnoreAction);
+                event->ignore();
+                break;
+            }
+            else{
+                QStringList sInfo = sItem->data(0, Qt::UserRole).toStringList();
+                qDebug()<<sInfo;
+                qDebug()<<sItem->text(0);
+                if (sInfo.size() < 2 || QString(sInfo[1]).toInt() == -1){
+                    event->setDropAction(Qt::IgnoreAction);
+                    event->ignore();
+                    break;
+                }
+            }
+        }
+        if (pItem && pItem != topLevelItem(0)){
             QStringList item = pItem->data(0,Qt::UserRole).toStringList();
-            if (QString(item[1]).toInt() != LUA_TTABLE){
+            if (item.size() < 2 || QString(item[1]).toInt() != LUA_TTABLE){
                 event->setDropAction( Qt::IgnoreAction );
                 event->ignore();
             }

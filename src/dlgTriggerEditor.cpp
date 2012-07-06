@@ -1738,7 +1738,7 @@ void dlgTriggerEditor::slot_deleteAlias()
     }
     else
     {
-        qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAlias() child to be deleted doesnt have a parent";
+        qDebug()<<"ERROR: dlgTriggerEditor::slot_deleteAlias() child to be deleted t have a parent";
     }
     delete pT;
     mCurrentAlias = 0;
@@ -2458,10 +2458,11 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     if (!pData.size())
         pParent = 0;
     QTreeWidgetItem * pNewItem = 0;
+//    qDebug()<<"in here"<<pData;
     if( pParent )
     {
         //goto ROOT_KEY;
-        //qDebug()<<"in pParent with"<<pData;
+        qDebug()<<"in pParent with"<<pData;
         QStringList cData = cItem->data(0, Qt::UserRole).toStringList();
         if (cData.size() && (QString(cData[1]).toInt()==LUA_TTABLE)){
             pParent=cItem;
@@ -2510,6 +2511,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     }
     else if (cItem){
         pData = cItem->data(0, Qt::UserRole).toStringList();//use lua types to set the first stringlist field to type
+        qDebug()<<"current item doesn't have a parent"<<pData;
         if (!pData.size()){
             //at root
             pData<<QString::number(LUA_TSTRING); //we can only add string keys
@@ -2523,6 +2525,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         int pType = QString(pData[1]).toInt();
         //check if we have a table parent, we want to nest this new varaible under this table
         if( pType == LUA_TTABLE){
+            qDebug()<<"table parent";
             pNewItem = new QTreeWidgetItem( cItem, nameL );
             pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
             pNewItem->setCheckState(0, Qt::Unchecked);
@@ -2552,6 +2555,7 @@ void dlgTriggerEditor::addVar( bool isFolder ){
             pData << QString::number(LUA_TNONE);
             pData << "";
         }
+        qDebug()<<"base item"<<mpVarBaseItem;
         pNewItem = new QTreeWidgetItem( mpVarBaseItem, nameL );
         pNewItem->setFlags(Qt::ItemIsTristate|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsDropEnabled|Qt::ItemIsDragEnabled);
         pNewItem->setCheckState(0, Qt::Unchecked);
@@ -2559,12 +2563,16 @@ void dlgTriggerEditor::addVar( bool isFolder ){
         //pNewItem->
         pData << "";
         pNewItem->setData(0, Qt::UserRole, pData);
-        treeWidget_vars->insertTopLevelItem( 0, pNewItem );
+        mpVarBaseItem->insertChild(0, pNewItem);
+//        treeWidget_vars->insertTopLevelItem( 0, pNewItem );
     }
-    treeWidget_vars->setCurrentItem( pNewItem );
-    mCurrentVar = (QTreeWidgetItem*)pNewItem;
-    showInfo( msgInfoAddVar );
-    slot_var_clicked( (QTreeWidgetItem*)treeWidget_vars->currentItem(), 0 );
+    qDebug()<<"ne witem"<<pNewItem;
+    if (pNewItem){
+        treeWidget_vars->setCurrentItem( pNewItem );
+        mCurrentVar = (QTreeWidgetItem*)pNewItem;
+        showInfo( msgInfoAddVar );
+        slot_var_clicked( (QTreeWidgetItem*)treeWidget_vars->currentItem(), 0 );
+    }
 }
 
 void dlgTriggerEditor::addKey( bool isFolder )
@@ -4060,11 +4068,19 @@ void dlgTriggerEditor::saveVar(){
     luaInterface * lI = new luaInterface(mpHost);
     QString newName = mpVarsMainArea->lineEdit_var_name->text();
     QString newValue = mpVarsMainArea->lineEdit_var_value->toPlainText();
+    if (newName == "")
+        newName = "NewVariable";
+//        qDebug()<<"no name";
+//        slot_var_clicked(pItem,0);
+//        return;
     int nameType = mpVarsMainArea->key_type->itemData(mpVarsMainArea->key_type->currentIndex(), Qt::UserRole).toInt();
     int valueType = mpVarsMainArea->var_type->itemData(mpVarsMainArea->var_type->currentIndex(), Qt::UserRole).toInt();
+    if (newValue == ""){
+        newValue = "empty";
+    }
     //check variable recasting
     int varRecast = canRecast(pItem,nameType,valueType);
-    qDebug()<<"var recast status"<<varRecast<<nameType<<valueType;
+    qDebug()<<"var recast status of"<<newName<<varRecast<<nameType<<valueType;
     int forceSave = 0;
     if (varRecast == 2){
         //qDebug()<<"it works out";
@@ -4073,7 +4089,12 @@ void dlgTriggerEditor::saveVar(){
         //qDebug()<<"rcast it";
         QStringList pInfo = pItem->data(0,Qt::UserRole).toStringList();
         if (valueType != LUA_TTABLE){
-            lI->deleteVar(pItem);
+            qDebug()<<"deleting";
+            if (!lI->deleteVar(pItem)){
+                qDebug()<<"dvar broke";
+                return;//something broke!
+            }
+            qDebug()<<"done deleting";
             if (!pInfo.size()){
                 pInfo<<QString::number(nameType);
                 pInfo<<QString::number(valueType);
@@ -4092,8 +4113,30 @@ void dlgTriggerEditor::saveVar(){
         }
         pItem->setData(0, Qt::UserRole,pInfo);
     }
+//    else{
+//        if (newName == "NewVariable" && nameType == -1 && valueType == -1){
+//            //it never lived!
+//            qDebug()<<"killing it";
+//            QTreeWidgetItem * pParent = (QTreeWidgetItem *)pItem->parent();
+//            if( pParent )
+//            {
+//                pParent->removeChild( pItem );
+//            }
+//            else
+//            {
+////                delete pItem;
+//                qDebug()<<"ERROR: dlgTriggerEditor::saveVar() child to be deleted doesnt have a parent";
+//            }
+//        }
+//        return;
+//    }
+    if (nameType != -1 && valueType != -1){
+        qDebug()<<"saving new var";
+        if (!lI->saveVar(pItem,newName, newValue, forceSave)){
+            qDebug()<<"var not saved";
+        }
+    }
     mpHost->setHiddenVariable(pItem, mpVarsMainArea->hideVariable->isChecked());
-    lI->saveVar(pItem,newName, newValue, forceSave);
     slot_var_clicked(pItem,0);
 }
 
@@ -4486,9 +4529,10 @@ void dlgTriggerEditor::slot_var_clicked( QTreeWidgetItem *pItem, int column ){
     }
     mpCurrentVarItem = pItem; //remember what has been clicked to save it
     QStringList varInfo;
+    qDebug()<<varInfo<<"clicked";
     luaInterface * lI = new luaInterface(mpHost);
     varInfo = pItem->data(0,Qt::UserRole).toStringList();
-    if (!varInfo.size())
+    if (!varInfo.size() || varInfo[0] == "-1" || varInfo[1] == "-1")
         return;
     if (mpHost->isHiddenVariable(pItem)){
         mpVarsMainArea->hideVariable->setChecked(true);
