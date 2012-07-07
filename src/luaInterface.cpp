@@ -66,9 +66,6 @@ int luaInterface::lua_panic (lua_State *L){
     lua_pushstring(L,error.toLatin1().data());
     lua_error(L);
     longjmp(buf,1);
-//    lua_getglobal(L, "ERROR");
-//    throw VarPanic(error, (int)lua_tonumber(L, -1));
-
     return 0;
 }
 
@@ -106,6 +103,8 @@ int luaInterface::pushVariable(lua_State* L, QTreeWidgetItem * pItem){
     case LUA_TBOOLEAN:
         lua_pushboolean(L, varName.toLower()=="true"?1:0);
         break;
+    case LUA_TTABLE:
+        lua_newtable(L);
     default:
         return 0;
     }
@@ -131,19 +130,24 @@ int luaInterface::getVariable(lua_State* L, QStringList varInfo){
         while (vType == LUA_TTABLE){
             //fetch tables until we're where we need to be
             varInfo.pop_front();
-            if (!pushVariable(L, kType, curVar)){
-                lua_settop(L, startStack);
-                return 0;
-            }
+//            if (!pushVariable(L, kType, curVar)){
+//                lua_settop(L, startStack);
+//                return 0;
+//            }
             if (!tabled){
-                lua_pop(L,1);
+//                lua_pop(L,1);
                 lua_getglobal(L, curVar.toLatin1().data());
                 tabled=1;
                 if (!varInfo.size())
                     return 2;
             }
-            else
+            else{
+                if (!pushVariable(L, kType, curVar)){
+                    lua_settop(L, startStack);
+                    return 0;
+                }
                 lua_gettable(L,-2);
+            }
             if (varInfo.size()){
                 curVar = varInfo.first();
                 vType = QString(curVar.at(0)).toInt();
@@ -205,7 +209,10 @@ int luaInterface::deleteVar(lua_State* L, QTreeWidgetItem * pItem){
         int tabled = getVariable(L, pItem);
         lua_pop(L, 1);
         QString vName = pItem->text(0);
-        pushVariable(L, pItem);
+        if (!pushVariable(L, pItem)){
+            lua_settop(L, startSize);
+            return 0;
+        }
         lua_pushnil(L);
         for (int i=1;i<=lua_gettop(L);i++){
             qDebug()<<i<<":"<<lua_type(L,i*-1);
@@ -213,10 +220,12 @@ int luaInterface::deleteVar(lua_State* L, QTreeWidgetItem * pItem){
         qDebug()<<"dtabled"<<tabled;
         if (tabled == 1 || tabled == 2){
             lua_setglobal(L, vName.toLatin1().data());
+            return 1;
         }
         else if (tabled){
             //we're in a table
             lua_settable(L, -3);
+            return 1;
         }
         else{
             lua_settop(L,startSize);
@@ -259,6 +268,7 @@ int luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString 
                 }
                 pItem->setText(0,newName);
                 pItem->setText(1,newName.toLower());
+                return 1;
             }
             else if (tabled>0){
                 //we're renaming a table, so first we save the value
@@ -267,12 +277,18 @@ int luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString 
                 //lua_settop(L, stackTop);
                 //a quick hack to get the deletion right
                 QString oldName = pInfo.last();
+                QStringList oPinfo = pInfo;
                 pInfo[0] = oldName.at(0);
                 pItem->setData(0, Qt::UserRole, pInfo);
                 if (setjmp(buf) == 0)
-                    deleteVar(L, pItem);
+                    if (!deleteVar(L, pItem)){
+                        lua_settop(L, stackTop);
+                        pItem->setData(0, Qt::UserRole, oPinfo);
+                        return 0;
+                    }
                 else{
                     lua_settop(L, stackTop);
+                    pItem->setData(0, Qt::UserRole, oPinfo);
                     return 0;
                 }
                 pInfo[0] = QString::number(kType);
@@ -284,6 +300,10 @@ int luaInterface::renameVariable(lua_State* L, QTreeWidgetItem * pItem, QString 
                 pItem->setData(0, Qt::UserRole, pInfo);
                 return 1;
             }
+        }
+        else{
+            lua_settop(L, stackTop);
+            return 0;
         }
     }
     else{

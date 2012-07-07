@@ -268,6 +268,7 @@ bool XMLexport::writeHost( Host * pT )
         qDebug()<<"installed module being done";
         writeStartElement( "mInstalledModules" );
         QMapIterator<QString, QStringList> it(pT->mInstalledModules);
+        pT->modulesToWrite.clear();
         while( it.hasNext() )
         {
             it.next();

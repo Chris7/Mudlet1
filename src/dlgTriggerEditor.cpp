@@ -2440,13 +2440,21 @@ void dlgTriggerEditor::addVar( bool isFolder ){
     mpVarsMainArea->key_type->setCurrentIndex(0);
     if (isFolder){
         mpVarsMainArea->lineEdit_var_value->setReadOnly(true);
+        mpVarsMainArea->var_type->setDisabled(true);
         mpVarsMainArea->var_type->setCurrentIndex(4);
-        name="NewTable";
+        mpVarsMainArea->lineEdit_var_name->setPlaceholderText("Table name...");
+        mpVarsMainArea->lineEdit_var_value->setText("NewTable");
+        name="";
     }
     else{
         mpVarsMainArea->lineEdit_var_value->setReadOnly(false);
+        mpVarsMainArea->lineEdit_var_name->setPlaceholderText("Variable name...");
+//        mpVarsMainArea->lineEdit_var_value->setPlaceholderText("Enter Value Here");
+        mpVarsMainArea->var_type->setDisabled(false);
         mpVarsMainArea->var_type->setCurrentIndex(0);
-        name = "NewVariable";
+//        mpVarsMainArea->lineEdit_var_name->setText("");
+//        mpVarsMainArea->lineEdit_var_value->setText("Enter Value Here");
+        name = "";
     }
     QStringList nameL;
     nameL << name;
@@ -4130,7 +4138,7 @@ void dlgTriggerEditor::saveVar(){
 //        }
 //        return;
 //    }
-    if (nameType != -1 && valueType != -1){
+    if (varRecast){
         qDebug()<<"saving new var";
         if (!lI->saveVar(pItem,newName, newValue, forceSave)){
             qDebug()<<"var not saved";
