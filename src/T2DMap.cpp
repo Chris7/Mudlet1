@@ -676,10 +676,10 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 lp.setPen( lpen );
                 QRectF br;
                 lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+                _drawRect.setSize(br.size());//set drawrect to the new size for selecting
                 p.drawPixmap(lpos, pix, br.toRect() );
             }
             else{
-
                 p.drawPixmap( lpos, it.value().pix.scaled(_drawRect.size().toSize()) );
             }
             if( it.value().hilite )
@@ -2705,14 +2705,27 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
     {
         int x = event->x();
         int y = height()-event->y();
-        if ((mpMap->m2DPanXStart-x) > 1)
+        bool newX = false, newY=false;
+        if ((mpMap->m2DPanXStart-x) > 1){
             shiftRight();
-        else if ((mpMap->m2DPanXStart-x) < -1)
+            newX = true;
+        }
+        if ((mpMap->m2DPanXStart-x) < -1){
             shiftLeft();
-        if ((mpMap->m2DPanYStart-y) > 1)
+            newX=true;
+        }
+        if ((mpMap->m2DPanYStart-y) > 1){
             shiftDown();
-        else if ((mpMap->m2DPanYStart-y) < -1)
+            newY=true;
+        }
+        if ((mpMap->m2DPanYStart-y) < -1){
             shiftUp();
+            newY=true;
+        }
+        if (newX)
+            mpMap->m2DPanXStart=x;
+        if (newY)
+            mpMap->m2DPanYStart=y;
         return;
     }
 
