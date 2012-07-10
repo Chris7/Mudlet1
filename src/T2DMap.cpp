@@ -676,6 +676,9 @@ void T2DMap::paintEvent( QPaintEvent * e )
                 lp.setPen( lpen );
                 QRectF br;
                 lp.drawText( lr, Qt::AlignLeft, it.value().text, &br );
+                //the later operations transform this, we need to untransform old labels
+                mpMap->mapLabels[mAID][it.key()].size = QSizeF(br.width()/mTX, br.height()/mTY);
+//                qDebug()<<it.value().text<<br.size();
                 _drawRect.setSize(br.size());//set drawrect to the new size for selecting
                 p.drawPixmap(lpos, pix, br.toRect() );
             }
@@ -1831,7 +1834,10 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                     int my = event->pos().y();
                     int mz = mOz;
                     QPoint click = QPoint(mx,my);
+                    qDebug()<<it.value().text<<it.value().size;
+                    qDebug()<<click;
                     QRectF br = QRect(_lx, _ly, it.value().size.width()*mTX, it.value().size.height()*mTY);
+                    qDebug()<<br;
                     if( br.contains( click ))
                     {
                         if( ! it.value().hilite )
