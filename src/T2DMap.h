@@ -116,6 +116,7 @@ public:
     bool mBubbleMode;
     bool mMapperUseAntiAlias;
     bool mLabelHilite;
+//    QList<TMapLabel *> mLabelList;
     bool mMoveLabel;
     int mCustomLineSelectedRoom;
     QString mCustomLineSelectedExit;

@@ -1839,6 +1839,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                         if( ! it.value().hilite )
                         {
                             mLabelHilite = true;
+//                            mLabelList.append(&mpMap->mapLabels[mAID][it.key()]);
                             mpMap->mapLabels[mAID][it.key()].hilite = true;
                             update();
                             return;
@@ -1846,12 +1847,14 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                         else
                         {
                             mpMap->mapLabels[mAID][it.key()].hilite = false;
+//                            int index = mLabelList.indexOf(&mpMap->mapLabels[mAID][it.key()]);
+//                            mLabelList.removeAt(index);
                             mLabelHilite = false;
                         }
                     }
                 }
 
-                mLabelHilite = false;
+                //mLabelHilite = false;
                 update();
             }
             if( mMultiSelection && mMultiSelectionList.size() > 0 && ( !secondaryModEnabled(event) ) ) mMultiSelection = false;
@@ -2086,6 +2089,11 @@ void T2DMap::mousePressEvent(QMouseEvent *event)
     mpMap->m2DLastX = 0;
     mpMap->m2DLastY = 0;
     mNewMoveAction = true;
+    if (mLabelHilite){
+        mMultiSelection = false;
+        mMultiSelectionListWidget.clear();
+        mMultiSelectionListWidget.hide();
+    }
     if( event->buttons() & Qt::LeftButton )
         mpMap->mLeftDown = true;
     else
@@ -2765,6 +2773,7 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
     mCustomLineSelectedPoint = -1;
 
     //FIXME:
+//    qDebug()<<"hilite status"<<mLabelHilite;
     if(  mLabelHilite )//mMoveLabel )//&& mLabelHilite )
     {
         if( mpMap->mapLabels.contains( mAID ) )
