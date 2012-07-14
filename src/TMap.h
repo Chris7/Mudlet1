@@ -130,6 +130,8 @@ public:
     bool mRightDown;
     float m2DPanXStart;
     float m2DPanYStart;
+    float m2DLastX;
+    float m2DLastY;
     int mViewArea;
     QString mapLocation;
     //mapVar mVars[20];

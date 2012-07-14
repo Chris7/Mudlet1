@@ -2083,6 +2083,8 @@ bool T2DMap::event( QEvent * event )
 
 void T2DMap::mousePressEvent(QMouseEvent *event)
 {
+    mpMap->m2DLastX = 0;
+    mpMap->m2DLastY = 0;
     mNewMoveAction = true;
     if( event->buttons() & Qt::LeftButton )
         mpMap->mLeftDown = true;
@@ -2693,6 +2695,15 @@ void T2DMap::slot_setArea()
 
 void T2DMap::mouseMoveEvent( QMouseEvent * event )
 {
+    //moved the mouse movements to a more generic format
+    if (!mpMap->m2DLastX)
+        mpMap->m2DLastX = event->posF().x();
+    if (!mpMap->m2DLastY)
+        mpMap->m2DLastY = event->posF().y();
+    float xDelta = (event->posF().x()-mpMap->m2DLastX);
+    float yDelta = (event->posF().y()-mpMap->m2DLastY);
+    mpMap->m2DLastX=event->posF().x();
+    mpMap->m2DLastY=event->posF().y();
     if (mpMap->mLeftDown && !mpMap->m2DPanMode && primaryModEnabled(event))
     {
         mpMap->m2DPanXStart = event->x();
@@ -2764,11 +2775,14 @@ void T2DMap::mouseMoveEvent( QMouseEvent * event )
                 it.next();
                 if( it.value().pos.z() != mOz ) continue;
                 if( ! it.value().hilite ) continue;
-                int mx = event->pos().x()/mTX + mOx;
+                /*int mx = event->pos().x()/mTX + mOx;
                 int my = event->pos().y()/mTY + mOy;
                 mx = mx - xspan/2;
                 my = yspan/2 - my;
-                QVector3D p = QVector3D(mx,my,mOz);
+                qDebug()<<it.value().pos.x()<<it.value().pos.y();
+                qDebug()<<mx<<my;
+                qDebug()<<xDelta/mTX<<yDelta/mTY;*/
+                QVector3D p = QVector3D(it.value().pos.x()+xDelta/mTX,it.value().pos.y()-yDelta/mTY,mOz);
                 mpMap->mapLabels[mAID][it.key()].pos = p;
             }
         }

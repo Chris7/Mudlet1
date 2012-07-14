@@ -75,8 +75,10 @@ TMap::TMap( Host * pH )
     m2DPanMode = false;
     mLeftDown = false;
     mRightDown = false;
-    float m2DPanXStart=0;
-    float m2DPanYStart=0;
+    m2DPanXStart=0;
+    m2DPanYStart=0;
+    m2DLastX=0;
+    m2DLastY=0;
     int mViewArea = 0;
 }
 
