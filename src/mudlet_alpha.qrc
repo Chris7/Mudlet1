@@ -120,5 +120,6 @@
         <file>generic_mapper_script.xml</file>
         <file>mudlet-mapper.xml</file>
         <file>icons/3slogo.png</file>
+        <file>icons/3klogo.png</file>
     </qresource>
 </RCC>
