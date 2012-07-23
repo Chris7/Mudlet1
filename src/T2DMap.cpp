@@ -1793,8 +1793,7 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                 _ry = yspan/2*mTY-mTY*oy;
 
             QList<int> roomList = pArea->rooms;
-            if (primaryModEnabled(event))
-                mMultiSelectionList.clear();
+            bool listChanged = false;
             for( int k=0; k<roomList.size(); k++ )
             {
                 int rx = mpMap->rooms[pArea->rooms[k]]->x*mTX+_rx;
@@ -1806,13 +1805,18 @@ void T2DMap::mouseReleaseEvent(QMouseEvent * event )
                 int mz = mOz;
                 if( (abs(mx-rx)<mTX*rSize/2) && (abs(my-ry)<mTY*rSize/2) && (mz == rz) )
                 {
-                    if( mMultiSelectionList.contains( pArea->rooms[k]) && primaryModEnabled(event) )
-                        mMultiSelectionList.removeAll( pArea->rooms[k] );
-                    else
-                        mMultiSelectionList << pArea->rooms[k];
+                    if (primaryModEnabled(event)){
+                        if( mMultiSelectionList.contains( pArea->rooms[k]))
+                            mMultiSelectionList.removeAll( pArea->rooms[k] );
+                        else
+                            mMultiSelectionList << pArea->rooms[k];
+                    }
+                    listChanged = true;
                     if( mMultiSelectionList.size() > 0 ) mMultiSelection = false;
                 }
             }
+            if (!listChanged && primaryModEnabled(event))
+                mMultiSelectionList.clear();
 
             // select labels
             if( mpMap->mapLabels.contains( mAID ) )
