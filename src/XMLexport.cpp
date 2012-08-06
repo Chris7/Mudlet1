@@ -81,14 +81,11 @@ XMLexport::XMLexport( TKey * pT )
 
 bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
     setDevice(device);
-    qDebug()<<moduleName;
     writeStartDocument();
     writeDTD("<!DOCTYPE MudletPackage>");
 
     writeStartElement( "MudletPackage" );
     writeAttribute("version", "1.0");
-    qDebug()<<"starting writeModule routine";
-
     writeStartElement( "TriggerPackage" );
     Host * pT = mpHost;
     bool ret = true;
@@ -101,7 +98,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         if( ! pChildTrigger || pChildTrigger->mPackageName != moduleName) continue;
         if( ! pChildTrigger->isTempTrigger() && pChildTrigger->mModuleMember)
         {
-            ret = writeTrigger( pChildTrigger );
+            ret = writeTrigger( pChildTrigger);
             nodesWritten+=1;
         }
     }
@@ -117,7 +114,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         if( ! pChildTimer || pChildTimer->mPackageName != moduleName) continue;
         if( ! pChildTimer->isTempTimer() && pChildTimer->mModuleMember)
         {
-            ret = writeTimer( pChildTimer );
+            ret = writeTimer( pChildTimer);
             nodesWritten+=1;
         }
     }
@@ -133,7 +130,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         if( ! pChildAlias || pChildAlias->mPackageName != moduleName) continue;
         if( ! pChildAlias->isTempAlias() && pChildAlias->mModuleMember)
         {
-            ret = writeAlias( pChildAlias );
+            ret = writeAlias( pChildAlias);
             nodesWritten+=1;
         }
     }
@@ -148,7 +145,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         TAction * pChildAction = *it4;
         if( ! pChildAction || pChildAction->mPackageName != moduleName) continue;
         if (pChildAction->mModuleMember){
-            ret = writeAction( pChildAction );
+            ret = writeAction( pChildAction);
             nodesWritten+=1;
         }
     }
@@ -163,7 +160,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         TScript * pChildScript = *it5;
         if( ! pChildScript || pChildScript->mPackageName != moduleName) continue;
         if (pChildScript->mModuleMember){
-            ret = writeScript( pChildScript );
+            ret = writeScript( pChildScript);
         nodesWritten+=1;
         }
     }
@@ -178,7 +175,7 @@ bool XMLexport::writeModuleXML( QIODevice * device, QString moduleName){
         TKey * pChildKey = *it6;
         if( ! pChildKey || pChildKey->mPackageName != moduleName) continue;
         if (pChildKey->mModuleMember){
-            ret = writeKey( pChildKey );
+            ret = writeKey( pChildKey);
         nodesWritten+=1;
         }
     }
@@ -356,7 +353,7 @@ bool XMLexport::writeHost( Host * pT )
         if( ! pChildTrigger || pChildTrigger->mModuleMember) continue;
         if( ! pChildTrigger->isTempTrigger())
         {
-            ret = writeTrigger( pChildTrigger );
+            ret = writeTrigger( pChildTrigger);
         }
     }
     writeEndElement(); //end trigger package tag
@@ -369,7 +366,7 @@ bool XMLexport::writeHost( Host * pT )
         if (pChildTimer->mModuleMember) continue;
         if( ! pChildTimer->isTempTimer())
         {
-            ret = writeTimer( pChildTimer );
+            ret = writeTimer( pChildTimer);
         }
     }
     writeEndElement();
@@ -382,7 +379,7 @@ bool XMLexport::writeHost( Host * pT )
         if (pChildAlias->mModuleMember) continue;
         if( ! pChildAlias->isTempAlias())
         {
-            ret = writeAlias( pChildAlias );
+            ret = writeAlias( pChildAlias);
         }
     }
     writeEndElement();
@@ -393,7 +390,7 @@ bool XMLexport::writeHost( Host * pT )
     {
         TAction * pChildAction = *it4;
         if (pChildAction->mModuleMember) continue;
-        ret = writeAction( pChildAction );
+        ret = writeAction( pChildAction);
     }
     writeEndElement();
 
@@ -403,7 +400,7 @@ bool XMLexport::writeHost( Host * pT )
     {
         TScript * pChildScript = *it5;
         if (pChildScript->mModuleMember) continue;
-        ret = writeScript( pChildScript );
+        ret = writeScript( pChildScript);
     }
     writeEndElement();
 
@@ -413,7 +410,7 @@ bool XMLexport::writeHost( Host * pT )
     {
         TKey * pChildKey = *it6;
         if (pChildKey->mModuleMember) continue;
-        ret = writeKey( pChildKey );
+        ret = writeKey( pChildKey);
     }
     writeEndElement();
     writeStartElement("VariablePackage");
@@ -488,7 +485,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
         if( ! pChildTrigger ) continue;
         if( ! pChildTrigger->isTempTrigger())
         {
-            ret = writeTrigger( pChildTrigger );
+            ret = writeTrigger( pChildTrigger);
         }
     }
     writeEndElement(); //end trigger package tag
@@ -500,7 +497,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
         TTimer * pChildTimer = *it2;
         if( ! pChildTimer->isTempTimer())
         {
-            ret = writeTimer( pChildTimer );
+            ret = writeTimer( pChildTimer);
         }
     }
     writeEndElement();
@@ -512,7 +509,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
         TAlias * pChildAlias = *it3;
         if( ! pChildAlias->isTempAlias())
         {
-            ret = writeAlias( pChildAlias );
+            ret = writeAlias( pChildAlias);
         }
     }
     writeEndElement();
@@ -522,7 +519,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
     for( ItActionUnit it4 = pT->mActionUnit.mActionRootNodeList.begin(); it4 != pT->mActionUnit.mActionRootNodeList.end(); it4++)
     {
         TAction * pChildAction = *it4;
-            ret = writeAction( pChildAction );
+            ret = writeAction( pChildAction);
     }
     writeEndElement();
 
@@ -531,7 +528,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
     for( ItScriptUnit it5 = pT->mScriptUnit.mScriptRootNodeList.begin(); it5 != pT->mScriptUnit.mScriptRootNodeList.end(); it5++)
     {
         TScript * pChildScript = *it5;
-            ret = writeScript( pChildScript );
+            ret = writeScript( pChildScript);
     }
     writeEndElement();
 
@@ -540,7 +537,7 @@ bool XMLexport::writeGenericPackage( Host * pT )
     for( ItKeyUnit it6 = pT->mKeyUnit.mKeyRootNodeList.begin(); it6 != pT->mKeyUnit.mKeyRootNodeList.end(); it6++)
     {
         TKey * pChildKey = *it6;
-            ret = writeKey( pChildKey );
+            ret = writeKey( pChildKey);
     }
     writeEndElement();
 
@@ -560,7 +557,7 @@ bool XMLexport::exportTrigger( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "TriggerPackage" );
-    writeTrigger( mpTrigger );
+    writeTrigger( mpTrigger);
     writeEndElement();//TriggerPackage
 
     writeEndElement();//MudletPackage
@@ -569,71 +566,71 @@ bool XMLexport::exportTrigger( QIODevice * device )
 }
 
 
-bool XMLexport::writeTrigger( TTrigger * pT )
+bool XMLexport::writeTrigger( TTrigger * pT)
 {
-    if (!pT->mModuleMasterFolder){
-    //qDebug()<<"trigger written"<<pT->mModuleMember;
-    QString tag;
-    if( pT->mIsFolder )
-    {
-        tag = "TriggerGroup";
-    }
-    else
-    {
-        tag = "Trigger";
-    }
-    writeStartElement( tag );
-    writeAttribute( "isActive", pT->shouldBeActive() ? "yes" : "no" );
-    writeAttribute( "isFolder", pT->mIsFolder ? "yes" : "no" );
-    writeAttribute( "isTempTrigger", pT->mIsTempTrigger ? "yes" : "no" );
-    writeAttribute( "isMultiline", pT->mIsMultiline ? "yes" : "no" );
-    writeAttribute( "isPerlSlashGOption", pT->mPerlSlashGOption ? "yes" : "no" );
-    writeAttribute( "isColorizerTrigger", pT->mIsColorizerTrigger ? "yes" : "no" );
-    writeAttribute( "isFilterTrigger", pT->mFilterTrigger ? "yes" : "no" );
-    writeAttribute( "isSoundTrigger", pT->mSoundTrigger ? "yes" : "no" );
-    writeAttribute( "isColorTrigger", pT->mColorTrigger ? "yes" : "no" );
-    writeAttribute( "isColorTriggerFg", pT->mColorTriggerFg ? "yes" : "no" );
-    writeAttribute( "isColorTriggerBg", pT->mColorTriggerBg ? "yes" : "no" );
+    if (!pT->mModuleMasterFolder && pT->exportItem){
+        qDebug()<<"going to write"<<pT->getName();
+        QString tag;
+        if( pT->mIsFolder )
+        {
+            tag = "TriggerGroup";
+        }
+        else
+        {
+            tag = "Trigger";
+        }
+        writeStartElement( tag );
+        writeAttribute( "isActive", pT->shouldBeActive() ? "yes" : "no" );
+        writeAttribute( "isFolder", pT->mIsFolder ? "yes" : "no" );
+        writeAttribute( "isTempTrigger", pT->mIsTempTrigger ? "yes" : "no" );
+        writeAttribute( "isMultiline", pT->mIsMultiline ? "yes" : "no" );
+        writeAttribute( "isPerlSlashGOption", pT->mPerlSlashGOption ? "yes" : "no" );
+        writeAttribute( "isColorizerTrigger", pT->mIsColorizerTrigger ? "yes" : "no" );
+        writeAttribute( "isFilterTrigger", pT->mFilterTrigger ? "yes" : "no" );
+        writeAttribute( "isSoundTrigger", pT->mSoundTrigger ? "yes" : "no" );
+        writeAttribute( "isColorTrigger", pT->mColorTrigger ? "yes" : "no" );
+        writeAttribute( "isColorTriggerFg", pT->mColorTriggerFg ? "yes" : "no" );
+        writeAttribute( "isColorTriggerBg", pT->mColorTriggerBg ? "yes" : "no" );
 
 
-    writeTextElement( "name", pT->mName );
-    writeTextElement( "script", pT->mScript );
-    writeTextElement( "triggerType", QString::number( pT->mTriggerType ) );
-    writeTextElement( "conditonLineDelta", QString::number( pT->mConditionLineDelta ) );
-    writeTextElement( "mStayOpen", QString::number( pT->mStayOpen ) );
-    writeTextElement( "mCommand", pT->mCommand );
-    writeTextElement( "packageName", pT->mPackageName );
-    writeTextElement( "mFgColor", pT->mFgColor.name() );
-    writeTextElement( "mBgColor", pT->mBgColor.name() );
-    writeTextElement( "mSoundFile", pT->mSoundFile );
-    writeTextElement( "colorTriggerFgColor", pT->mColorTriggerFgColor.name() );
-    writeTextElement( "colorTriggerBgColor", pT->mColorTriggerBgColor.name() );
+        writeTextElement( "name", pT->mName );
+        writeTextElement( "script", pT->mScript );
+        writeTextElement( "triggerType", QString::number( pT->mTriggerType ) );
+        writeTextElement( "conditonLineDelta", QString::number( pT->mConditionLineDelta ) );
+        writeTextElement( "mStayOpen", QString::number( pT->mStayOpen ) );
+        writeTextElement( "mCommand", pT->mCommand );
+        writeTextElement( "packageName", pT->mPackageName );
+        writeTextElement( "mFgColor", pT->mFgColor.name() );
+        writeTextElement( "mBgColor", pT->mBgColor.name() );
+        writeTextElement( "mSoundFile", pT->mSoundFile );
+        writeTextElement( "colorTriggerFgColor", pT->mColorTriggerFgColor.name() );
+        writeTextElement( "colorTriggerBgColor", pT->mColorTriggerBgColor.name() );
 
-    writeStartElement( "regexCodeList" );
-    for( int i=0; i<pT->mRegexCodeList.size(); i++ )
-    {
-        writeTextElement( "string", pT->mRegexCodeList[i] );
-    }
-    writeEndElement();
+        writeStartElement( "regexCodeList" );
+        for( int i=0; i<pT->mRegexCodeList.size(); i++ )
+        {
+            writeTextElement( "string", pT->mRegexCodeList[i] );
+        }
+        writeEndElement();
 
-    writeStartElement( "regexCodePropertyList" );
-    for( int i=0; i<pT->mRegexCodePropertyList.size(); i++ )
-    {
-        writeTextElement( "integer", QString::number( pT->mRegexCodePropertyList[i] ) );
-    }
-    writeEndElement();
+        writeStartElement( "regexCodePropertyList" );
+        for( int i=0; i<pT->mRegexCodePropertyList.size(); i++ )
+        {
+            writeTextElement( "integer", QString::number( pT->mRegexCodePropertyList[i] ) );
+        }
+        writeEndElement();
     }
     typedef list<TTrigger *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TTrigger * pChild = *it;
       //  if (pChild->mModuleMember) continue;
-        writeTrigger( pChild );
+        writeTrigger( pChild);
     }
-    writeEndElement();
-
+    if (!pT->mModuleMasterFolder && pT->exportItem)
+        writeEndElement();
     return true;
-}
+    }
 
 
 bool XMLexport::exportAlias( QIODevice * device )
@@ -647,7 +644,7 @@ bool XMLexport::exportAlias( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "AliasPackage" );
-    writeAlias( mpAlias );
+    writeAlias( mpAlias);
     writeEndElement();
 
     writeEndElement();//MudletPackage
@@ -657,7 +654,7 @@ bool XMLexport::exportAlias( QIODevice * device )
 
 bool XMLexport::writeAlias( TAlias * pT )
 {
-    if (!pT->mModuleMasterFolder){
+    if (!pT->mModuleMasterFolder && pT->exportItem){
     QString tag;
     if( pT->mIsFolder )
     {
@@ -678,13 +675,14 @@ bool XMLexport::writeAlias( TAlias * pT )
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "packageName", pT->mPackageName );
     writeTextElement( "regex", pT->mRegexCode );
-}
+    }
     typedef list<TAlias *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TAlias * pChild = *it;
-        writeAlias( pChild );
+        writeAlias( pChild);
     }
+    if (!pT->mModuleMasterFolder && pT->exportItem)
     writeEndElement();
 
     return true;
@@ -702,7 +700,7 @@ bool XMLexport::exportAction( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "ActionPackage" );
-    writeAction( mpAction );
+    writeAction( mpAction);
     writeEndElement();
 
     writeEndElement();//MudletPackage
@@ -712,7 +710,7 @@ bool XMLexport::exportAction( QIODevice * device )
 
 bool XMLexport::writeAction( TAction * pT )
 {
-    if (!pT->mModuleMasterFolder){
+    if (!pT->mModuleMasterFolder && pT->exportItem){
     QString tag;
     if( pT->mIsFolder )
     {
@@ -748,13 +746,14 @@ bool XMLexport::writeAction( TAction * pT )
     writeTextElement( "buttonColumn", QString::number(pT->mButtonColumns) );
     writeTextElement( "buttonRotation", QString::number(pT->mButtonRotation) );
     writeTextElement( "buttonColor", pT->mButtonColor.name() );
-}
+    }
     typedef list<TAction *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TAction * pChild = *it;
-        writeAction( pChild );
+        writeAction( pChild);
     }
+    if (!pT->mModuleMasterFolder && pT->exportItem)
     writeEndElement();
 
     return true;
@@ -772,7 +771,7 @@ bool XMLexport::exportTimer( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "TimerPackage" );
-    writeTimer( mpTimer );
+    writeTimer( mpTimer);
     writeEndElement();
 
     writeEndElement();//MudletPackage
@@ -782,7 +781,7 @@ bool XMLexport::exportTimer( QIODevice * device )
 
 bool XMLexport::writeTimer( TTimer * pT )
 {
-    if (!pT->mModuleMasterFolder){
+    if (!pT->mModuleMasterFolder && pT->exportItem){
     QString tag;
     if( pT->mIsFolder )
     {
@@ -805,13 +804,14 @@ bool XMLexport::writeTimer( TTimer * pT )
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "packageName", pT->mPackageName );
     writeTextElement( "time", pT->mTime.toString( "hh:mm:ss.zzz" ) );
-}
+    }
     typedef list<TTimer *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TTimer * pChild = *it;
-        writeTimer( pChild );
+        writeTimer( pChild);
     }
+    if (!pT->mModuleMasterFolder && pT->exportItem)
     writeEndElement();
 
     return true;
@@ -829,7 +829,7 @@ bool XMLexport::exportScript( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "ScriptPackage" );
-    writeScript( mpScript );
+    writeScript( mpScript);
     writeEndElement();
 
     writeEndElement();//MudletPackage
@@ -839,7 +839,7 @@ bool XMLexport::exportScript( QIODevice * device )
 
 bool XMLexport::writeScript( TScript * pT )
 {
-    if (!pT->mModuleMasterFolder){
+    if (!pT->mModuleMasterFolder && pT->exportItem){
     QString tag;
     if( pT->mIsFolder )
     {
@@ -865,13 +865,14 @@ bool XMLexport::writeScript( TScript * pT )
         writeTextElement( "string", pT->mEventHandlerList[i] );
     }
     writeEndElement();
-}
+    }
     typedef list<TScript *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TScript * pChild = *it;
-        writeScript( pChild );
+        writeScript( pChild);
     }
+    if (!pT->mModuleMasterFolder && pT->exportItem)
     writeEndElement();
 
     return true;
@@ -889,7 +890,7 @@ bool XMLexport::exportKey( QIODevice * device )
     writeAttribute("version", "1.0");
 
     writeStartElement( "KeyPackage" );
-    writeKey( mpKey );
+    writeKey( mpKey);
     writeEndElement();
 
     writeEndElement();//MudletPackage
@@ -899,7 +900,7 @@ bool XMLexport::exportKey( QIODevice * device )
 
 bool XMLexport::writeKey( TKey * pT )
 {
-    if (!pT->mModuleMasterFolder){
+    if (!pT->mModuleMasterFolder && pT->exportItem){
     QString tag;
     if( pT->mIsFolder )
     {
@@ -921,13 +922,14 @@ bool XMLexport::writeKey( TKey * pT )
     writeTextElement( "command", pT->mCommand );
     writeTextElement( "keyCode", QString::number( pT->mKeyCode ) );
     writeTextElement( "keyModifier", QString::number( pT->mKeyModifier ) );
-}
+    }
     typedef list<TKey *>::const_iterator I;
     for( I it = pT->mpMyChildrenList->begin(); it != pT->mpMyChildrenList->end(); it++)
     {
         TKey * pChild = *it;
-        writeKey( pChild );
+        writeKey( pChild);
     }
+    if (!pT->mModuleMasterFolder && pT->exportItem)
     writeEndElement();
 
 

@@ -41,12 +41,12 @@ public:
 
     bool            writeHost( Host * );
 
-    bool            writeTrigger( TTrigger * );
-    bool            writeTimer( TTimer * );
-    bool            writeAlias( TAlias * );
-    bool            writeAction( TAction * );
-    bool            writeScript( TScript * );
-    bool            writeKey( TKey * );
+    bool            writeTrigger( TTrigger *);
+    bool            writeTimer( TTimer *);
+    bool            writeAlias( TAlias *);
+    bool            writeAction( TAction *);
+    bool            writeScript( TScript *);
+    bool            writeKey( TKey *);
     bool            writeModuleXML( QIODevice * device, QString moduleName);
     bool            exportHost( Host * );
 

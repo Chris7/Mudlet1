@@ -118,7 +118,8 @@ SOURCES += TConsole.cpp \
     T2DMap.cpp \
     dlgRoomExits.cpp \
     luaInterface.cpp \
-    dlgVarsMainArea.cpp
+    dlgVarsMainArea.cpp \
+    dlgPackageExporter.cpp
 
 
 HEADERS += mudlet.h \
@@ -195,7 +196,8 @@ HEADERS += mudlet.h \
     T2DMap.h \
     dlgRoomExits.h \
     luaInterface.h \
-    dlgVarsMainArea.h
+    dlgVarsMainArea.h \
+    dlgPackageExporter.h
 
 FORMS += ui/connection_profiles.ui \
     ui/main_window.ui \
@@ -229,7 +231,8 @@ FORMS += ui/connection_profiles.ui \
     ui/module_manager.ui \
     ui/package_manager_unpack.ui \
     ui/custom_lines.ui \
-    ui/vars_main_area.ui
+    ui/vars_main_area.ui \
+    ui/dlgPackageExporter.ui
 
 #win32: {
 #    SOURCES += lua_yajl.c

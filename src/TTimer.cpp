@@ -44,6 +44,7 @@ TTimer::TTimer( TTimer * parent, Host * pHost )
 , mIsTempTimer( false )
 , mModuleMember(false)
 , mModuleMasterFolder(false)
+, exportItem(true)
 , mpTimer( new QTimer )
 {
     mpTimer->stop();
@@ -58,6 +59,7 @@ TTimer::TTimer( QString name, QTime time, Host * pHost )
 , mNeedsToBeCompiled( true )
 , mModuleMember(false)
 , mModuleMasterFolder(false)
+, exportItem(true)
 , mIsTempTimer( false )
 , mpTimer( new QTimer )
 {

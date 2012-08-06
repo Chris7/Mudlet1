@@ -42,6 +42,7 @@
 #include "TTextEdit.h"
 #include "dlgNotepad.h"
 #include "luaInterface.h"
+#include "dlgPackageExporter.h"
 #include <QtWebKit/QWebView>
 
 //#ifdef Q_CC_GNU
@@ -362,6 +363,7 @@ mudlet::mudlet()
     connect(actionShow_Map, SIGNAL(triggered()), this, SLOT(slot_mapper()));
     connect(dactionDownload, SIGNAL(triggered()), this, SLOT(slot_show_help_dialog_download()));
     connect(actionPackage_manager, SIGNAL(triggered()), this, SLOT(slot_package_manager()));
+    connect(actionPackage_Exporter, SIGNAL(triggered()), this, SLOT(slot_package_exporter()));
     connect(actionModule_manager, SIGNAL(triggered()), this, SLOT(slot_module_manager()));
 
     connect(mactionTriggers, SIGNAL(triggered()), this, SLOT(show_trigger_dialog()));
@@ -622,6 +624,13 @@ void mudlet::slot_uninstall_package()
         pH->uninstallPackage( pI->text(), 0);
     packageList->clear();
     packageList->addItems( pH->mInstalledPackages );
+}
+
+void mudlet::slot_package_exporter(){
+    Host * pH = getActiveHost();
+    if( ! pH ) return;
+    dlgPackageExporter *d = new dlgPackageExporter(this, pH);
+    d->show();
 }
 
 void mudlet::slot_close_profile_requested( int tab )

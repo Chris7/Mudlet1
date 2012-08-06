@@ -73,6 +73,7 @@ public:
     //bool             serialize( QDataStream & );
     //bool             restore( QDataStream & fs, bool );
     bool             isClone( TKey & ) const;
+    bool             exportItem;
 
 private:
 

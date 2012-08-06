@@ -153,6 +153,7 @@ public:
     QString                                mName;
     bool                                   mIsTempTrigger;
     QStringList                            mRegexCodeList;
+    bool             exportItem;
 
 private:
 

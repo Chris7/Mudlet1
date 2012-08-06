@@ -85,6 +85,7 @@ public:
     bool             isClone(TTimer &b) const;
     bool             isOffsetTimer();
     bool             mRegisteredAnonymousLuaFunction;
+    bool             exportItem;
 
 private:
 
