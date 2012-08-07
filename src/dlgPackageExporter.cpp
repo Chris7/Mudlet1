@@ -61,7 +61,6 @@ void dlgPackageExporter::slot_export_package(){
             QTreeWidgetItem * item = trigList.at(i);
             if (item->checkState(0) == Qt::Unchecked && triggerMap.contains(item)){
                 triggerMap[item]->exportItem = false;
-                qDebug()<<"not writing"<<triggerMap[item]->getName();
             }
         }
         items = treeWidget->findItems(QString("Timers"), Qt::MatchExactly, 0);
@@ -101,6 +100,7 @@ void dlgPackageExporter::slot_export_package(){
         for (int i=0;i<scriptList.size();i++){
             QTreeWidgetItem * item = scriptList.at(i);
             if (item->checkState(0) == Qt::Unchecked && scriptMap.contains(item)){
+                qDebug()<<"not writing"<<scriptMap[item]->getName();
                 scriptMap[item]->exportItem = false;
             }
         }
@@ -274,8 +274,7 @@ void dlgPackageExporter::recurseScripts(TScript* item, QTreeWidgetItem* qItem){
         pItem->setCheckState(0, Qt::Unchecked);
         scriptMap.insert(pItem, pChild);
         qItem->addChild(pItem);
-        if (pChild->isFolder())
-            recurseScripts(pChild, pItem);
+        recurseScripts(pChild, pItem);
     }
 }
 
@@ -314,8 +313,7 @@ void dlgPackageExporter::recurseKeys(TKey* item, QTreeWidgetItem* qItem){
         pItem->setCheckState(0, Qt::Unchecked);
         keyMap.insert(pItem, pChild);
         qItem->addChild(pItem);
-        if (pChild->isFolder())
-            recurseKeys(pChild, pItem);
+        recurseKeys(pChild, pItem);
     }
 }
 

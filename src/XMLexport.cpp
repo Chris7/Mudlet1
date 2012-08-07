@@ -569,7 +569,6 @@ bool XMLexport::exportTrigger( QIODevice * device )
 bool XMLexport::writeTrigger( TTrigger * pT)
 {
     if (!pT->mModuleMasterFolder && pT->exportItem){
-        qDebug()<<"going to write"<<pT->getName();
         QString tag;
         if( pT->mIsFolder )
         {
