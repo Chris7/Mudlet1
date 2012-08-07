@@ -9,15 +9,16 @@ QT += network opengl phonon webkit
 DEPENDPATH += .
 INCLUDEPATH += .
 LIBLUA = -llua5.1
-!exists(/usr/lib/liblua5.1.a):LIBLUA = -llua
-EXTERNAL_INCLUDES = "C:\mudlet_package\includes"
+!exists(/usr/lib/x86_64-linux-gnu/liblua5.1.a):LIBLUA = -llua
+
 # automatically link to LuaJIT if it exists
-exists(/usr/local/lib/libluajit-5.1.a):LIBLUA = -L/usr/local/lib -lluajit-5.1
+exists(/usr/lib/x86_64-linux-gnu/libluajit-5.1.a):LIBLUA = -L/usr/lib/x86_64-linux-gnu/ -lluajit-5.1
 
 unix:LIBS += -lpcre \
     $$LIBLUA \
     -lhunspell \
     -lyajl \
+    -lGLU \
     -lzzip 
 
 win32:LIBS += -L"C:\mudlet_package\mudlet_libs" \
