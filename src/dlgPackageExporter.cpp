@@ -33,7 +33,6 @@ dlgPackageExporter::dlgPackageExporter(QWidget *parent, Host* host) :
     listScripts();
     listActions();
     listTimers();
-    //listActions();
 }
 
 dlgPackageExporter::~dlgPackageExporter()
@@ -181,9 +180,13 @@ void dlgPackageExporter::slot_browse_button(){
 
 void dlgPackageExporter::recurseTriggers(TTrigger* trig, QTreeWidgetItem* qTrig){
     list<TTrigger *> * childList = trig->getChildrenList();
+    if (!childList->size())
+        return;
     list<TTrigger *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TTrigger * pChild = *it;
+        if (pChild->isTempTrigger())
+            continue;
         QStringList sl;
         sl << pChild->getName();
         QTreeWidgetItem * pItem = new QTreeWidgetItem(sl);
@@ -191,8 +194,7 @@ void dlgPackageExporter::recurseTriggers(TTrigger* trig, QTreeWidgetItem* qTrig)
         pItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsTristate|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         pItem->setCheckState(0, Qt::Unchecked);
         qTrig->addChild(pItem);
-        if (pChild->isFolder())
-            recurseTriggers(pChild, pItem);
+        recurseTriggers(pChild, pItem);
     }
 }
 
@@ -213,16 +215,19 @@ void dlgPackageExporter::listTriggers()
         pItem->setCheckState(0, Qt::Unchecked);
         top->addChild(pItem);
         triggerMap.insert(pItem, pChild);
-        if (pChild->isFolder())
-            recurseTriggers(pChild, pItem);
+        recurseTriggers(pChild, pItem);
     }
 }
 
 void dlgPackageExporter::recurseAliases(TAlias* item, QTreeWidgetItem* qItem){
     list<TAlias *> * childList = item->getChildrenList();
+    if (!childList->size())
+        return;
     list<TAlias *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TAlias * pChild = *it;
+        if (pChild->isTempAlias())
+            continue;
         QStringList sl;
         sl << pChild->getName();
         QTreeWidgetItem * pItem = new QTreeWidgetItem(sl);
@@ -230,8 +235,7 @@ void dlgPackageExporter::recurseAliases(TAlias* item, QTreeWidgetItem* qItem){
         pItem->setCheckState(0, Qt::Unchecked);
         qItem->addChild(pItem);
         aliasMap.insert(pItem, pChild);
-        if (pChild->isFolder())
-            recurseAliases(pChild, pItem);
+        recurseAliases(pChild, pItem);
     }
 }
 
@@ -252,13 +256,14 @@ void dlgPackageExporter::listAliases()
         pItem->setCheckState(0, Qt::Unchecked);
         top->addChild(pItem);
         aliasMap.insert(pItem, pChild);
-        if (pChild->isFolder())
-            recurseAliases(pChild, pItem);
+        recurseAliases(pChild, pItem);
     }
 }
 
 void dlgPackageExporter::recurseScripts(TScript* item, QTreeWidgetItem* qItem){
     list<TScript *> * childList = item->getChildrenList();
+    if (!childList->size())
+        return;
     list<TScript *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TScript * pChild = *it;
@@ -291,13 +296,14 @@ void dlgPackageExporter::listScripts()
         pItem->setCheckState(0, Qt::Unchecked);
         scriptMap.insert(pItem, pChild);
         top->addChild(pItem);
-        if (pChild->isFolder())
-            recurseScripts(pChild, pItem);
+        recurseScripts(pChild, pItem);
     }
 }
 
 void dlgPackageExporter::recurseKeys(TKey* item, QTreeWidgetItem* qItem){
     list<TKey *> * childList = item->getChildrenList();
+    if (!childList->size())
+        return;
     list<TKey *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TKey * pChild = *it;
@@ -330,13 +336,14 @@ void dlgPackageExporter::listKeys()
         pItem->setCheckState(0, Qt::Unchecked);
         keyMap.insert(pItem, pChild);
         top->addChild(pItem);
-        if (pChild->isFolder())
-            recurseKeys(pChild, pItem);
+        recurseKeys(pChild, pItem);
     }
 }
 
 void dlgPackageExporter::recurseActions(TAction* item, QTreeWidgetItem* qItem){
     list<TAction *> * childList = item->getChildrenList();
+    if (!childList->size())
+        return;
     list<TAction *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TAction * pChild = *it;
@@ -347,8 +354,7 @@ void dlgPackageExporter::recurseActions(TAction* item, QTreeWidgetItem* qItem){
         pItem->setCheckState(0, Qt::Unchecked);
         actionMap.insert(pItem, pChild);
         qItem->addChild(pItem);
-        if (pChild->isFolder())
-            recurseActions(pChild, pItem);
+        recurseActions(pChild, pItem);
     }
 }
 
@@ -369,16 +375,19 @@ void dlgPackageExporter::listActions()
         pItem->setCheckState(0, Qt::Unchecked);
         actionMap.insert(pItem, pChild);
         top->addChild(pItem);
-        if (pChild->isFolder())
-            recurseActions(pChild, pItem);
+        recurseActions(pChild, pItem);
     }
 }
 
 void dlgPackageExporter::recurseTimers(TTimer* item, QTreeWidgetItem* qItem){
     list<TTimer *> * childList = item->getChildrenList();
+    if (!childList->size())
+        return;
     list<TTimer *>::iterator it;
     for(it=childList->begin(); it!=childList->end();it++){
         TTimer * pChild = *it;
+        if (pChild->isTempTimer())
+            continue;
         QStringList sl;
         sl << pChild->getName();
         QTreeWidgetItem * pItem = new QTreeWidgetItem(sl);
@@ -386,8 +395,7 @@ void dlgPackageExporter::recurseTimers(TTimer* item, QTreeWidgetItem* qItem){
         pItem->setCheckState(0, Qt::Unchecked);
         timerMap.insert(pItem, pChild);
         qItem->addChild(pItem);
-        if (pChild->isFolder())
-            recurseTimers(pChild, pItem);
+        recurseTimers(pChild, pItem);
     }
 }
 
@@ -408,7 +416,6 @@ void dlgPackageExporter::listTimers()
         pItem->setCheckState(0, Qt::Unchecked);
         timerMap.insert(pItem, pChild);
         top->addChild(pItem);
-        if (pChild->isFolder())
-            recurseTimers(pChild, pItem);
+        recurseTimers(pChild, pItem);
     }
 }
