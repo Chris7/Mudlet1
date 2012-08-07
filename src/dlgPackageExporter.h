@@ -39,6 +39,8 @@ private:
     Ui::dlgPackageExporter *ui;
     Host* mpHost;
     QTreeWidget * treeWidget;
+    QPushButton *exportButton;
+    QPushButton *closeButton;
 public slots:
     void slot_browse_button();
     void slot_export_package();
