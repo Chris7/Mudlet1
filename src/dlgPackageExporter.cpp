@@ -19,7 +19,14 @@ dlgPackageExporter::dlgPackageExporter(QWidget *parent, Host* host) :
     ui->setupUi(this);
     treeWidget = ui->treeWidget;
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(slot_browse_button()));
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(slot_export_package()));
+
+    closeButton = ui->buttonBox->addButton (QDialogButtonBox::Close);
+
+    exportButton = new QPushButton(tr("&Export"));
+    exportButton->setDisabled(true); // disabled by default until the user selects a location
+    ui->buttonBox->addButton(exportButton, QDialogButtonBox::ResetRole);
+    connect(exportButton, SIGNAL(clicked()), this, SLOT(slot_export_package()));
+
     listTriggers();
     listAliases();
     listKeys();
@@ -148,6 +155,10 @@ void dlgPackageExporter::slot_export_package(){
                 aliasMap[item]->exportItem = true;
             }
         }
+
+        ui->infoLabel->setText("Exported package to "+filePath);
+    } else {
+        ui->infoLabel->setText("Failed to export - couldn't open "+filePath+" for writing in. Do you have the necessary permissions to write to that folder?");
     }
 }
 
@@ -157,9 +168,15 @@ void dlgPackageExporter::slot_browse_button(){
     dialog.setNameFilter(tr("Mudlet Packages (*.xml)"));
     dialog.setViewMode(QFileDialog::Detail);
     QString fileName;
-    if (dialog.exec())
+    if (dialog.exec()) {
         fileName = dialog.selectedFiles().first();
-    ui->filePath->setText(fileName);
+
+        if (!fileName.endsWith(".xml"))
+            fileName.append(".xml");
+
+        ui->filePath->setText(fileName);
+        exportButton->setDisabled(false);
+    }
 }
 
 void dlgPackageExporter::recurseTriggers(TTrigger* trig, QTreeWidgetItem* qTrig){
