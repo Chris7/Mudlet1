@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Package exporter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="3">
     <widget class="QTreeWidget" name="treeWidget">
      <column>
       <property name="text">
-       <string>Check Items To Export</string>
+       <string>Check items to export</string>
       </property>
      </column>
      <item>
