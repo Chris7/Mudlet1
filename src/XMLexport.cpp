@@ -626,7 +626,7 @@ bool XMLexport::writeTrigger( TTrigger * pT)
       //  if (pChild->mModuleMember) continue;
         writeTrigger( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
         writeEndElement();
     return true;
     }
@@ -681,7 +681,7 @@ bool XMLexport::writeAlias( TAlias * pT )
         TAlias * pChild = *it;
         writeAlias( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
     writeEndElement();
 
     return true;
@@ -752,7 +752,7 @@ bool XMLexport::writeAction( TAction * pT )
         TAction * pChild = *it;
         writeAction( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
     writeEndElement();
 
     return true;
@@ -810,7 +810,7 @@ bool XMLexport::writeTimer( TTimer * pT )
         TTimer * pChild = *it;
         writeTimer( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
     writeEndElement();
 
     return true;
@@ -871,7 +871,7 @@ bool XMLexport::writeScript( TScript * pT )
         TScript * pChild = *it;
         writeScript( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
     writeEndElement();
 
     return true;
@@ -928,7 +928,7 @@ bool XMLexport::writeKey( TKey * pT )
         TKey * pChild = *it;
         writeKey( pChild);
     }
-    if (!pT->mModuleMasterFolder && pT->exportItem)
+    if (pT->exportItem)
     writeEndElement();
 
 
