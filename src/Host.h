@@ -175,6 +175,7 @@ public:
     bool               mCodeCompletion;
     QFont              mCommandLineFont;
     QString            mCommandSeparator;
+    QString            mCommandSeparatorEscape;
     QString            mCommandSeperator;
     bool               mDisableAutoCompletion;
     QFont              mDisplayFont;

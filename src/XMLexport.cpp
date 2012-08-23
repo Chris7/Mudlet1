@@ -318,6 +318,7 @@ bool XMLexport::writeHost( Host * pT )
     writeTextElement( "mDisplayFont", pT->mDisplayFont.toString() );
     writeTextElement( "mCommandLineFont", pT->mCommandLineFont.toString() );
     writeTextElement( "mCommandSeparator", pT->mCommandSeparator );
+    writeTextElement( "mCommandSeparatorEscape", pT->mCommandSeparatorEscape );
     writeTextElement( "commandLineMinimumHeight", QString::number(pT->commandLineMinimumHeight) );
 
     writeTextElement( "mFgColor2", pT->mFgColor_2.name() );

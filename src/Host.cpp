@@ -61,6 +61,7 @@ Host::Host( int port, QString hostname, QString login, QString pass, int id )
 , mCodeCompletion( true )
 , mCommandLineFont   ( QFont("Bitstream Vera Sans Mono", 10, QFont::Courier ) )//( QFont("Monospace", 10, QFont::Courier) )
 , mCommandSeparator  ( QString(";") )
+, mCommandSeparatorEscape  ( QString("~") )
 , mCommandSeperator  ( QString(";") )
 , mDisableAutoCompletion( false )
 , mDisplayFont       ( QFont("Bitstream Vera Sans Mono", 10, QFont::Courier ) )//, mDisplayFont       ( QFont("Bitstream Vera Sans Mono", 10, QFont:://( QFont("Monospace", 10, QFont::Courier) ), mPort              ( port )
@@ -193,6 +194,7 @@ Host::Host()
 , mCodeCompletion( true )
 , mCommandLineFont   ( QFont("Bitstream Vera Sans Mono", 10, QFont::Courier ) )//( QFont("Monospace", 10, QFont::Courier) )
 , mCommandSeparator  ( QString(";") )
+, mCommandSeparatorEscape  ( QString("~") )
 , mCommandSeperator  ( QString(";") )
 , mDisableAutoCompletion( false )
 , mDisplayFont       ( QFont("Bitstream Vera Sans Mono", 10, QFont::Courier ) )//, mDisplayFont       ( QFont("Bitstream Vera Sans Mono", 10, QFont:://( QFont("Monospace", 10, QFont::Courier) ), mPort              ( port )
@@ -561,6 +563,16 @@ void Host::send( QString cmd, bool wantPrint, bool dontExpandAliases )
         mpConsole->update();
     }
     QStringList commandList = cmd.split( QString( mCommandSeparator ), QString::SkipEmptyParts );
+    QStringList com2;
+    for (int i=0;i<commandList.size();i++){
+        QString com = commandList[i];
+        while (com.endsWith(mCommandSeparatorEscape) && i<commandList.size()){
+            i++;
+            com += mCommandSeparator+commandList[i];
+        }
+        com2.append(com);
+    }
+    commandList = com2;
     if( ! dontExpandAliases )
     {
         if( commandList.size() == 0 )
