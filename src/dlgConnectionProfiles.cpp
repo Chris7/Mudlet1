@@ -1012,6 +1012,8 @@ void dlgConnectionProfiles::fillout_form()
             continue;
         if( mProfileList[i] == "3Scapes" )
             continue;
+        if( mProfileList[i] == "3Kingdoms" )
+            continue;
         QString sList;
         sList = mProfileList[i];
         QListWidgetItem * pItem = new QListWidgetItem( sList );
