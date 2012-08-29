@@ -152,6 +152,8 @@ public:
     bool               uninstallPackage( QString, int module);
     bool               removeDir( const QString dirName, QString originalPath);
 
+    void               replaceMap(TMap* map);
+
     cTelnet            mTelnet;
     TConsole *         mpConsole;
     TLuaInterpreter    mLuaInterpreter;

@@ -134,11 +134,6 @@ public:
     float m2DLastY;
     int mViewArea;
     QString mapLocation;
-    //mapVar mVars[20];
-    //mapVar <int> mvRoomId;
-    QMap<QString, mVarTypes> mVars;
-    //QMap<QString, *QVariant> mVars;
-    //mVars.insert("RoomId", &mRoomId);
     int mTargetID;
     QList<int> mPathList;
     QList<QString> mDirList;

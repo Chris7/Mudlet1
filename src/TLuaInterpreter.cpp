@@ -7064,6 +7064,22 @@ int TLuaInterpreter::getMapLabels( lua_State * L )
     return 1;
 }
 
+int TLuaInterpreter::shareMap( lua_State *L){
+    //host name to share with as argument
+    QString hostName;
+    if (lua_isstring(L,1))
+        hostName = lua_tostring(L,1);
+    qDebug()<<HostManager::self()->getHostList();
+    if (!hostName.isEmpty()){
+        Host* host = HostManager::self()->getHost(hostName);
+        Host * pHost = TLuaInterpreter::luaInterpreterMap[L];
+        host->mpMap->mpMapper->mp2dMap->mpMap = pHost->mpMap;
+        host->mpMap->mpMapper = pHost->mpMap->mpMapper;
+        host->replaceMap(pHost->mpMap);
+    }
+    return 1;
+}
+
 int TLuaInterpreter::getMapLabel( lua_State * L )
 {
     int area, labelId = -1;
@@ -9862,7 +9878,7 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "getMapSize", TLuaInterpreter::getMapSize );
     lua_register( pGlobalLua, "getMapLocation", TLuaInterpreter::getMapLocation );
     lua_register( pGlobalLua, "setMapLocation", TLuaInterpreter::setMapLocation );
-
+    lua_register( pGlobalLua, "shareMap", TLuaInterpreter::shareMap);
     lua_atpanic(pGlobalLua, luaInterface::lua_panic);
 
 

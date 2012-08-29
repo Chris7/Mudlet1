@@ -328,6 +328,12 @@ int Host::isHiddenVariable(QTreeWidgetItem * pItem){
     return hiddenVariables.contains(pValue);
 }
 
+void Host::replaceMap(TMap *map){
+    qDebug()<<"old map"<<mpMap;
+    mpMap = map;
+    qDebug()<<"new map"<<mpMap;
+}
+
 void Host::setHiddenVariable(QTreeWidgetItem * pItem, bool status){
     QStringList pData = pItem->data(0, Qt::UserRole).toStringList();
     if (!pData.size())

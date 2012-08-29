@@ -347,6 +347,7 @@ public:
     static int getMapSize(lua_State * L);
     static int getMapLocation(lua_State * L);
     static int setMapLocation(lua_State * L);
+    static int shareMap( lua_State *L);
 
     std::list<std::string> mCaptureGroupList;
     std::list<int> mCaptureGroupPosList;
