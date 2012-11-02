@@ -934,6 +934,11 @@ void XMLimport::readHostPackage( Host * pT )
                 pT->mCommandSeparator = readElementText();
                 continue;
             }
+            else if( name() == "mCommandSeparatorEscape" )
+            {
+                pT->mCommandSeparatorEscape = readElementText();
+                continue;
+            }
             else if( name() == "mCommandLineFgColor")
             {
                 pT->mCommandLineFgColor.setNamedColor( readElementText() );

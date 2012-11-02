@@ -41,7 +41,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="General">
       <property name="sizePolicy">
@@ -330,7 +330,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_38">
             <property name="toolTip">
              <string/>
@@ -343,12 +343,22 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1" colspan="2">
+          <item row="5" column="1" colspan="2">
            <widget class="QSpinBox" name="commandLineMinimumHeight">
             <property name="maximum">
              <number>300</number>
             </property>
            </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Command separator escape character</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" colspan="2">
+           <widget class="QLineEdit" name="command_separator_escape"/>
           </item>
          </layout>
         </widget>

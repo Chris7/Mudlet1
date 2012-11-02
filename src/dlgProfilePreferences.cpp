@@ -379,7 +379,8 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
 
         show_sent_text_checkbox->setChecked(pHost->mPrintCommand);
         auto_clear_input_line_checkbox->setChecked(pHost->mAutoClearCommandLineAfterSend);
-        command_separator_lineedit->setText( pHost->mCommandSeparator);
+        command_separator_lineedit->setText( pHost-> mCommandSeparator);
+        command_separator_escape->setText( pHost->mCommandSeparatorEscape);
         //disable_auto_completion_checkbox->setChecked(pHost->mDisableAutoCompletion);
 
         checkBox_USE_IRE_DRIVER_BUGFIX->setChecked( pHost->mUSE_IRE_DRIVER_BUGFIX );
@@ -1327,6 +1328,7 @@ void dlgProfilePreferences::slot_save_and_exit()
     pHost->mPrintCommand = show_sent_text_checkbox->isChecked();
     pHost->mAutoClearCommandLineAfterSend = auto_clear_input_line_checkbox->isChecked();
     pHost->mCommandSeparator = command_separator_lineedit->text();
+    pHost->mCommandSeparatorEscape = command_separator_escape->text();
     pHost->mAcceptServerGUI = acceptServerGUI->isChecked();
     //pHost->mDisableAutoCompletion = disable_auto_completion_checkbox->isChecked();
     pHost->mUSE_IRE_DRIVER_BUGFIX = checkBox_USE_IRE_DRIVER_BUGFIX->isChecked();
