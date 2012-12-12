@@ -492,8 +492,12 @@ void mudlet::slot_help_module(){
     Host * pH = getActiveHost();
     if (!pH)
         return;
+
     int cRow = moduleTable->currentRow();
     QTableWidgetItem * pI = moduleTable->item(cRow, 2);
+    if (!pI)
+        return;
+
     if (pH->moduleHelp[pI->text()].contains("helpURL"))
         openWebPage(pH->moduleHelp[pI->text()]["helpURL"]);
     if (pH->moduleHelp[pI->text()].contains("helpHTML"))
