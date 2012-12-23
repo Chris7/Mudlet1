@@ -411,7 +411,7 @@ void mudlet::layoutModules(){
     QStringList sl;
     // The following seems like a non-intuitive operator
     // overload but that is how they do it...
-    sl << "Save & Resync Module?" << "Priority" << "Module Name" << "Module Location";
+    sl << "Module Name" << "Priority" << "Save & Sync?" << "Module Location";
     moduleTable->setHorizontalHeaderLabels(sl);
     moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     moduleTable->verticalHeader()->hide();
@@ -428,23 +428,27 @@ void mudlet::layoutModules(){
         masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
         if (moduleInfo[1].toInt()){
             masterModule->setCheckState(Qt::Checked);//Qt::Checked);
-            masterModule->setText("YES");
+            masterModule->setText("sync");
         }
         else{
             masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-            masterModule->setText("NO");
+            masterModule->setText("don't sync");
         }
-        masterModule->setToolTip(QString("Checking this box will cause the module\nto be saved & resync'd across all\nopen sessions.  Make sure any\nimportant modules are backed up before enabling this option!"));
+        masterModule->setToolTip(QString("Checking this box will cause the module to be saved & resync'd across all open sessions.\nMake sure any important modules are backed up before enabling this option!"));
         QString moduleName = it.key();
         itemEntry->setText(moduleName);
+        itemEntry->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled); // disallow editing of module name, because that is not saved
         itemLocation->setText(moduleInfo[0]);
-        itemPriority->setText(QString::number(pH->mModulePriorities[moduleName]));
-        moduleTable->setItem(row, 0, masterModule);
+        itemLocation->setToolTip(moduleInfo[0]); // show the full path in a tooltip, in case it doesn't fit in the table
+        itemLocation->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled); // disallow editing of module path, because that is not saved
+        itemPriority->setData(Qt::EditRole, pH->mModulePriorities[moduleName]);
+        moduleTable->setItem(row, 0, itemEntry);
         moduleTable->setItem(row, 1, itemPriority);
-        moduleTable->setItem(row, 2, itemEntry);
+        moduleTable->setItem(row, 2, masterModule);
         moduleTable->setItem(row, 3, itemLocation);
     }
     moduleTable->resizeColumnsToContents();
+    moduleTable->sortItems(1, Qt::AscendingOrder);
 }
 
 void mudlet::slot_module_manager(){
@@ -494,7 +498,7 @@ void mudlet::slot_help_module(){
         return;
 
     int cRow = moduleTable->currentRow();
-    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
+    QTableWidgetItem * pI = moduleTable->item(cRow, 0);
     if (!pI)
         return;
 
@@ -508,22 +512,24 @@ void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
     int i = pItem->row();
     Host * pH = getActiveHost();
     QStringList moduleStringList;
-    QTableWidgetItem * entry = moduleTable->item(i,2);
-    QTableWidgetItem * checkStatus = moduleTable->item(i,0);
+    QTableWidgetItem * entry = moduleTable->item(i,0);
+    QTableWidgetItem * checkStatus = moduleTable->item(i,2);
     QTableWidgetItem * itemPriority = moduleTable->item(i,1);
-    if (!entry || !pH->mInstalledModules.contains(entry->text()))
+    // the following gets called during module uninstallation as each cell gets destroyed, so check all items
+    if (!entry || !checkStatus || !itemPriority || !pH->mInstalledModules.contains(entry->text()))
         return;
     moduleStringList = pH->mInstalledModules[entry->text()];
     if (checkStatus->checkState() == Qt::Unchecked){
         moduleStringList[1] = "0";
-        checkStatus->setText("NO");
+        checkStatus->setText("don't sync");
     }
     if (checkStatus->checkState() == Qt::Checked){
         moduleStringList[1] = "1";
-        checkStatus->setText("YES");
+        checkStatus->setText("sync");
     }
     pH->mInstalledModules[entry->text()] = moduleStringList;
     pH->mModulePriorities[entry->text()] = itemPriority->text().toInt();
+    moduleTable->sortItems(1, Qt::AscendingOrder);
 }
 
 void mudlet::slot_install_module()
@@ -557,7 +563,7 @@ void mudlet::slot_uninstall_module()
     Host * pH = getActiveHost();
     if( ! pH ) return;
     int cRow = moduleTable->currentRow();
-    QTableWidgetItem * pI = moduleTable->item(cRow, 2);
+    QTableWidgetItem * pI = moduleTable->item(cRow, 0);
     if( pI )
         pH->uninstallPackage( pI->text(), 1);
     for (int i=moduleTable->rowCount()-1; i >= 0; --i)
