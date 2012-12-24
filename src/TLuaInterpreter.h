@@ -115,7 +115,6 @@ public:
 
     TGatekeeperThread * mpGatekeeperThread;
     QNetworkAccessManager * mpFileDownloader;
-    static int openWebPage(lua_State *);
     static int lockExit( lua_State * );
     static int lockSpecialExit( lua_State * );
     static int hasExitLock( lua_State * );

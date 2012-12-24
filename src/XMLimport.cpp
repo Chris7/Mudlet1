@@ -485,12 +485,6 @@ void XMLimport::readHelpPackage(){
                 mpHost->moduleHelp[mPackageName].insert("helpURL", contents);
                 continue;
             }
-            else if( name() == "helpHTML" )
-            {
-                QString contents = readElementText();
-                mpHost->moduleHelp[mPackageName].insert("helpHTML", contents);
-                continue;
-            }
         }
     }
     qDebug()<<"module help:"<<mpHost->moduleHelp;

@@ -43,7 +43,6 @@
 #include "dlgNotepad.h"
 #include "luaInterface.h"
 #include "dlgPackageExporter.h"
-#include <QtWebKit/QWebView>
 
 //#ifdef Q_CC_GNU
     #include "dlgIRC.h"
@@ -475,17 +474,10 @@ void mudlet::slot_module_manager(){
 void mudlet::openWebPage(QString path){
     if (path.isEmpty() || path.isNull())
         return;
-    QWebView *view = new QWebView(this);
     QUrl url(path);
-    if (url.isValid())
-        view->setUrl(url);
-    else
-        view->setHtml(path);
-    view->setFixedHeight(600);
-    view->setFixedWidth(600);
-    view->setWindowFlags(Qt::Window);
-    view->move(QPoint(50,50));
-    view->show();
+    if (!url.isValid())
+        return;
+    QDesktopServices::openUrl(path);
 }
 
 void mudlet::slot_help_module(){
@@ -496,8 +488,6 @@ void mudlet::slot_help_module(){
     QTableWidgetItem * pI = moduleTable->item(cRow, 2);
     if (pH->moduleHelp[pI->text()].contains("helpURL"))
         openWebPage(pH->moduleHelp[pI->text()]["helpURL"]);
-    if (pH->moduleHelp[pI->text()].contains("helpHTML"))
-        openWebPage(pH->moduleHelp[pI->text()]["helpHTML"]);
 }
 
 void mudlet::slot_module_clicked(QTableWidgetItem* pItem){

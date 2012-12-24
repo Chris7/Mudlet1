@@ -1959,18 +1959,6 @@ int TLuaInterpreter::setModulePriority( lua_State * L  ){
     return 0;
 }
 
-int TLuaInterpreter::openWebPage(lua_State * L){
-    QString path;
-    if (!lua_isstring(L,1)){
-        lua_pushstring(L, "openWebPage: String required");
-        lua_error(L);
-        return 1;
-    }
-    path = lua_tostring(L,1);
-    mudlet::self()->openWebPage(path);
-    return 0;
-}
-
 int TLuaInterpreter::loadMap( lua_State * L )
 {
     string location="";
@@ -9830,7 +9818,6 @@ void TLuaInterpreter::initLuaGlobals()
     lua_register( pGlobalLua, "saveMap", TLuaInterpreter::saveMap );
     lua_register( pGlobalLua, "loadMap", TLuaInterpreter::loadMap );
     lua_register( pGlobalLua, "setMainWindowSize", TLuaInterpreter::setMainWindowSize );
-    lua_register( pGlobalLua, "openWebPage", TLuaInterpreter::openWebPage);
     // removed because of various Qt crashes
     //lua_register( pGlobalLua, "setAppStyleSheet", TLuaInterpreter::setAppStyleSheet );
     lua_register( pGlobalLua, "sendIrc", TLuaInterpreter::sendIrc );
