@@ -415,39 +415,53 @@ void mudlet::layoutModules(){
     moduleTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     moduleTable->verticalHeader()->hide();
     moduleTable->setShowGrid(true);
+    //order modules by priority and then alphabetically
+    QMap<int, QStringList> mOrder;
     while( it.hasNext() ){
         it.next();
-        QStringList moduleInfo = it.value();
-        qDebug()<<"module info"<<moduleInfo;
-        int row = moduleTable->rowCount();
-        moduleTable->insertRow(row);
-        QTableWidgetItem *masterModule = new QTableWidgetItem ();
-        QTableWidgetItem *itemEntry = new QTableWidgetItem ();
-        QTableWidgetItem *itemLocation = new QTableWidgetItem ();
-        QTableWidgetItem *itemPriority = new QTableWidgetItem ();
-        masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-        if (moduleInfo[1].toInt()){
-            masterModule->setCheckState(Qt::Checked);//Qt::Checked);
-            masterModule->setText("sync");
+        int priority = pH->mModulePriorities[it.key()];
+        if (mOrder.contains(priority))
+            mOrder[priority].append(it.key());
+        else
+            mOrder[priority] = QStringList(it.key());
+    }
+    QMapIterator<int, QStringList> it2 (mOrder);
+    while(it2.hasNext()){
+        it2.next();
+        QStringList pModules = it2.value();
+        pModules.sort();
+        for(int i=0;i<pModules.size();i++){
+            int row = moduleTable->rowCount();
+            moduleTable->insertRow(row);
+            QTableWidgetItem *masterModule = new QTableWidgetItem ();
+            QTableWidgetItem *itemEntry = new QTableWidgetItem ();
+            QTableWidgetItem *itemLocation = new QTableWidgetItem ();
+            QTableWidgetItem *itemPriority = new QTableWidgetItem ();
+            masterModule->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+            QStringList moduleInfo = pH->mInstalledModules[pModules[i]];
+            if (moduleInfo[1].toInt()){
+                masterModule->setCheckState(Qt::Checked);//Qt::Checked);
+                masterModule->setText("sync");
+            }
+            else{
+                masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
+                masterModule->setText("don't sync");
+            }
+            masterModule->setToolTip(QString("Checking this box will cause the module to be saved & resync'd across all open sessions.\nMake sure any important modules are backed up before enabling this option!"));
+            QString moduleName = pModules[i];
+            itemEntry->setText(moduleName);
+            itemEntry->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+            itemLocation->setText(moduleInfo[0]);
+            //itemPriority->setText(QString::number(pH->mModulePriorities[moduleName]));
+            //moduleTable->setItem(row, 0, masterModule);
+            itemLocation->setToolTip(moduleInfo[0]); // show the full path in a tooltip, in case it doesn't fit in the table
+            itemLocation->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled); // disallow editing of module path, because that is not saved
+            itemPriority->setData(Qt::EditRole, pH->mModulePriorities[moduleName]);
+            moduleTable->setItem(row, 0, itemEntry);
+            moduleTable->setItem(row, 1, itemPriority);
+            moduleTable->setItem(row, 2, masterModule);
+            moduleTable->setItem(row, 3, itemLocation);
         }
-        else{
-            masterModule->setCheckState(Qt::Unchecked);//Qt::Checked);
-            masterModule->setText("don't sync");
-        }
-        masterModule->setToolTip(QString("Checking this box will cause the module to be saved & resync'd across all open sessions.\nMake sure any important modules are backed up before enabling this option!"));
-        QString moduleName = it.key();
-        itemEntry->setText(moduleName);
-        itemEntry->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-        itemLocation->setText(moduleInfo[0]);
-        //itemPriority->setText(QString::number(pH->mModulePriorities[moduleName]));
-        //moduleTable->setItem(row, 0, masterModule);
-        itemLocation->setToolTip(moduleInfo[0]); // show the full path in a tooltip, in case it doesn't fit in the table
-        itemLocation->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled); // disallow editing of module path, because that is not saved
-        itemPriority->setData(Qt::EditRole, pH->mModulePriorities[moduleName]);
-        moduleTable->setItem(row, 0, itemEntry);
-        moduleTable->setItem(row, 1, itemPriority);
-        moduleTable->setItem(row, 2, masterModule);
-        moduleTable->setItem(row, 3, itemLocation);
     }
     moduleTable->resizeColumnsToContents();
     //moduleTable->sortItems(1, Qt::AscendingOrder);
@@ -531,6 +545,7 @@ void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
 
 void mudlet::slot_module_changed(QTableWidgetItem* pItem){
     int i = pItem->row();
+    int c = pItem->column();
     Host * pH = getActiveHost();
     QStringList moduleStringList;
     QTableWidgetItem * entry = moduleTable->item(i,0);
@@ -549,7 +564,6 @@ void mudlet::slot_module_changed(QTableWidgetItem* pItem){
     }
     pH->mInstalledModules[entry->text()] = moduleStringList;
     pH->mModulePriorities[entry->text()] = itemPriority->text().toInt();
-    //moduleTable->sortItems(1, Qt::AscendingOrder);
 }
 
 void mudlet::slot_install_module()
