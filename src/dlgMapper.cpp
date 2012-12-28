@@ -46,11 +46,15 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     roomSize->setValue(mpHost->mRoomSize*10);
     lineSize->setValue(mpHost->mLineSize);
     strongHighlight->setChecked( mpHost->mMapStrongHighlight );
+
     showInfo->setChecked( mpHost->mShowInfo );
+    mp2dMap->mShowInfo = mpHost->mShowInfo;
+
     //searchList->setSelectionMode( QAbstractItemView::SingleSelection );
     //connect(roomID, SIGNAL(returnPressed()), this, SLOT(goRoom()));
     connect(bubbles, SIGNAL(clicked()), this, SLOT(slot_bubbles()));
     connect(grid, SIGNAL(clicked()), this, SLOT(slot_showGrid()));
+    connect(showInfo, SIGNAL(clicked()), this, SLOT(slot_info()));
     connect(ortho, SIGNAL(pressed()), glWidget, SLOT(fullView()));
     connect(singleLevel, SIGNAL(pressed()), glWidget, SLOT(singleView()));
     connect(increaseTop, SIGNAL(pressed()), glWidget, SLOT(increaseTop()));
@@ -64,7 +68,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(shiftRight, SIGNAL(pressed()), mp2dMap, SLOT(shiftRight()));
     connect(shiftUp, SIGNAL(pressed()), mp2dMap, SLOT(shiftUp()));
     connect(shiftDown, SIGNAL(pressed()), mp2dMap, SLOT(shiftDown()));
-    connect(showInfo, SIGNAL(clicked()), mp2dMap, SLOT(showInfo()));
 
     connect(shiftZup, SIGNAL(pressed()), glWidget, SLOT(shiftZup()));
     connect(shiftZdown, SIGNAL(pressed()), glWidget, SLOT(shiftZdown()));
@@ -326,5 +329,12 @@ void dlgMapper::slot_bubbles()
 {
     mp2dMap->mBubbleMode = bubbles->isChecked();
     mp2dMap->mpHost->mBubbleMode = mp2dMap->mBubbleMode;
+    mp2dMap->update();
+}
+
+void dlgMapper::slot_info()
+{
+    mp2dMap->mShowInfo = showInfo->isChecked();
+    mp2dMap->mpHost->mShowInfo = mp2dMap->mShowInfo;
     mp2dMap->update();
 }

@@ -415,12 +415,6 @@ void T2DMap::shiftZdown()
     update();
 }
 
-void T2DMap::showInfo()
-{
-    mShowInfo = !mShowInfo;
-    update();
-}
-
 void T2DMap::switchArea(QString name)
 {
     if( !mpMap ) return;
