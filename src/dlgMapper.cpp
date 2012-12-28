@@ -50,6 +50,9 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     showInfo->setChecked( mpHost->mShowInfo );
     mp2dMap->mShowInfo = mpHost->mShowInfo;
 
+    showRoomIDs->setChecked( mpHost->mShowRoomID );
+    mp2dMap->mShowRoomID = mpHost->mShowRoomID;
+
     //searchList->setSelectionMode( QAbstractItemView::SingleSelection );
     //connect(roomID, SIGNAL(returnPressed()), this, SLOT(goRoom()));
     connect(bubbles, SIGNAL(clicked()), this, SLOT(slot_bubbles()));
@@ -92,7 +95,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(strongHighlight, SIGNAL(stateChanged(int)), this, SLOT( slot_toggleStrongHighlight(int)));
     mpDownloader = new QNetworkAccessManager( this );
     connect(mpDownloader, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
-    showRoomIDs->setChecked(Qt::Unchecked);
     connect(showRoomIDs, SIGNAL(stateChanged(int)), this, SLOT(slot_toggleShowRoomIDs(int)));
     mp2dMap->mFontHeight = QFontMetrics( mpHost->mDisplayFont ).height();
     glWidget->hide();
@@ -157,6 +159,7 @@ void dlgMapper::slot_toggleShowRoomIDs(int s)
         mp2dMap->mShowRoomID = true;
     else
         mp2dMap->mShowRoomID = false;
+    mp2dMap->mpHost->mShowRoomID = mp2dMap->mShowRoomID;
     mp2dMap->update();
 }
 
