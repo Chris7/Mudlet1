@@ -37,6 +37,7 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     repopulateAreas();
     grid->setChecked( true );
     bubbles->setChecked( mpHost->mBubbleMode );
+    mp2dMap->mBubbleMode = mpHost->mBubbleMode;
     d3buttons->setVisible(false);
     roomSize->setValue(mpHost->mRoomSize*10);
     lineSize->setValue(mpHost->mLineSize);
@@ -319,5 +320,6 @@ void dlgMapper::slot_showGrid()
 void dlgMapper::slot_bubbles()
 {
     mp2dMap->mBubbleMode = bubbles->isChecked();
+    mp2dMap->mpHost->mBubbleMode = mp2dMap->mBubbleMode;
     mp2dMap->update();
 }
