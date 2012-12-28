@@ -45,7 +45,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     d3buttons->setVisible(false);
     roomSize->setValue(mpHost->mRoomSize*10);
     lineSize->setValue(mpHost->mLineSize);
-    strongHighlight->setChecked( mpHost->mMapStrongHighlight );
 
     showInfo->setChecked( mpHost->mShowInfo );
     mp2dMap->mShowInfo = mpHost->mShowInfo;
@@ -92,7 +91,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     connect(xRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setXRotation(int)));
     connect(yRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setYRotation(int)));
     connect(zRot, SIGNAL(valueChanged(int)), glWidget, SLOT(setZRotation(int)));
-    connect(strongHighlight, SIGNAL(stateChanged(int)), this, SLOT( slot_toggleStrongHighlight(int)));
     mpDownloader = new QNetworkAccessManager( this );
     connect(mpDownloader, SIGNAL(finished(QNetworkReply*)),this, SLOT(replyFinished(QNetworkReply*)));
     connect(showRoomIDs, SIGNAL(stateChanged(int)), this, SLOT(slot_toggleShowRoomIDs(int)));
