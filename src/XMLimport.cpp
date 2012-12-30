@@ -820,8 +820,8 @@ void XMLimport::readHostPackage( Host * pT )
         pT->mLineSize=1;
     pT->mMapStrongHighlight = ( attributes().value("mStrongHighlight") == "yes" );
     pT->mBubbleMode = ( attributes().value("mBubbleMode") == "yes" );
-    pT->mShowGrid = ( attributes().value("mShowGrid") == "yes" );
     pT->mShowRoomID = ( attributes().value("mShowRoomIDs") == "yes" );
+    pT->mShowPanel = ( attributes().value("mShowPanel") == "yes" );
     int mkey = attributes().value("mMapModKey").toString().toInt();
     if (mkey)
         pT->mMapModKey = mkey;

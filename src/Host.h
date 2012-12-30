@@ -306,8 +306,8 @@ public:
     bool               mPanDefault;
     bool               mShowInfo;
     bool               mBubbleMode;
-    bool               mShowGrid;
     bool               mShowRoomID;
+    bool               mShowPanel;
     int                mMapModKey;
     int                mMapSecModKey;
     int                mServerGUI_Package_version;

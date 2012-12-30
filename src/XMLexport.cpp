@@ -243,8 +243,8 @@ bool XMLexport::writeHost( Host * pT )
     writeAttribute( "mRoomSize", QString::number(pT->mRoomSize));
     writeAttribute( "mLineSize", QString::number(pT->mLineSize));
     writeAttribute( "mBubbleMode", pT->mBubbleMode ? "yes" : "no");
-    writeAttribute( "mShowGrid", pT->mShowGrid ? "yes" : "no");
     writeAttribute( "mShowRoomIDs", pT->mShowRoomID ? "yes" : "no");
+    writeAttribute( "mShowPanel", pT->mShowPanel ? "yes" : "no");
     writeAttribute( "mMapModKey", QString::number(pT->mMapModKey));
     writeAttribute( "mMapSecModKey", QString::number(pT->mMapSecModKey));
 
