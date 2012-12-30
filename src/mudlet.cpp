@@ -545,7 +545,6 @@ void mudlet::slot_module_clicked(QTableWidgetItem* pItem){
 
 void mudlet::slot_module_changed(QTableWidgetItem* pItem){
     int i = pItem->row();
-    int c = pItem->column();
     Host * pH = getActiveHost();
     QStringList moduleStringList;
     QTableWidgetItem * entry = moduleTable->item(i,0);
