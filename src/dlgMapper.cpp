@@ -36,9 +36,6 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     mp2dMap->mpHost = pH;
     repopulateAreas();
 
-    grid->setChecked( mpHost->mShowGrid );
-    mp2dMap->mShowGrid = mpHost->mShowGrid;
-
     bubbles->setChecked( mpHost->mBubbleMode );
     mp2dMap->mBubbleMode = mpHost->mBubbleMode;
 
@@ -52,10 +49,11 @@ dlgMapper::dlgMapper( QWidget * parent, Host * pH, TMap * pM )
     showRoomIDs->setChecked( mpHost->mShowRoomID );
     mp2dMap->mShowRoomID = mpHost->mShowRoomID;
 
+    panel->setVisible(mpHost->mShowPanel);
+
     //searchList->setSelectionMode( QAbstractItemView::SingleSelection );
     //connect(roomID, SIGNAL(returnPressed()), this, SLOT(goRoom()));
     connect(bubbles, SIGNAL(clicked()), this, SLOT(slot_bubbles()));
-    connect(grid, SIGNAL(clicked()), this, SLOT(slot_showGrid()));
     connect(showInfo, SIGNAL(clicked()), this, SLOT(slot_info()));
     connect(ortho, SIGNAL(pressed()), glWidget, SLOT(fullView()));
     connect(singleLevel, SIGNAL(pressed()), glWidget, SLOT(singleView()));
@@ -170,6 +168,7 @@ void dlgMapper::slot_toggleStrongHighlight( int v )
 void dlgMapper::slot_togglePanel()
 {
     panel->setVisible(!panel->isVisible());
+    mpHost->mShowPanel = panel->isVisible();
 }
 
 void dlgMapper::show2dView()
@@ -316,13 +315,6 @@ void dlgMapper::slot_roomSize(int d)
 void dlgMapper::slot_lineSize(int d)
 {
     mp2dMap->setExitSize( d );
-    mp2dMap->update();
-}
-
-void dlgMapper::slot_showGrid()
-{
-    mp2dMap->mShowGrid = grid->isChecked();
-    mp2dMap->mpHost->mShowGrid = mp2dMap->mShowGrid;
     mp2dMap->update();
 }
 

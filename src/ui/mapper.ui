@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
+    <width>403</width>
     <height>387</height>
    </rect>
   </property>
@@ -627,13 +627,6 @@
              <widget class="QCheckBox" name="bubbles">
               <property name="text">
                <string>Round</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="grid">
-              <property name="text">
-               <string>Grid</string>
               </property>
              </widget>
             </item>

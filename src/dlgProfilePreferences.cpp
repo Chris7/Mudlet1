@@ -47,7 +47,6 @@ dlgProfilePreferences::dlgProfilePreferences( QWidget * pF, Host * pH )
     roomSize->setValue(mpHost->mRoomSize);
     lineSize->setValue(mpHost->mLineSize);
     bubbles->setChecked(mpHost->mBubbleMode);
-    grid->setChecked(mpHost->mShowGrid);
     showRoomIDs->setChecked(mpHost->mShowRoomID);
     mapModKey->setCurrentIndex(mpHost->mMapModKey);
     mapModSecKey->setCurrentIndex(mpHost->mMapSecModKey);
@@ -1347,7 +1346,6 @@ void dlgProfilePreferences::slot_save_and_exit()
             pHost->mpMap->mpMapper->mp2dMap->setExitSize((double)lineSize->value());
             pHost->mpMap->mpMapper->mp2dMap->setPanSpeed((int)panSpeed->value());
             pHost->mpMap->mpMapper->mp2dMap->setBubbleMode(bubbles->isChecked());
-            pHost->mpMap->mpMapper->mp2dMap->setGridMode(grid->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->showRoomIDs(showRoomIDs->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->setPanDefault(panDefault->isChecked());
             pHost->mpMap->mpMapper->mp2dMap->setMapModKey(mapModKey->currentIndex());
